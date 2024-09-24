@@ -1,0 +1,15 @@
+build
+CMakeLists.txt.user
+.DS_Store
+.vstags
+.vscode
+.history
+cvtreeManual.aux
+cvtreeManual.fdb_latexmk
+cvtreeManual.fls
+cvtreeManual.log
+cvtreeManual.synctex.gz
+__pycache__
+data
+.ipynb_checkpoints/
+a.out
