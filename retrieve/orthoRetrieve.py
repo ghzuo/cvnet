@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:36:39
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-09-24 20:49:07
+@Last Modified Time: 2024-09-24 21:18:51
 '''
 
 
@@ -51,30 +51,15 @@ def getMisLink(seq, lnks, cl, mg):
     return orf, nlnk
 
 
-def addCID(seq, cls):
-    seq = np.append(seq, np.zeros([1, seq.shape[1]], dtype='int'), axis=0)
-    for ci, cl in enumerate(cls):
-        for e in cl:
-            seq[2, e] = ci
-    return seq
-
-
-def statCl(cls, gid):
-    inf = [(len(np.unique(gid[cl])), len(cl)) for cl in cls]
-    return np.array(inf).T
-
-
 if __name__ == "__main__":
     wkdir = "WorkingDirectory/"
     nmiss = 2
 
-    cls = oft.readClusters(wkdir)
-    seq = oft.readSeqID(wkdir)
-    seq = addCID(seq, cls)
-    cln = statCl(cls, seq[0])
-
+    # get basic info about cluster and sequence
+    cls, cln, seq = oft.getInfo(wkdir)
     lnks = oft.readGraph(wkdir)
 
+    # retrieve missing gene
     omlist = np.empty([9, 0], dtype='int')
     for ci, cl in enumerate(cls):
         mg = getMisGenome(cl, seq[0])
@@ -85,6 +70,8 @@ if __name__ == "__main__":
             ocl = cln[:, orf[2]]
             omlist = np.append(omlist, np.row_stack(
                 (ncl, orf, ocl, nlnk)), axis=1)
+
+    # output result
     omlist = pd.DataFrame(omlist.T,
                           columns=[
                               "new cl", "ng@ncl", "no@ncl", "genome", "orf",

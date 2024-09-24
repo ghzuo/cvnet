@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-09-24 18:34:56
+@Last Modified Time: 2024-09-24 21:11:29
 '''
 
 import numpy as np
@@ -77,10 +77,30 @@ def readSeqID(dir):
     return np.array([gids, oids], dtype='int')
 
 
+def addCID(seq, cls):
+    seq = np.append(seq, np.zeros([1, seq.shape[1]], dtype='int'), axis=0)
+    for ci, cl in enumerate(cls):
+        for e in cl:
+            seq[2, e] = ci
+    return seq
+
+
+def statCl(cls, gid):
+    inf = [(len(np.unique(gid[cl])), len(cl)) for cl in cls]
+    return np.array(inf).T
+
+
+def getInfo(dir):
+    cls = readClusters(dir)
+    seq = readSeqID(dir)
+    seq = addCID(seq, cls)
+    cln = statCl(cls, seq[0])
+    return cls, cln, seq
+
+
 if __name__ == "__main__":
     wkdir = "WorkingDirectory/"
 
-    # cls = readClusters(wkdir)
-    cls = readGraph(wkdir)
-    for ndx in cls:
-        print(ndx)
+    cls, cln, seq = getInfo(wkdir)
+    print(cln)
+    print(seq)
