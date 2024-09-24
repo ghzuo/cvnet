@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:36:39
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-09-24 21:18:51
+@Last Modified Time: 2024-09-25 00:32:42
 '''
 
 
@@ -53,6 +53,7 @@ def getMisLink(seq, lnks, cl, mg):
 
 if __name__ == "__main__":
     wkdir = "WorkingDirectory/"
+    ofile = "OrthoRetrieve.txt"
     nmiss = 2
 
     # get basic info about cluster and sequence
@@ -60,21 +61,19 @@ if __name__ == "__main__":
     lnks = oft.readGraph(wkdir)
 
     # retrieve missing gene
-    omlist = np.empty([9, 0], dtype='int')
-    for ci, cl in enumerate(cls):
-        mg = getMisGenome(cl, seq[0])
-        if (len(mg) != 0 and len(mg) <= nmiss):
-            orf, nlnk = getMisLink(seq, lnks, cl, mg)
-            ncl = np.repeat([ci, *list(cln[:, ci])],
-                            orf.shape[1]).reshape(3, -1)
-            ocl = cln[:, orf[2]]
-            omlist = np.append(omlist, np.row_stack(
-                (ncl, orf, ocl, nlnk)), axis=1)
-
-    # output result
-    omlist = pd.DataFrame(omlist.T,
-                          columns=[
-                              "new cl", "ng@ncl", "no@ncl", "genome", "orf",
-                              "old cl", "ng@ocl", "no@ocl", "#link"
-                          ])
-    omlist.to_csv("OrthoRetrieve.csv", index=False)
+    with open(ofile, 'w') as f:
+        f.write("### the column is: \n## " + '\n## '.join(
+            ["genome id", "gene id", "original cluster id",
+             "number genome in original cluster ",
+             "number gene in original cluster",
+             "number link from new cluster to gene"]) + '\n')
+        for ci, cl in enumerate(cls):
+            mg = getMisGenome(cl, seq[0])
+            nmg = len(mg)
+            if (nmg != 0 and nmg <= nmiss):
+                print("# for cluster %d, include %d genomes %d gene, missing genomes:" %
+                      (ci, *list(cln[:, ci])), mg, file=f)
+                orf, nlnk = getMisLink(seq, lnks, cl, mg)
+                ocl = cln[:, orf[2]]
+                np.savetxt(f, np.row_stack(
+                    [orf, ocl, nlnk]).T, fmt='%d', delimiter='\t')
