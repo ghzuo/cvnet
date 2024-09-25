@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:36:39
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-09-25 10:45:36
+@Last Modified Time: 2024-09-25 11:21:47
 '''
 
 
@@ -56,7 +56,10 @@ def getopts():
                         help='max of absent genomes for'
                         ' Orthogroup to retrieve')
     opts = parser.parse_args()
+
     # check options
+    if not opts.workdir.endswith('/'):
+        opts.workdir += '/'
 
     return opts
 
