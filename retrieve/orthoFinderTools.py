@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-09-24 21:11:29
+@Last Modified Time: 2024-09-25 10:40:29
 '''
 
 import numpy as np
@@ -96,6 +96,26 @@ def getInfo(dir):
     seq = addCID(seq, cls)
     cln = statCl(cls, seq[0])
     return cls, cln, seq
+
+
+def getGeneLink(orf, lnks):
+    ndx = []
+    wgh = []
+    for ln in lnks[orf]:
+        n, w = ln.split(':', 1)
+        ndx.append(n)
+        wgh.append(w)
+    return np.array(ndx, dtype='int'), np.array(wgh, dtype='float')
+
+
+def getClusterOutLink(cl, lnks):
+    items = []
+    for el in cl:
+        ndx, _ = getGeneLink(el, lnks)
+        items.extend(np.setdiff1d(ndx, cl))
+    items = np.array(items, dtype='int')
+    ndx, count = np.unique(items, return_counts=True)
+    return ndx, count
 
 
 if __name__ == "__main__":
