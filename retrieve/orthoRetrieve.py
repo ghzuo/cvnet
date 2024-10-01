@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:36:39
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-09-25 11:21:47
+@Last Modified Time: 2024-10-01 23:02:59
 '''
 
 
@@ -47,7 +47,7 @@ def getopts():
     parser = argparse.ArgumentParser(
         description="Obtain candidate genes of absent genomes for orthogroups")
     parser.add_argument('-d', '--workdir', action='store',
-                        default="WorkingDirectory/",
+                        default="./",
                         help='the work directory of OrthoFinder')
     parser.add_argument('-o', '--outfile', action='store',
                         default="OrthoRetrieve.txt",

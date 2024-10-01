@@ -10,10 +10,11 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-09-25 10:40:29
+@Last Modified Time: 2024-10-01 23:20:33
 '''
 
 import numpy as np
+import pandas as pd
 
 
 def parseROW(row):
@@ -45,7 +46,7 @@ def readMatrix(fname):
 
 
 def readClusters(dir):
-    infile = dir + "clusters_OrthoFinder_I1.5.txt"
+    infile = dir + "WorkingDirectory/clusters_OrthoFinder_I1.5.txt"
     mtxStr = readMatrix(infile)
     cls = []
     for sl in mtxStr:
@@ -54,7 +55,7 @@ def readClusters(dir):
 
 
 def readGraph(dir):
-    infile = dir + "OrthoFinder_graph.txt"
+    infile = dir + "WorkingDirectory/OrthoFinder_graph.txt"
     mtxStr = []
     with open(infile) as f:
         for line in f:
@@ -65,7 +66,7 @@ def readGraph(dir):
 
 
 def readSeqID(dir):
-    infile = dir + "SequenceIDs.txt"
+    infile = dir + "WorkingDirectory/SequenceIDs.txt"
     gids = []
     oids = []
     with open(infile) as f:
@@ -118,8 +119,29 @@ def getClusterOutLink(cl, lnks):
     return ndx, count
 
 
+def getSubLinks(dir, maxN=''):
+    graph = readGraph(dir)
+    lnks = []
+    for glk in graph[:maxN]:
+        rlnk = []
+        for ln in glk:
+            n, w = ln.split(':', 1)
+            n = int(n)
+            if n >= maxN:
+                break
+            else:
+                rlnk.append((n, float(w)))
+        lnks.append(rlnk)
+    return lnks
+
+
+def readGeneCount(dir):
+    infile = dir + "Orthogroups/Orthogroups.GeneCount.tsv"
+    return pd.read_csv(infile, sep='\t', index_col="Orthogroup")
+
+
 if __name__ == "__main__":
-    wkdir = "WorkingDirectory/"
+    wkdir = "./"
 
     cls, cln, seq = getInfo(wkdir)
     print(cln)
