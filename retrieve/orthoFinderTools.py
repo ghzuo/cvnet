@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-10-01 23:20:33
+@Last Modified Time: 2024-10-02 22:53:17
 '''
 
 import numpy as np
@@ -133,6 +133,19 @@ def getSubLinks(dir, maxN=''):
                 rlnk.append((n, float(w)))
         lnks.append(rlnk)
     return lnks
+
+
+def writeGraph2MCL(lnks, fname="graph.mcl"):
+    nNode = len(lnks)
+    with open(fname, 'w') as f:
+        f.write(f"(mclheader\nmcltype matrix\ndimensions {nNode}x{nNode}\n)"
+                "\n\n(mclmatrix\nbegin\n\n")
+        for ndx, items in enumerate(lnks):
+            f.write(f"{ndx}    ")
+            for n, w in items:
+                f.write(f"{n}:{w} ")
+            f.write("$\n")
+        f.write(")\n")
 
 
 def readGeneCount(dir):
