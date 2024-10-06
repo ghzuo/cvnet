@@ -10,11 +10,12 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-10-02 22:53:17
+@Last Modified Time: 2024-10-06 11:22:57
 '''
 
 import numpy as np
 import pandas as pd
+import subprocess
 
 
 def parseROW(row):
@@ -45,13 +46,17 @@ def readMatrix(fname):
     return parseMCLmatrix(content[2])
 
 
-def readClusters(dir):
-    infile = dir + "WorkingDirectory/clusters_OrthoFinder_I1.5.txt"
+def fileClusters(infile):
     mtxStr = readMatrix(infile)
     cls = []
     for sl in mtxStr:
         cls.append(np.array(sl, dtype='int'))
     return cls
+
+
+def readClusters(dir):
+    infile = dir + "WorkingDirectory/clusters_OrthoFinder_I1.5.txt"
+    return fileClusters(infile)
 
 
 def readGraph(dir):
@@ -135,15 +140,19 @@ def getSubLinks(dir, maxN=''):
     return lnks
 
 
-def writeGraph2MCL(lnks, fname="graph.mcl"):
+def writeGraph2MCL(lnks, fname="graph.mcl", weight=True):
     nNode = len(lnks)
+    if weight:
+        def outItem(n, w): return f"{n}:{w:<5.3f} "
+    else:
+        def outItem(n, w): return f"{n} "
     with open(fname, 'w') as f:
         f.write(f"(mclheader\nmcltype matrix\ndimensions {nNode}x{nNode}\n)"
                 "\n\n(mclmatrix\nbegin\n\n")
         for ndx, items in enumerate(lnks):
             f.write(f"{ndx}    ")
             for n, w in items:
-                f.write(f"{n}:{w} ")
+                f.write(outItem(n, w))
             f.write("$\n")
         f.write(")\n")
 
@@ -151,6 +160,13 @@ def writeGraph2MCL(lnks, fname="graph.mcl"):
 def readGeneCount(dir):
     infile = dir + "Orthogroups/Orthogroups.GeneCount.tsv"
     return pd.read_csv(infile, sep='\t', index_col="Orthogroup")
+
+
+def runMCL(infile, outfile=None, inf=1.5, te=16):
+    if outfile is None:
+        outfile = infile + ".mcl"
+    subprocess.call(['mcl', infile, '-o', outfile,
+                    '-I', str(inf), '-te', str(te), '-V', 'all'])
 
 
 if __name__ == "__main__":
