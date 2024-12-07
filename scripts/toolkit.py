@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-10-06 11:22:57
+@Last Modified Time: 2024-12-07 1:27:08
 '''
 
 import numpy as np
@@ -167,6 +167,16 @@ def runMCL(infile, outfile=None, inf=1.5, te=16):
         outfile = infile + ".mcl"
     subprocess.call(['mcl', infile, '-o', outfile,
                     '-I', str(inf), '-te', str(te), '-V', 'all'])
+
+
+def readSeqName(file):
+    df = pd.read_csv(file, header=None)
+    df.columns = ["FileName"]
+    df["Genome"] = df["FileName"].apply(lambda x: x.split('.', 1)[0])
+    df["GeneIndex"] = df["FileName"].apply(lambda x: x.split('.')[2])
+    ggndx = {name: idx for idx, name in enumerate(df["Genome"].unique())}
+    df["GenomeIndex"] = df["Genome"].apply(lambda x: ggndx[x])
+    return df
 
 
 if __name__ == "__main__":
