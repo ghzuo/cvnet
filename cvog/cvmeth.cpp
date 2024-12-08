@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2022-12-27 20:19:46
+ * @Last Modified Time: 2024-12-08 7:51:30
  */
 
 #include "cvmeth.h"
@@ -109,6 +109,21 @@ void CVmeth::execute(const string &gname, const vector<size_t> &klist,
   }
 };
 
+void CVmeth::getcv(const string &fname, int k, vector<CVvec> &cvs) {
+
+  // read genomes
+  Genome genome;
+  string gfile = fname + gsuff;
+  theg.readgene(gfile, genome);
+
+  // get the cv in map format
+  vector<pair<int, CVmap>> mcv{make_pair(k, CVmap())};
+  for (auto &gene : genome) {
+    cv(gene, mcv);
+    cvs.emplace_back(cvmap2vec(mcv.front().second));
+  }
+};
+
 float CVmeth::getcv(const string &fname, int k, CVvec &aCV, bool save) {
   string cvfile = getCVname(fname, k);
   if (gzvalid(cvfile)) {
@@ -129,13 +144,11 @@ float CVmeth::getcv(const string &fname, int k, CVvec &aCV, bool save) {
       writecv(mcv.front().second, cvfile);
 
     // convert CV map into CV vector
-    aCV.reserve(mcv.front().second.size());
-    double inner(0);
-    for (auto &it : mcv.front().second) {
-      aCV.emplace_back(it);
-      inner += it.second * it.second;
-    }
-    return sqrt(inner);
+    aCV = cvmap2vec(mcv.front().second);
+    float norm = 0.0;
+    for(auto& it : aCV)
+      norm += it.second * it.second;
+    return sqrt(norm);
   }
 };
 
@@ -201,41 +214,60 @@ size_t CVmeth::count(const Genome &genome, size_t k, CVmap &cv) {
   size_t n(0);
   for (const auto &gene : genome) {
     // the number of kstring of the gene
-    n += (gene.size() - k + 1);
+    n += count(gene, k, cv);
+  }
+  return n;
+};
 
-    // get the first k string
-    Kstr ks(gene.substr(0, k));
+size_t CVmeth::count(const Gene &gene, size_t k, CVmap &cv) {
+  // get the first k string
+  Kstr ks(gene.substr(0, k));
+  CVmap::iterator iter = cv.find(ks);
+  if (iter == cv.end()) {
+    cv[ks] = 1.0;
+  } else {
+    ++(iter->second);
+  }
+
+  // get the next kstring
+  for (int i = k; i < gene.size(); ++i) {
+    ks.behead();
+    ks.append(gene[i]);
     CVmap::iterator iter = cv.find(ks);
     if (iter == cv.end()) {
       cv[ks] = 1.0;
     } else {
       ++(iter->second);
     }
-
-    // get the next kstring
-    for (int i = k; i < gene.size(); ++i) {
-      ks.behead();
-      ks.append(gene[i]);
-      CVmap::iterator iter = cv.find(ks);
-      if (iter == cv.end()) {
-        cv[ks] = 1.0;
-      } else {
-        ++(iter->second);
-      }
-    }
   }
-  return n;
+
+  return gene.size() - k + 1;
 };
 
-// The Markov Method
+// The Count Method
 void Counting::cv(const Genome &genome, vector<pair<int, CVmap>> &vcv) {
   for (auto &item : vcv) {
     count(genome, item.first, item.second);
   }
 };
 
+void Counting::cv(const Gene &gene, vector<pair<int, CVmap>> &vcv) {
+  for (auto &item : vcv) {
+    count(gene, item.first, item.second);
+  }
+};
+
 // Hao method based the Markov Model
 void HaoMethod::cv(const Genome &genome, vector<pair<int, CVmap>> &vcv) {
+  docv(genome, vcv);
+}
+
+void HaoMethod::cv(const Gene &gene, vector<pair<int, CVmap>> &vcv) {
+  docv(gene, vcv);
+}
+
+template <typename T>
+void HaoMethod::docv(const T &seq, vector<pair<int, CVmap>> &vcv) {
 
   // require k to count
   set<int> slist;
@@ -250,7 +282,7 @@ void HaoMethod::cv(const Genome &genome, vector<pair<int, CVmap>> &vcv) {
   map<int, double> nstr;
   for (auto &k : slist) {
     CVmap cv;
-    nstr[k] = count(genome, k, cv);
+    nstr[k] = count(seq, k, cv);
     mvc[k] = cv;
   }
 

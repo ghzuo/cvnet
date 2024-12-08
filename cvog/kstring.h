@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2017-03-17 15:39:23
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2022-12-15 19:40:56
+ * @Last Modified Time: 2024-12-08 7:38:52
  */
 
 #ifndef KSTRING_H
@@ -106,6 +106,7 @@ double shrink(CVblock&, CVblock&);
 double binaryAlign(CVblock&, CVblock&);
 void _binaryAlign(CVblock&, CVblock&, double& d);
 
+CVvec cvmap2vec(const CVmap&);
 void writecv(const CVmap&, const string&);
 void writecv(const CVvec&, const string&);
 double readcv(const string&, CVvec&);

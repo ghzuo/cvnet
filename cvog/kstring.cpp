@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2022-03-16 12:21:29
+ * @Last Modified Time: 2024-12-08 7:58:28
  */
 
 #include "kstring.h"
@@ -104,15 +104,17 @@ ostream &operator<<(ostream &os, const Kstr &ks) {
 };
 
 /// output cv in binary file and gzip it
-void writecv(const CVmap &cv, const string &file) {
-
-  CVvec kslist(cv.size());
-  int index(-1);
-  for (const CVdim &cdim : cv)
-    kslist[++index] = cdim;
-  sort(kslist.begin(), kslist.end(),
+CVvec cvmap2vec(const CVmap &cm) {
+  CVvec cv(cm.size());
+  for (const CVdim &cdim : cm)
+    cv.emplace_back(cdim);
+  sort(cv.begin(), cv.end(),
        [](const CVdim &a, const CVdim &b) { return a.first < b.first; });
-  writecv(kslist, file);
+  return cv;
+};
+
+void writecv(const CVmap &cv, const string &file) {
+  writecv(cvmap2vec(cv), file);
 };
 
 // output cv vector file and gzip it
