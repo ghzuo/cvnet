@@ -13,23 +13,22 @@ include_directories("../kit")
 set(CVTREEHEADS
     readgenome.h
     kstring.h
-    cvmeth.h
-    cvbrick.h
+    karray.h
     cvarray.h
-    distmatrix.h
-    distmeth.h
-    distmeth4cva.h)
+#    distmatrix.h
+#    distmeth.h
+#    distmeth4cva.h
+    cvmeth.h)
 
 set(LIBCVKIT_SRC
     ${CVTREEHEADS}
     readgenome.cpp
     kstring.cpp
-    cvbrick.cpp
-    cvcache.cpp
+    karray.cpp
     cvarray.cpp
-    distmatrix.cpp
-    distmeth.cpp
-    distmeth4cva.cpp
+#    distmatrix.cpp
+#    distmeth.cpp
+#    distmeth4cva.cpp
     cvmeth.cpp)
 
 ADD_LIBRARY(cvkit STATIC ${LIBCVKIT_SRC})
@@ -43,16 +42,15 @@ set(CVDB2DM_SRC ${CVTREEHEADS} cva2dm.h cva2dm.cpp)
 add_executable(g2cva ${G2CVA_SRC})
 target_link_libraries(g2cva cvkit kit)
 
-add_executable(dbquery ${DBQUERY_SRC})
-target_link_libraries(dbquery cvkit kit)
+# add_executable(dbquery ${DBQUERY_SRC})
+# target_link_libraries(dbquery cvkit kit)
 
-add_executable(cva2dm ${CVDB2DM_SRC})
-target_link_libraries(cva2dm cvkit kit)
-
+# add_executable(cva2dm ${CVDB2DM_SRC})
+# target_link_libraries(cva2dm cvkit kit)
 
 install(
   TARGETS g2cva
-          dbquery
-          cva2dm
+          # dbquery
+          # cva2dm
           # dms2mcl
   RUNTIME DESTINATION bin)

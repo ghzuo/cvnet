@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-08 7:51:30
+ * @Last Modified Time: 2024-12-09 9:14:14
  */
 
 #include "cvmeth.h"
@@ -121,6 +121,7 @@ void CVmeth::getcv(const string &fname, int k, vector<CVvec> &cvs) {
   for (auto &gene : genome) {
     cv(gene, mcv);
     cvs.emplace_back(cvmap2vec(mcv.front().second));
+    mcv.front().second.clear();
   }
 };
 

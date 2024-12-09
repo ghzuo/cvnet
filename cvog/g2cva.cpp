@@ -7,39 +7,43 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2023-01-16 10:16:14
+ * @Last Modified Time: 2024-12-09 9:28:47
  */
 
 #include "g2cva.h"
 
 int main(int argc, char *argv[]) {
   // get the input arguments
-  Args myargs(argc, argv);
+  Args args(argc, argv);
 
-  // init the distance matrix by species list
-  CVArrayWrite cva(myargs.fname, myargs.keepcache);
-  cva.fillCV(myargs.cmeth, myargs.flist, myargs.glist, myargs.k);
-
-  // output the condese cv array
-  cva.writecva();
+#pragma omp parallel for
+  // get the cva for every species
+  for (size_t i = 0; i < args.flist.size(); ++i) {
+    string cvfile = args.cmeth->getCVname(args.flist[i], args.k);
+    if (!gzvalid(cvfile)) {
+      vector<CVvec> cvs;
+      args.cmeth->getcv(args.flist[i], args.k, cvs);
+      CVArray cva(cvs);
+      cva.write(cvfile);
+    }
+  }
 }
 
 /*********************************************************************/
 /******************** End of Main programin **************************/
 /*********************************************************************/
 
-Args::Args(int argc, char **argv) : k(6), keepcache(false) {
+Args::Args(int argc, char **argv) : k(5) {
 
   program = argv[0];
   string listfile("list");
   string gtype("faa");
   string gdir("");
-  string cvdir("");
-  string pdir("cvdb/");
+  string cvdir("cva/");
   string methStr("Hao");
 
   char ch;
-  while ((ch = getopt(argc, argv, "G:i:k:V:g:m:o:Kqh")) != -1) {
+  while ((ch = getopt(argc, argv, "G:i:k:V:g:m:qh")) != -1) {
     switch (ch) {
     case 'G':
       gdir = optarg;
@@ -61,12 +65,6 @@ Args::Args(int argc, char **argv) : k(6), keepcache(false) {
     case 'm':
       methStr = optarg;
       break;
-    case 'o':
-      fname = optarg;
-      break;
-    case 'K':
-      keepcache = true;
-      break;
     case 'q':
       theInfo.quiet = true;
       break;
@@ -85,11 +83,13 @@ Args::Args(int argc, char **argv) : k(6), keepcache(false) {
 
   // set the method
   cmeth = CVmeth::create(methStr, cvdir, gtype);
+  if (!cvdir.empty())
+    mkpath(cvdir);
 
   // check the K value
   cmeth->checkK(k);
 
- // read the genome list
+  // read the genome list
   map<string, string> nameMap;
   readNameMap(listfile, flist, nameMap);
   uniqueWithOrder(flist);
@@ -102,25 +102,13 @@ Args::Args(int argc, char **argv) : k(6), keepcache(false) {
     // delete the suffix of file
     if (getsuffix(fname) == gtype)
       fname = delsuffix(fname);
-
-    // get the CV info
-    if (iter != nameMap.end()) {
-      glist.emplace_back(iter->second, ndx++);
-    } else {
-      glist.emplace_back(getFileName(fname), ndx++);
-    }
   }
 
   // add the surper directory of genome
-  if(!gdir.empty()){
-    for(auto& fn : flist){
+  if (!gdir.empty()) {
+    for (auto &fn : flist) {
       fn = gdir + fn;
     }
-  }
-
-  // set the outfile name
-  if (fname.empty()) {
-    fname = "cvdb/" + cmeth->cvsuff.substr(1) + to_string(k);
   }
 };
 
@@ -131,11 +119,9 @@ void Args::usage() {
        << " [ -V <cvdir> ]    Super directory for CVs, default:\n"
        << "                   for normal: <same to fasta file>\n"
        << " [ -i list ]       Input species list, default: list\n"
-       << " [ -o <filename> ] Output file name, default: cvdb/<gtype>.<meth>k\n"
-       << " [ -k 6 ]          Values of k, default: K = 6\n"
+       << " [ -k 5 ]          Values of k, default: K = 5\n"
        << " [ -g faa ]        Type of genome file, default: faa\n"
        << " [ -m Hao/Count ]  Method for cvtree, default: Hao\n"
-       << " [ -K ]            Keep the running cache, default: No\n"
        << " [ -q ]            Run command in quiet mode\n"
        << " [ -h ]            Display this information\n"
        << endl;
