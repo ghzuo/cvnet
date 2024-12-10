@@ -7,11 +7,11 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2022-12-22 16:56:12
+ * @Last Modified Time: 2024-12-10 10:04:49
  */
 
-#ifndef CVA2DM_H
-#define CVA2DM_H
+#ifndef CVA2SM_H
+#define CVA2SM_H
 
 #include "cvarray.h"
 #include "kit.h"

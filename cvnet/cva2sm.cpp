@@ -7,10 +7,10 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2023-01-16 10:52:58
+ * @Last Modified Time: 2024-12-10 10:04:36
  */
 
-#include "cva2dm.h"
+#include "cva2sm.h"
 
 int main(int argc, char *argv[]) {
   // get the input arguments

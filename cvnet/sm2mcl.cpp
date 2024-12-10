@@ -7,10 +7,10 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-06 22:57:05
+ * @Last Modified Time: 2024-12-10 10:18:33
  */
 
-#include "dm2mcl.hpp"
+#include "dm2mcl.h"
 
 int main(int argc, char *argv[]) {
   // get the argments

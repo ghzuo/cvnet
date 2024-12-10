@@ -7,15 +7,15 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:29:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-06 22:08:48
+ * @Last Modified Time: 2024-12-10 10:19:07
  */
 
 #include <boost/program_options.hpp>
 #include <iostream>
 #include <vector>
 
-#include "mclmatrix.hpp"
-#include "../cvtree/distmatrix.h"
+#include "mclmatrix.h"
+#include "similarMatrix.h"
 
 using namespace std;
 namespace po = boost::program_options;

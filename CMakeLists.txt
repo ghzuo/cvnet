@@ -7,7 +7,7 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2017-09-01 16:22:53
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2024-12-07 6:16:57
+# @Last Modified Time: 2024-12-10 10:09:24
 ###
 
 cmake_minimum_required(VERSION 3.10)
@@ -80,5 +80,5 @@ endif()
 
 ## include subdirectories
 ADD_SUBDIRECTORY(kit)
-ADD_SUBDIRECTORY(cvog)
+ADD_SUBDIRECTORY(cvnet)
 

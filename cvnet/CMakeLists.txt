@@ -15,10 +15,10 @@ set(CVTREEHEADS
     kstring.h
     karray.h
     cvarray.h
-#    distmatrix.h
-#    distmeth.h
-#    distmeth4cva.h
-    cvmeth.h)
+    cvmeth.h
+    similarMatrix.h
+#    similarMeth.h
+    mclmatrix.h)
 
 set(LIBCVKIT_SRC
     ${CVTREEHEADS}
@@ -26,10 +26,11 @@ set(LIBCVKIT_SRC
     kstring.cpp
     karray.cpp
     cvarray.cpp
-#    distmatrix.cpp
-#    distmeth.cpp
-#    distmeth4cva.cpp
-    cvmeth.cpp)
+    cvmeth.cpp
+    similarMatrix.cpp
+#    similarMeth.cpp
+    mclmatrix.cpp
+    )
 
 ADD_LIBRARY(cvkit STATIC ${LIBCVKIT_SRC})
 
@@ -37,7 +38,9 @@ set(DBQUERY_SRC ${CVTREEHEADS} dbquery.cpp)
 
 set(G2CVA_SRC ${CVTREEHEADS} g2cva.h g2cva.cpp)
 
-set(CVDB2DM_SRC ${CVTREEHEADS} cva2dm.h cva2dm.cpp)
+set(CVA2SM_SRC ${CVTREEHEADS} cva2sm.h cva2sm.cpp)
+
+set(SM2MCL_SRC ${CVTREEHEADS} sm2mcl.h sm2mcl.cpp)
 
 add_executable(g2cva ${G2CVA_SRC})
 target_link_libraries(g2cva cvkit kit)
@@ -45,12 +48,15 @@ target_link_libraries(g2cva cvkit kit)
 # add_executable(dbquery ${DBQUERY_SRC})
 # target_link_libraries(dbquery cvkit kit)
 
-# add_executable(cva2dm ${CVDB2DM_SRC})
-# target_link_libraries(cva2dm cvkit kit)
+# add_executable(cva2sm ${CVA2SM_SRC})
+# target_link_libraries(cva2sm cvkit kit)
+
+# add_executable(sm2mcl ${SM2MCL_SRC})
+# target_link_libraries(sm2mcl cvkit kit)
 
 install(
   TARGETS g2cva
           # dbquery
-          # cva2dm
-          # dms2mcl
+          # cva2sm
+          # sm2mcl
   RUNTIME DESTINATION bin)
