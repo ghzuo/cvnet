@@ -7,21 +7,22 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-10 10:04:49
+ * @Last Modified Time: 2024-12-12 9:13:04
  */
 
 #ifndef CVA2SM_H
 #define CVA2SM_H
 
-#include "cvarray.h"
 #include "kit.h"
+#include "cvarray.h"
+#include "similarMeth.h"
 using namespace std;
 
 // read arguments
 struct Args {
-  string program, infile, outfile;
-  DistMeth4CVA* dmeth;
-  int nboot;
+  string program, smdir;
+  SimilarMeth* smeth;
+  vector<string> flist;
 
   Args(int, char **);
   void usage();

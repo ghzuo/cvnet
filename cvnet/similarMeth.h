@@ -7,11 +7,11 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2023-01-16 15:56:57
+ * @Last Modified Time: 2024-12-12 8:08:18
  */
 
-#ifndef DISTMETH_H
-#define DISTMETH_H
+#ifndef SIMILARMETH_H
+#define SIMILARMETH_H
 
 #include <algorithm>
 #include <fstream>
@@ -25,35 +25,26 @@
 #include <unordered_map>
 #include <vector>
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
-#include "cvbrick.h"
-#include "distmatrix.h"
-#include "info.h"
-#include "kstring.h"
-#include "memory.h"
-#include "stringOpt.h"
+#include "cvarray.h"
+#include "kit.h"
+#include "similarMatrix.h"
 
 using namespace std;
 
-void initL0Norm(const vector<CVGinfo> &, const vector<int> &, vector<double> &);
-void initL1Norm(const vector<CVGinfo> &, const vector<int> &, vector<double> &);
-void initL2Norm(const vector<CVGinfo> &, const vector<int> &, vector<double> &);
-
-struct DistMeth4CVA {
+struct SimilarMeth {
   string name;
-  function<void(const vector<CVGinfo> &, const vector<int> &, vector<double> &)>
-      initNorm;
+  enum LPnorm lp;
 
   // the create function
-  static DistMeth4CVA *create(const string &);
+  static SimilarMeth *create(const string &);
+
+  // get the similarity matrix
+  void getSim(const CVArray &, const CVArray &, Msimilar &);
 
   // the virtual function for different methods
-  virtual void introDist(vector<CVatom> &, vector<double> &, MdistNoName &) = 0;
-  virtual void interDist(vector<CVatom> &, vector<double> &, vector<CVatom> &,
-                         vector<double> &, vector<double> &) = 0;
+  virtual void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) = 0;
+  virtual void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
+                         const vector<float> &, Msimilar &) = 0;
 
   // scale the value at the end
   virtual float scale(float, float, float) = 0;
@@ -61,90 +52,96 @@ struct DistMeth4CVA {
 
 // ... son class for different method
 // ... distance scaling at L2
-struct Cosine : public DistMeth4CVA {
+struct Cosine : public SimilarMeth {
   Cosine() {
     name = "Cosine";
-    initNorm = initL2Norm;
+    lp = L2;
   };
 
-  void introDist(vector<CVatom> &, vector<double> &, MdistNoName &) override;
-  void interDist(vector<CVatom> &, vector<double> &, vector<CVatom> &,
-                 vector<double> &, vector<double> &);
+  void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) override;
+  void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
+                 const vector<float> &, Msimilar &) override;
+  ;
   float scale(float, float, float) override;
 };
 
-struct Euclidean : public DistMeth4CVA {
+struct Euclidean : public SimilarMeth {
   Euclidean() {
     name = "Euclidean";
-    initNorm = initL2Norm;
+    lp = L2;
   };
 
-  void introDist(vector<CVatom> &, vector<double> &, MdistNoName &) override;
-  void interDist(vector<CVatom> &, vector<double> &, vector<CVatom> &,
-                 vector<double> &, vector<double> &);
+  void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) override;
+  void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
+                 const vector<float> &, Msimilar &) override;
   float scale(float, float, float) override;
+  void zeroItem(const Kblock&, size_t, Msimilar&);
+  void normBLK(const Kblock&, const vector<float>&, vector<Kitem>&);
 };
 
 // ... distance scaling at L1
-struct InterList : public DistMeth4CVA {
+struct InterList : public SimilarMeth {
   InterList() {
     name = "InterList";
-    initNorm = initL1Norm;
+    lp = L1;
   };
 
-  void introDist(vector<CVatom> &, vector<double> &, MdistNoName &) override;
-  void interDist(vector<CVatom> &, vector<double> &, vector<CVatom> &,
-                 vector<double> &, vector<double> &);
+  void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) override;
+  void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
+                 const vector<float> &, Msimilar &) override;
   float scale(float, float, float) override;
 };
 
-struct Min2Max : public DistMeth4CVA {
+struct Min2Max : public SimilarMeth {
   Min2Max() {
     name = "Min2Max";
-    initNorm = initL1Norm;
+    lp = L1;
   };
 
-  void introDist(vector<CVatom> &, vector<double> &, MdistNoName &) override;
-  void interDist(vector<CVatom> &, vector<double> &, vector<CVatom> &,
-                 vector<double> &, vector<double> &);
+  void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) override;
+  void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
+                 const vector<float> &, Msimilar &) override;
   float scale(float, float, float) override;
 };
 
 // ... distance scaling at L0
-struct InterSet : public DistMeth4CVA {
+struct InterSet : public SimilarMeth {
   InterSet() {
     name = "InterSet";
-    initNorm = initL0Norm;
+    lp = L0;
   };
 
-  void introDist(vector<CVatom> &, vector<double> &, MdistNoName &) override;
-  void interDist(vector<CVatom> &, vector<double> &, vector<CVatom> &,
-                 vector<double> &, vector<double> &);
+  void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) override;
+  void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
+                 const vector<float> &, Msimilar &) override;
   float scale(float, float, float) override;
 };
 
-struct Dice : public DistMeth4CVA {
+struct Dice : public SimilarMeth {
   Dice() {
     name = "Dice";
-    initNorm = initL0Norm;
+    lp = L0;
   };
 
-  void introDist(vector<CVatom> &, vector<double> &, MdistNoName &) override;
-  void interDist(vector<CVatom> &, vector<double> &, vector<CVatom> &,
-                 vector<double> &, vector<double> &);
+  void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) override;
+  void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
+                 const vector<float> &, Msimilar &) override;
   float scale(float, float, float) override;
 };
 
-struct ItoU : public DistMeth4CVA {
+struct ItoU : public SimilarMeth {
   ItoU() {
     name = "ItoU";
-    initNorm = initL0Norm;
+    lp = L0;
   };
 
-  void introDist(vector<CVatom> &, vector<double> &, MdistNoName &) override;
-  void interDist(vector<CVatom> &, vector<double> &, vector<CVatom> &,
-                 vector<double> &, vector<double> &);
+  void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) override;
+  void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
+                 const vector<float> &, Msimilar &) override;
   float scale(float, float, float) override;
 };
+
+string smFileName(const string &, const string &, const string &);
+void calcSM(SimilarMeth *, vector<string> &, string &);
 
 #endif

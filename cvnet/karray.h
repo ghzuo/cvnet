@@ -8,7 +8,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-12-03 22:14:17
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-09 7:47:58
+ * @Last Modified Time: 2024-12-11 9:05:26
  */
 
 #ifndef KARRAY_H
@@ -44,13 +44,16 @@ struct KdimInfo {
   KdimInfo(const Kstr & ks): kstr(ks), index(0, 0){};
   KdimInfo(const Kstr & ks, size_t i, size_t j): kstr(ks), index(i, j){};
 
+  bool operator==(const KdimInfo &rh) const { return kstr == rh.kstr; };
+  bool operator<(const KdimInfo &rh) const { return kstr < rh.kstr;};
+
   friend ostream &operator<<(ostream &, const KdimInfo &);
   friend istream &operator>>(istream &, KdimInfo &);
 };
 
 // the infomation of CV dimension
 struct CVdimInfo {
-  unsigned int len = 0;
+  float len   = NAN;
   float lasso = NAN;
   float norm  = NAN;
 

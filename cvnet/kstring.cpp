@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2022  Wenzhou Institute, University of Chinese Academy of Sciences.
- * See the accompanying Manual for the contributors and the way to cite this work.
- * Comments and suggestions welcome. Please contact
- * Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
- * 
+ * Copyright (c) 2022  Wenzhou Institute, University of Chinese Academy of
+ * Sciences. See the accompanying Manual for the contributors and the way to
+ * cite this work. Comments and suggestions welcome. Please contact Dr.
+ * Guanghong Zuo <ghzuo@ucas.ac.cn>
+ *
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-09 9:11:58
+ * @Last Modified Time: 2024-12-12 9:36:27
  */
 
 #include "kstring.h"
@@ -39,6 +39,9 @@ Kstr::Kstr(const string &str) : ks(0) {
 };
 
 string Kstr::decode() const {
+  if(nbase == 0)
+    return "code:" + to_string(ks);
+
   string str;
   for (unsigned long s = ks; s != 0; s /= nbase)
     str += char(cmap[s % nbase]);
@@ -151,7 +154,7 @@ double readcv(const string &filename, CVvec &cv) {
   // get the head (norm & size) of the cv file
   pair<double, mlong> tmp;
   int len = gzread(fp, (char *)&tmp, sizeof(CVdim));
-  if(len != sizeof(CVdim)) {
+  if (len != sizeof(CVdim)) {
     cerr << "Failed to read cv file " << filename << endl;
     exit(10);
   }

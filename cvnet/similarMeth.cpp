@@ -7,37 +7,15 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2023-01-17 17:54:11
+ * @Last Modified Time: 2024-12-12 9:26:30
  */
 
-#include "distmeth4cva.h"
+#include "similarMeth.h"
 
-// initial norm function
-void initL0Norm(const vector<CVGinfo> &nm, const vector<int> &idx,
-                vector<double> &norm) {
-  for (int i = 0; i < norm.size(); ++i) {
-    norm[i] = nm[idx[i]].len;
-  }
-};
-
-void initL1Norm(const vector<CVGinfo> &nm, const vector<int> &idx,
-                vector<double> &norm) {
-  for (int i = 0; i < norm.size(); ++i) {
-    norm[i] = nm[idx[i]].lasso;
-  }
-};
-
-void initL2Norm(const vector<CVGinfo> &nm, const vector<int> &idx,
-                vector<double> &norm) {
-  for (int i = 0; i < norm.size(); ++i) {
-    norm[i] = nm[idx[i]].norm;
-  }
-};
-
-DistMeth4CVA *DistMeth4CVA::create(const string &methStr) {
+SimilarMeth *SimilarMeth::create(const string &methStr) {
 
   // create the distance method
-  DistMeth4CVA *meth;
+  SimilarMeth *meth;
   if (methStr == "Cosine") {
     meth = new Cosine();
   } else if (methStr == "Euclidean") {
@@ -60,25 +38,41 @@ DistMeth4CVA *DistMeth4CVA::create(const string &methStr) {
   return meth;
 }
 
+void SimilarMeth::getSim(const CVArray &cva, const CVArray &cvb, Msimilar &sm) {
+  vector<pair<size_t, size_t>> aln;
+  alignSortVector(cva.kdi, cvb.kdi, aln);
+  for (auto &it : aln) {
+    Kblock kba = cva.getKblock(it.first);
+    Kblock kbb = cvb.getKblock(it.second);
+    _calcOneK(kba, cva.norm, kbb, cvb.norm, sm);
+  }
+
+  for (auto i = 0; i < cvb.norm.size(); ++i) {
+    for (auto j = 0; j < cvb.norm.size(); ++j) {
+      sm.set(i, j, scale(sm.get(i, j), cva.norm[i], cvb.norm[j]));
+    }
+  }
+};
+
 ///.........................
 /// Three method based on vector
-void Cosine::introDist(vector<CVatom> &kvec, vector<double> &norm,
-                       MdistNoName &dist) {
-  if (kvec.size() > 1) {
-    for (auto ita = kvec.begin(); ita != kvec.end(); ++ita) {
-      for (auto itb = ita + 1; itb != kvec.end(); ++itb) {
-        dist.addupdist(ita->index, itb->index, ita->value * itb->value);
+void Cosine::_calcOneK(const Kblock &blk, const vector<float> &norm,
+                       Msimilar &mtx) {
+  if (blk.size() > 1) {
+    for (auto ita = blk.begin(); ita != blk.end(); ++ita) {
+      for (auto itb = ita + 1; itb != blk.end(); ++itb) {
+        mtx.add(ita->index, itb->index, ita->value * itb->value);
       }
     }
   }
 }
 
-void Cosine::interDist(vector<CVatom> &cva, vector<double> &na,
-                       vector<CVatom> &cvb, vector<double> &nb,
-                       vector<double> &dist) {
-  for (auto &ca : cva) {
-    for (auto &cb : cvb) {
-      dist[ca.index + cb.index * na.size()] += ca.value * cb.value;
+void Cosine::_calcOneK(const Kblock &kba, const vector<float> &na,
+                       const Kblock &kbb, const vector<float> &nb,
+                       Msimilar &mtx) {
+  for (auto ka = kba.begin(); ka != kba.end(); ++ka) {
+    for (auto kb = kbb.begin(); ka != kbb.end(); ++ka) {
+      mtx.add(ka->index, kb->index, ka->value * kb->value);
     }
   }
 };
@@ -87,200 +81,235 @@ float Cosine::scale(float val, float aNorm, float bNorm) {
   return 0.5 * (1.0 - val / (aNorm * bNorm));
 }
 
-void Euclidean::introDist(vector<CVatom> &kvec, vector<double> &norm,
-                          MdistNoName &dist) {
-  // normalize vector
-  for (auto &ca : kvec) {
-    ca.value /= norm[ca.index];
-  }
+void Euclidean::zeroItem(const Kblock &blk, size_t nCV, Msimilar &mtx) {
+  if (blk.size() < nCV) {
+    vector<int> fullndx(nCV);
+    iota(fullndx.begin(), fullndx.end(), 0);
+    for (auto &b : blk)
+      fullndx[b.index] = -1;
 
-  if (kvec.size() > 1) {
-    for (auto ita = kvec.begin(); ita != kvec.end(); ++ita) {
-      for (auto itb = ita + 1; itb != kvec.end(); ++itb) {
-        double d = ita->value - itb->value;
-        dist.addupdist(ita->index, itb->index, d * d);
+    vector<int> ndx;
+    for (auto &it : fullndx) {
+      if (it != -1)
+        ndx.emplace_back(it);
+
+      for (auto it = blk.begin(); it != blk.end(); ++it) {
+        float d = it->value * it->value;
+        for (auto idx : ndx) {
+          mtx.add(it->index, idx, d);
+        }
       }
-    }
-  }
-
-  // for zero dimension
-  // the sum of them equal 2 - sum(nozero items)
-  for(auto& ca : kvec){
-    double d = -ca.value * ca.value;
-    size_t ndx(0);
-    for(; ndx<ca.index; ++ndx)
-      dist._addupdist(ca.index, ndx, d);
-    for(++ndx; ndx<norm.size(); ++ndx)
-      dist._addupdist(ndx, ca.index, d);
-  }
-}
-
-void Euclidean::interDist(vector<CVatom> &cva, vector<double> &na,
-                          vector<CVatom> &cvb, vector<double> &nb,
-                          vector<double> &dist) {
-  // normalize vector
-  for (auto &ca : cva)
-    ca.value /= na[ca.index];
-  for (auto &cb : cvb)
-    cb.value /= nb[cb.index];
-
-  for (auto &ca : cva) {
-    for (auto &cb : cvb) {
-      double d = ca.value - cb.value;
-      dist[ca.index + cb.index * na.size()] += d * d;
-    }
-  }
-
-  // for zero dimension
-  // the sum of them equal 2 - sum(nozero items)
-  for (auto &ca : cva) {
-    double d = ca.value * ca.value;
-    size_t ndx = ca.index;
-    for (int i = 0; i < nb.size(); ++i) {
-      dist[ndx] -= d;
-      ndx += na.size();
-    }
-  }
-
-  for (auto &cb : cvb) {
-    double d = cb.value * cb.value;
-    size_t ndx = cb.index * na.size();
-    for (int i = 0; i < na.size(); ++i) {
-      dist[ndx] -= d;
-      ndx++;
     }
   }
 };
 
+void Euclidean::_calcOneK(const Kblock &blk, const vector<float> &norm,
+                          Msimilar &mtx) {
+  // normalize vector and get index for zero item
+  vector<Kitem> blkNorm;
+  for (auto it = blk.begin(); it != blk.end(); ++it)
+    blkNorm.emplace_back(it->index, it->value / norm[it->index]);
+
+  // for the non zero items
+  if (blkNorm.size() > 1) {
+    for (auto ita = blkNorm.begin(); ita != blkNorm.end(); ++ita) {
+      for (auto itb = ita + 1; itb != blkNorm.end(); ++itb) {
+        float d = ita->value - itb->value;
+        mtx.add(ita->index, itb->index, d * d);
+      }
+    }
+  }
+
+  // for zero items with non zero items
+  zeroItem(Kblock(blkNorm.begin(), blkNorm.end()), norm.size(), mtx);
+}
+
+void Euclidean::_calcOneK(const Kblock &kba, const vector<float> &na,
+                          const Kblock &kbb, const vector<float> &nb,
+                          Msimilar &mtx) {
+  // normalize vector and get index for zero item
+  vector<Kitem> blkA;
+  for (auto it = kba.begin(); it != kba.end(); ++it)
+    blkA.emplace_back(it->index, it->value / na[it->index]);
+
+  vector<Kitem> blkB;
+  for (auto it = kbb.begin(); it != kbb.end(); ++it)
+    blkA.emplace_back(it->index, it->value / nb[it->index]);
+
+  // for non zero dimension
+  for (auto &ka : blkA) {
+    for (auto &kb : blkB) {
+      float d = ka.value - kb.value;
+      mtx.add(ka.index, kb.index, d * d);
+    }
+  }
+
+  // for zero dimension
+  // the sum of them equal 2 - sum(nozero items)
+  zeroItem(Kblock(blkA.begin(), blkA.end()), nb.size(), mtx);
+  // TODO: the order is wrong
+  zeroItem(Kblock(blkB.begin(), blkB.end()), na.size(), mtx);
+};
+
 float Euclidean::scale(float val, float aNorm, float bNorm) {
-  return sqrt(val + 2.0);
+  return 1 - sqrt(val);
 }
 
 // ... distance scaling at L1
 
-void InterList::introDist(vector<CVatom> &kvec, vector<double> &norm,
-                          MdistNoName &dist) {
-  if (kvec.size() > 1) {
-    for (auto ita = kvec.begin(); ita != kvec.end(); ++ita) {
-      for (auto itb = ita + 1; itb != kvec.end(); ++itb) {
-        dist.addupdist(ita->index, itb->index, min(ita->value, itb->value));
+void InterList::_calcOneK(const Kblock &blk, const vector<float> &norm,
+                          Msimilar &mtx) {
+  if (blk.size() > 1) {
+    for (auto ita = blk.begin(); ita != blk.end(); ++ita) {
+      for (auto itb = ita + 1; itb != blk.end(); ++itb) {
+        mtx.add(ita->index, itb->index, min(ita->value, itb->value));
       }
     }
   }
 }
 
-void InterList::interDist(vector<CVatom> &cva, vector<double> &na,
-                          vector<CVatom> &cvb, vector<double> &nb,
-                          vector<double> &dist) {
-  for (auto &ca : cva) {
-    for (auto &cb : cvb) {
-      dist[ca.index + cb.index * na.size()] += min(ca.value, cb.value);
+void InterList::_calcOneK(const Kblock &kba, const vector<float> &na,
+                          const Kblock &kbb, const vector<float> &nb,
+                          Msimilar &mtx) {
+  for (auto &ka : kba) {
+    for (auto &kb : kbb) {
+      mtx.add(ka.index, kb.index, min(ka.value, kb.value));
     }
   }
 };
 
 float InterList::scale(float val, float aNorm, float bNorm) {
-  return 1.0 - 2.0 * val / (aNorm + bNorm);
+  return 2.0 * val / (aNorm + bNorm);
 }
 
-void Min2Max::introDist(vector<CVatom> &kvec, vector<double> &norm,
-                        MdistNoName &dist) {
-  if (kvec.size() > 1) {
-    for (auto ita = kvec.begin(); ita != kvec.end(); ++ita) {
-      for (auto itb = ita + 1; itb != kvec.end(); ++itb) {
-        dist.addupdist(ita->index, itb->index,
-                       min(ita->value, itb->value) /
-                           max(ita->value, itb->value));
+void Min2Max::_calcOneK(const Kblock &blk, const vector<float> &norm,
+                        Msimilar &mtx) {
+  if (blk.size() > 1) {
+    for (auto ita = blk.begin(); ita != blk.end(); ++ita) {
+      for (auto itb = ita + 1; itb != blk.end(); ++itb) {
+        mtx.add(ita->index, itb->index,
+                min(ita->value, itb->value) / max(ita->value, itb->value));
       }
     }
   }
 }
 
-void Min2Max::interDist(vector<CVatom> &cva, vector<double> &na,
-                        vector<CVatom> &cvb, vector<double> &nb,
-                        vector<double> &dist) {
-  for (auto &ca : cva) {
-    for (auto &cb : cvb) {
-      dist[ca.index + cb.index * na.size()] +=
-          min(ca.value, cb.value) / max(ca.value, cb.value);
+void Min2Max::_calcOneK(const Kblock &kba, const vector<float> &na,
+                        const Kblock &kbb, const vector<float> &nb,
+                        Msimilar &mtx) {
+  for (auto &ka : kba) {
+    for (auto &kb : kbb) {
+      mtx.add(ka.index, kb.index,
+              min(ka.value, kb.value) / max(ka.value, kb.value));
     }
   }
 };
 
-float Min2Max::scale(float val, float aNorm, float bNorm) { return 1.0 - val; }
+float Min2Max::scale(float val, float aNorm, float bNorm) { return val; }
 
 // ... distance scaling at L0
-void InterSet::introDist(vector<CVatom> &kvec, vector<double> &norm,
-                         MdistNoName &dist) {
-  if (kvec.size() > 1) {
-    for (auto ita = kvec.begin(); ita != kvec.end(); ++ita) {
-      for (auto itb = ita + 1; itb != kvec.end(); ++itb) {
-        dist.addupdist(ita->index, itb->index, 1);
+void InterSet::_calcOneK(const Kblock &blk, const vector<float> &norm,
+                         Msimilar &mtx) {
+  if (blk.size() > 1) {
+    for (auto ita = blk.begin(); ita != blk.end(); ++ita) {
+      for (auto itb = ita + 1; itb != blk.end(); ++itb) {
+        mtx.add(ita->index, itb->index, 1);
       }
     }
   }
 }
 
-void InterSet::interDist(vector<CVatom> &cva, vector<double> &na,
-                         vector<CVatom> &cvb, vector<double> &nb,
-                         vector<double> &dist) {
-  for (auto &ca : cva) {
-    for (auto &cb : cvb) {
-      dist[ca.index + cb.index * na.size()]++;
+void InterSet::_calcOneK(const Kblock &kba, const vector<float> &na,
+                         const Kblock &kbb, const vector<float> &nb,
+                         Msimilar &mtx) {
+  for (auto &ka : kba) {
+    for (auto &kb : kbb) {
+      mtx.add(ka.index, kb.index, 1.0);
     }
   }
 };
 
 float InterSet::scale(float val, float aNorm, float bNorm) {
-  return 1.0 - val / sqrt(aNorm * bNorm);
+  return val / sqrt(aNorm * bNorm);
 }
 
-void Dice::introDist(vector<CVatom> &kvec, vector<double> &norm,
-                     MdistNoName &dist) {
-  if (kvec.size() > 1) {
-    for (auto ita = kvec.begin(); ita != kvec.end(); ++ita) {
-      for (auto itb = ita + 1; itb != kvec.end(); ++itb) {
-        dist.addupdist(ita->index, itb->index, 1);
+void Dice::_calcOneK(const Kblock &blk, const vector<float> &norm,
+                     Msimilar &mtx) {
+  if (blk.size() > 1) {
+    for (auto ita = blk.begin(); ita != blk.end(); ++ita) {
+      for (auto itb = ita + 1; itb != blk.end(); ++itb) {
+        mtx.add(ita->index, itb->index, 1.0);
       }
     }
   }
 }
 
-void Dice::interDist(vector<CVatom> &cva, vector<double> &na,
-                     vector<CVatom> &cvb, vector<double> &nb,
-                     vector<double> &dist) {
-  for (auto &ca : cva) {
-    for (auto &cb : cvb) {
-      dist[ca.index + cb.index * na.size()]++;
+void Dice::_calcOneK(const Kblock &kba, const vector<float> &na,
+                     const Kblock &kbb, const vector<float> &nb,
+                     Msimilar &mtx) {
+  for (auto &ka : kba) {
+    for (auto &kb : kbb) {
+      mtx.add(ka.index, kb.index, 1.0);
     }
   }
 };
 
 float Dice::scale(float val, float aNorm, float bNorm) {
-  return 1.0 - 2.0 * val / (aNorm + bNorm);
+  return 2.0 * val / (aNorm + bNorm);
 }
 
-void ItoU::introDist(vector<CVatom> &kvec, vector<double> &norm,
-                     MdistNoName &dist) {
-  if (kvec.size() > 1) {
-    for (auto ita = kvec.begin(); ita != kvec.end(); ++ita) {
-      for (auto itb = ita + 1; itb != kvec.end(); ++itb) {
-        dist.addupdist(ita->index, itb->index, 1);
+void ItoU::_calcOneK(const Kblock &blk, const vector<float> &norm,
+                     Msimilar &mtx) {
+  if (blk.size() > 1) {
+    for (auto ita = blk.begin(); ita != blk.end(); ++ita) {
+      for (auto itb = ita + 1; itb != blk.end(); ++itb) {
+        mtx.add(ita->index, itb->index, 1.0);
       }
     }
   }
 }
 
-void ItoU::interDist(vector<CVatom> &cva, vector<double> &na,
-                     vector<CVatom> &cvb, vector<double> &nb,
-                     vector<double> &dist) {
-  for (auto &ca : cva) {
-    for (auto &cb : cvb) {
-      dist[ca.index + cb.index * na.size()]++;
+void ItoU::_calcOneK(const Kblock &kba, const vector<float> &na,
+                     const Kblock &kbb, const vector<float> &nb,
+                     Msimilar &mtx) {
+  for (auto &ka : kba) {
+    for (auto &kb : kbb) {
+      mtx.add(ka.index, kb.index, 1.0);
     }
   }
 };
 
 float ItoU::scale(float val, float aNorm, float bNorm) {
-  return 1.0 - val / (aNorm + bNorm - val);
+  return val / (aNorm + bNorm - val);
 }
+
+/**********************************************************************
+ * Do calculations for similarity metrics (SM) based on cva file list.
+ **********************************************************************/
+string smFileName(const string &fna, const string &fnb, const string &dir) {
+  string fn1 = getFileName(fna);
+  auto pos = fn1.find_first_of('.');
+  string gn1 = fn1.substr(0, pos);
+  string suf = fn1.substr(pos, fn1.find_last_of('.') - pos);
+  string fn2 = getFileName(fnb);
+  string gn2 = fn2.substr(0, fn2.find_first_of('.'));
+  return dir + gn1 + "-" + gn2 + suf + ".sm.gz";
+}
+
+void calcSM(SimilarMeth *meth, vector<string> &flist, string &sdir) {
+  for (auto i = 0; i < flist.size(); i++) {
+    for (auto j = i + 1; j < flist.size(); j++) {
+      string smfile = smFileName(flist[i], flist[j], sdir);
+      if (!gzvalid(smfile)) {
+        CVArray cva(flist[i]);
+        cout << cva.kdi[0] << endl;
+        CVArray cvb(flist[j]);
+        cva.setNorm(meth->lp);
+        cvb.setNorm(meth->lp);
+        Msimilar sm(cva.norm.size(), cvb.norm.size());
+        meth->getSim(cva, cvb, sm);
+        sm.write(smfile);
+      }
+    }
+  }
+};

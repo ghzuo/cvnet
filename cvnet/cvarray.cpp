@@ -7,12 +7,12 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-09 9:00:12
+ * @Last Modified Time: 2024-12-12 9:20:44
  */
 
 #include "cvarray.h"
 
-void CVArray::get(const string & fname, CVmeth *cmeth, int k){
+void CVArray::get(const string &fname, CVmeth *cmeth, int k, bool cache) {
   string cvfile = cmeth->getCVname(fname, k);
   if (gzvalid(cvfile)) {
     read(cvfile);
@@ -20,28 +20,28 @@ void CVArray::get(const string & fname, CVmeth *cmeth, int k){
     vector<CVvec> cvs;
     cmeth->getcv(fname, k, cvs);
     set(cvs);
-    if(cache)
+    if (cache)
       write(cvfile);
   }
 };
 
-void CVArray::set(const vector<CVvec> &cvs){
+void CVArray::set(const vector<CVvec> &cvs) {
   // get the cvdiminfo
-  for(const auto& cv: cvs){
+  for (const auto &cv : cvs) {
     cvdi.emplace_back(CVdimInfo(cv));
   }
 
   // align kstr into map
   map<Kstr, vector<Kitem>> kmap;
-  for(auto i=0; i<cvs.size(); ++i){
+  for (auto i = 0; i < cvs.size(); ++i) {
     auto cv = cvs[i];
-    for(const auto& cd : cv){
+    for (const auto &cd : cv) {
       kmap[cd.first].emplace_back(Kitem(i, cd.second));
     }
   }
 
   // set CVArray based on map
-  for(auto& kar : kmap){
+  for (auto &kar : kmap) {
     size_t ibeg = data.size();
     size_t iend = ibeg + kar.second.size();
     kdi.emplace_back(KdimInfo(kar.first, ibeg, iend));
@@ -49,7 +49,31 @@ void CVArray::set(const vector<CVvec> &cvs){
   }
 };
 
-void CVArray::read(const string & fname){
+void CVArray::setNorm(enum LPnorm lp) {
+  norm.reserve(cvdi.size());
+  switch (lp) {
+  case L0:
+    for (auto &ci : cvdi)
+      norm.emplace_back(ci.len);
+    break;
+  case L1:
+    for (auto &ci : cvdi)
+      norm.emplace_back(ci.lasso);
+    break;
+  case L2:
+    for (auto &ci : cvdi)
+      norm.emplace_back(ci.norm);
+    break;
+  }
+  cvdi.clear();
+};
+
+Kblock CVArray::getKblock(size_t ndx) const {
+  return Kblock(data.begin() + kdi[ndx].index.first,
+                data.begin() + kdi[ndx].index.second);
+};
+
+void CVArray::read(const string &fname) {
   // open file to read
   gzFile fp;
   if ((fp = gzopen(fname.c_str(), "rb")) == NULL) {
@@ -63,22 +87,21 @@ void CVArray::read(const string & fname){
 
   // read the cvdiminfo
   cvdi.resize(std::get<0>(size));
-  gzread(fp, (char*)cvdi.data(), sizeof(CVdimInfo) * std::get<0>(size));
+  gzread(fp, (char *)cvdi.data(), sizeof(CVdimInfo) * std::get<0>(size));
 
   // read the kdiminfo
   kdi.resize(std::get<1>(size));
-  gzread(fp, (char*)kdi.data(), sizeof(KdimInfo) * std::get<1>(size));
+  gzread(fp, (char *)kdi.data(), sizeof(KdimInfo) * std::get<1>(size));
 
   // read the data
   data.resize(std::get<2>(size));
-  gzread(fp, (char*)data.data(), sizeof(Kitem) * std::get<2>(size));
+  gzread(fp, (char *)data.data(), sizeof(Kitem) * std::get<2>(size));
 
   // close file
   gzclose(fp);
-
 };
 
-void CVArray::write(const string & fname) const {
+void CVArray::write(const string &fname) const {
   // open and test file
   gzFile fp;
   if ((fp = gzopen(fname.c_str(), "wb")) == NULL) {
@@ -90,28 +113,28 @@ void CVArray::write(const string & fname) const {
   auto size = make_tuple(cvdi.size(), kdi.size(), data.size());
   gzwrite(fp, &size, sizeof(size));
 
-  //write the diminfo and data
+  // write the diminfo and data
   gzwrite(fp, cvdi.data(), cvdi.size() * sizeof(CVdimInfo));
   gzwrite(fp, kdi.data(), kdi.size() * sizeof(KdimInfo));
-  gzwrite(fp, data.data(), data.size()* sizeof(Kitem));
+  gzwrite(fp, data.data(), data.size() * sizeof(Kitem));
 
   // close file
   gzclose(fp);
 };
 
-ostream& operator<<(ostream& os, const CVArray& cva) {
+ostream &operator<<(ostream &os, const CVArray &cva) {
   // output cvdiminfo
   os << "The number of CV is " << cva.cvdi.size() << endl;
-  for(const auto& cd: cva.cvdi){
+  for (const auto &cd : cva.cvdi) {
     os << cd << endl;
   }
 
-  //output data according to kdiminfo
+  // output data according to kdiminfo
   os << "\nThe number of K is " << cva.kdi.size() << "\n"
      << "The number of items is " << cva.data.size() << endl;
-  for(const auto& kd: cva.kdi){
+  for (const auto &kd : cva.kdi) {
     os << kd.kstr << "\t";
-    for(auto i=kd.index.first; i<kd.index.second; ++i){
+    for (auto i = kd.index.first; i < kd.index.second; ++i) {
       os << cva.data[i] << " ";
     }
     os << endl;

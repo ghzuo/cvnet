@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-09 9:28:47
+ * @Last Modified Time: 2024-12-12 9:10:14
  */
 
 #include "g2cva.h"
@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   Args args(argc, argv);
 
 #pragma omp parallel for
-  // get the cva for every species
+//  get the cva for every species
   for (size_t i = 0; i < args.flist.size(); ++i) {
     string cvfile = args.cmeth->getCVname(args.flist[i], args.k);
     if (!gzvalid(cvfile)) {
@@ -95,10 +95,7 @@ Args::Args(int argc, char **argv) : k(5) {
   uniqueWithOrder(flist);
 
   // get the glist by flist and nameMap
-  unsigned ndx(0);
   for (auto &fname : flist) {
-    auto iter = nameMap.find(fname);
-
     // delete the suffix of file
     if (getsuffix(fname) == gtype)
       fname = delsuffix(fname);

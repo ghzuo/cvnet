@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-10 10:05:13
+ * @Last Modified Time: 2024-12-11 3:33:27
  */
 
 #ifndef SIMIlARMATRIX_H
@@ -42,6 +42,8 @@ struct Msimilar {
   // get/set value of matrix
   void _set(size_t, size_t, float);
   void set(size_t, size_t, float);
+  void _add(size_t, size_t, float);
+  void add(size_t, size_t, float);
   float _get(size_t, size_t) const;
   float get(size_t, size_t) const;
   pair<size_t, size_t> index(size_t) const;
@@ -49,6 +51,8 @@ struct Msimilar {
 
   // output info
   string info() const;
+  void write(const string &filename) const;
+  void read(const string &filename);
 };
 
 #endif

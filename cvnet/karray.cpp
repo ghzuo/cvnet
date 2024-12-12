@@ -8,7 +8,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-12-03 22:15:34
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-09 8:51:43
+ * @Last Modified Time: 2024-12-12 7:04:20
  */
 
 #include "karray.h"
@@ -24,9 +24,9 @@ ostream &operator<<(ostream &os, const KdimInfo &kdi) {
 };
 
 CVdimInfo::CVdimInfo(const CVvec& cv){
-  len = cv.size();
-  lasso = 0;
-  norm = 0;
+  len = float(cv.size());
+  lasso = 0.0;
+  norm = 0.0;
 
   for(const auto& cd : cv){
     lasso += cd.second;
