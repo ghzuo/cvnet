@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-12 8:00:52
+ * @Last Modified Time: 2024-12-13 9:04:11
  */
 
 #include "similarMatrix.h"
@@ -15,7 +15,10 @@
 // option on sigle item
 float Msimilar::get(size_t i, size_t j) const {
   if (i >= nrow || j >= ncol) {
-    cerr << "Error: the index out of matrix" << endl;
+    cerr << "Error: the index out of matrix at Msimilar::set() for: ("
+         << to_string(i) + ", " + to_string(j) + ") into (" + to_string(nrow) +
+                ", " + to_string(ncol) + ")"
+         << endl;
     exit(4);
   }
   return _get(i, j);
@@ -25,19 +28,23 @@ float Msimilar::_get(size_t i, size_t j) const { return data[index(i, j)]; };
 
 void Msimilar::set(size_t i, size_t j, float val) {
   if (i >= nrow || j >= ncol) {
-    cerr << "Error: the index out of matrix" << endl;
+    cerr << "Error: the index out of matrix at Msimilar::set() for: ("
+         << to_string(i) + ", " + to_string(j) + ") into (" + to_string(nrow) +
+                ", " + to_string(ncol) + ")"
+         << endl;
     exit(4);
   }
   _set(i, j, val);
 };
 
-void Msimilar::_set(size_t i, size_t j, float val) {
-  data[index(i, j)] = val;
-};
+void Msimilar::_set(size_t i, size_t j, float val) { data[index(i, j)] = val; };
 
 void Msimilar::add(size_t i, size_t j, float val) {
   if (i >= nrow || j >= ncol) {
-    cerr << "Error: the index out of matrix" << endl;
+    cerr << "Error: the index out of matrix at Msimilar::add() for: ("
+         << to_string(i) + ", " + to_string(j) + ") into (" + to_string(nrow) +
+                ", " + to_string(ncol) + ")"
+         << endl;
     exit(4);
   }
   _add(i, j, val);
@@ -58,8 +65,8 @@ pair<size_t, size_t> Msimilar::index(size_t ndx) const {
 
 // .. the infomation of matrix
 string Msimilar::info() const {
-  return "The dimension of the distance matrix is: " +
-         std::to_string(nrow) + "x" + std::to_string(ncol);
+  return "The dimension of the distance matrix is: " + std::to_string(nrow) +
+         "x" + std::to_string(ncol);
 }
 
 void Msimilar::write(const string &fname) const {
@@ -75,13 +82,13 @@ void Msimilar::write(const string &fname) const {
   gzwrite(fp, &ncol, sizeof(ncol));
 
   // write data
-  gzwrite(fp, data.data(), data.size()*sizeof(data[0]));
+  gzwrite(fp, data.data(), data.size() * sizeof(data[0]));
 
   // close file
   gzclose(fp);
 };
 
-void Msimilar::read(const string &fname){
+void Msimilar::read(const string &fname) {
   // open file to read
   gzFile fp;
   if ((fp = gzopen(fname.c_str(), "rb")) == NULL) {
@@ -94,7 +101,7 @@ void Msimilar::read(const string &fname){
   gzread(fp, (char *)&ncol, sizeof(ncol));
 
   // read data
-  gzread(fp, (char *)data.data(), nrow*ncol*sizeof(float));
+  gzread(fp, (char *)data.data(), nrow * ncol * sizeof(float));
 
   // close file
   gzclose(fp);

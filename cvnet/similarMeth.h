@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-12 8:08:18
+ * @Last Modified Time: 2024-12-13 11:14:28
  */
 
 #ifndef SIMILARMETH_H
@@ -30,6 +30,19 @@
 #include "similarMatrix.h"
 
 using namespace std;
+
+struct TriFileName {
+  string inputA, inputB, output;
+  static string outdir;
+
+  TriFileName() = default;
+  TriFileName(const string&, const string&);
+  TriFileName(const string &a, const string &b, const string &o)
+      : inputA(a), inputB(b), output(o){};
+
+  static void setdir(const string&);
+  friend ostream &operator<<(ostream &, const TriFileName &);
+};
 
 struct SimilarMeth {
   string name;
@@ -75,8 +88,8 @@ struct Euclidean : public SimilarMeth {
   void _calcOneK(const Kblock &, const vector<float> &, const Kblock &,
                  const vector<float> &, Msimilar &) override;
   float scale(float, float, float) override;
-  void zeroItem(const Kblock&, size_t, Msimilar&);
-  void normBLK(const Kblock&, const vector<float>&, vector<Kitem>&);
+  void zeroItem(const Kblock &, size_t, Msimilar &);
+  void normBLK(const Kblock &, const vector<float> &, vector<Kitem> &);
 };
 
 // ... distance scaling at L1
@@ -140,8 +153,4 @@ struct ItoU : public SimilarMeth {
                  const vector<float> &, Msimilar &) override;
   float scale(float, float, float) override;
 };
-
-string smFileName(const string &, const string &, const string &);
-void calcSM(SimilarMeth *, vector<string> &, string &);
-
 #endif

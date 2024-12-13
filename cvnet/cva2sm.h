@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-12 9:13:04
+ * @Last Modified Time: 2024-12-13 10:32:42
  */
 
 #ifndef CVA2SM_H
@@ -20,12 +20,11 @@ using namespace std;
 
 // read arguments
 struct Args {
-  string program, smdir;
+  string program;
   SimilarMeth* smeth;
-  vector<string> flist;
+  vector<TriFileName> flist;
 
   Args(int, char **);
   void usage();
 };
-
 #endif

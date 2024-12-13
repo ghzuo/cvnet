@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-11 3:33:27
+ * @Last Modified Time: 2024-12-12 9:49:19
  */
 
 #ifndef SIMIlARMATRIX_H
@@ -32,7 +32,7 @@ struct Msimilar {
   vector<float> data;
 
   Msimilar() = default;
-  Msimilar(long irow, long icol, double d0 = 0.0) : nrow(nrow), ncol(icol) {
+  Msimilar(long irow, long icol, double d0 = 0.0) : nrow(irow), ncol(icol) {
     data.resize(irow * icol, d0);
   };
   Msimilar(const Msimilar &rhs)

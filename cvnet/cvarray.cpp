@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-12 9:20:44
+ * @Last Modified Time: 2024-12-13 7:15:24
  */
 
 #include "cvarray.h"
@@ -69,8 +69,10 @@ void CVArray::setNorm(enum LPnorm lp) {
 };
 
 Kblock CVArray::getKblock(size_t ndx) const {
-  return Kblock(data.begin() + kdi[ndx].index.first,
-                data.begin() + kdi[ndx].index.second);
+  auto _beg = data.begin() + kdi[ndx].index.first;
+  auto _end = data.begin() + kdi[ndx].index.second;
+  Kblock kb(_beg, _end);
+  return kb;
 };
 
 void CVArray::read(const string &fname) {

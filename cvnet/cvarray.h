@@ -8,7 +8,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-11-25 11:34:53
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-12 5:32:57
+ * @Last Modified Time: 2024-12-13 7:16:37
  */
 
 #ifndef CVARRAY_H
@@ -24,19 +24,21 @@ using namespace std;
 
 enum LPnorm { L0, L1, L2 };
 
-struct Kblock {
-  vector<Kitem>::const_iterator _begin;
-  vector<Kitem>::const_iterator _end;
+// struct Kblock {
+//   vector<Kitem>::const_iterator _begin;
+//   vector<Kitem>::const_iterator _end;
 
-  Kblock() = default;
-  Kblock(vector<Kitem>::const_iterator begin_,
-         vector<Kitem>::const_iterator end_)
-      : _begin(begin_), _end(end_){};
+//   Kblock() = default;
+//   Kblock(vector<Kitem>::const_iterator begin_,
+//          vector<Kitem>::const_iterator end_)
+//       : _begin(begin_), _end(end_){};
 
-  vector<Kitem>::const_iterator begin() const { return _begin; };
-  vector<Kitem>::const_iterator end() const { return _end; };
-  size_t size() const { return _end - _begin; }
-};
+//   vector<Kitem>::const_iterator begin() const { return _begin; };
+//   vector<Kitem>::const_iterator end() const { return _end; };
+//   size_t size() const { return _end - _begin; }
+// };
+
+typedef vector<Kitem> Kblock;
 
 struct CVArray {
   vector<KdimInfo> kdi;

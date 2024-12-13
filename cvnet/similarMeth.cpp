@@ -7,10 +7,41 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-12 9:26:30
+ * @Last Modified Time: 2024-12-13 7:39:27
  */
 
 #include "similarMeth.h"
+
+/*************************************************************
+* For input cvfiles to similiarity file
+*************************************************************/
+
+string TriFileName::outdir;
+
+TriFileName::TriFileName(const string &a, const string &b)
+    : inputA(a), inputB(b) {
+  string fn1 = getFileName(inputA);
+  auto pos = fn1.find_first_of('.');
+  string gn1 = fn1.substr(0, pos);
+  string suf = fn1.substr(pos, fn1.find_last_of('.') - pos);
+  string fn2 = getFileName(inputB);
+  string gn2 = fn2.substr(0, fn2.find_first_of('.'));
+  output = outdir + gn1 + "-" + gn2 + suf + ".sm.gz";
+};
+
+void TriFileName::setdir(const string &dir) {
+  outdir = dir;
+  addsuffix(outdir, "/");
+  mkpath(outdir);
+}
+
+ostream& operator<<(ostream& os, const TriFileName& tf) {
+  return os << tf.inputA << " .vs. " << tf.inputB << " -> " << tf.output;
+}
+
+/**************************************************************
+* the similar methods
+**************************************************************/
 
 SimilarMeth *SimilarMeth::create(const string &methStr) {
 
@@ -47,7 +78,7 @@ void SimilarMeth::getSim(const CVArray &cva, const CVArray &cvb, Msimilar &sm) {
     _calcOneK(kba, cva.norm, kbb, cvb.norm, sm);
   }
 
-  for (auto i = 0; i < cvb.norm.size(); ++i) {
+  for (auto i = 0; i < cva.norm.size(); ++i) {
     for (auto j = 0; j < cvb.norm.size(); ++j) {
       sm.set(i, j, scale(sm.get(i, j), cva.norm[i], cvb.norm[j]));
     }
@@ -71,7 +102,8 @@ void Cosine::_calcOneK(const Kblock &kba, const vector<float> &na,
                        const Kblock &kbb, const vector<float> &nb,
                        Msimilar &mtx) {
   for (auto ka = kba.begin(); ka != kba.end(); ++ka) {
-    for (auto kb = kbb.begin(); ka != kbb.end(); ++ka) {
+    for (auto kb = kbb.begin(); kb != kbb.end(); ++kb) {
+      cout << *ka << " and " << *kb << endl;
       mtx.add(ka->index, kb->index, ka->value * kb->value);
     }
   }
@@ -282,34 +314,3 @@ void ItoU::_calcOneK(const Kblock &kba, const vector<float> &na,
 float ItoU::scale(float val, float aNorm, float bNorm) {
   return val / (aNorm + bNorm - val);
 }
-
-/**********************************************************************
- * Do calculations for similarity metrics (SM) based on cva file list.
- **********************************************************************/
-string smFileName(const string &fna, const string &fnb, const string &dir) {
-  string fn1 = getFileName(fna);
-  auto pos = fn1.find_first_of('.');
-  string gn1 = fn1.substr(0, pos);
-  string suf = fn1.substr(pos, fn1.find_last_of('.') - pos);
-  string fn2 = getFileName(fnb);
-  string gn2 = fn2.substr(0, fn2.find_first_of('.'));
-  return dir + gn1 + "-" + gn2 + suf + ".sm.gz";
-}
-
-void calcSM(SimilarMeth *meth, vector<string> &flist, string &sdir) {
-  for (auto i = 0; i < flist.size(); i++) {
-    for (auto j = i + 1; j < flist.size(); j++) {
-      string smfile = smFileName(flist[i], flist[j], sdir);
-      if (!gzvalid(smfile)) {
-        CVArray cva(flist[i]);
-        cout << cva.kdi[0] << endl;
-        CVArray cvb(flist[j]);
-        cva.setNorm(meth->lp);
-        cvb.setNorm(meth->lp);
-        Msimilar sm(cva.norm.size(), cvb.norm.size());
-        meth->getSim(cva, cvb, sm);
-        sm.write(smfile);
-      }
-    }
-  }
-};
