@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-15 5:20:34
+ * @Last Modified Time: 2024-12-15 21:25:36
  */
 
 #include "similarMeth.h"
@@ -74,7 +74,6 @@ void SimilarMeth::getSim(const CVArray &cva, const CVArray &cvb, Msimilar &sm) {
   vector<pair<size_t, size_t>> aln;
   alignSortVector(cva.kdi, cvb.kdi, aln);
 
-  long ndx(0);
   for (auto &it : aln) {
     Kblock kba = cva.getKblock(it.first);
     Kblock kbb = cvb.getKblock(it.second);

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-15 12:44:33
+ * @Last Modified Time: 2024-12-15 21:24:05
  */
 
 #include "similarMatrix.h"
@@ -48,7 +48,7 @@ void Msimilar::_add(size_t i, size_t j, float val) {
   data[index(i, j)] += val;
 };
 
-size_t Msimilar::index(size_t i, size_t j) const { return nrow * i + j; };
+size_t Msimilar::index(size_t i, size_t j) const { return ncol * i + j; };
 
 string Msimilar::outIndex(size_t i, size_t j) const {
   return "(" + to_string(i) + ", " + to_string(j) + ")";
