@@ -7,7 +7,7 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2017-09-01 16:22:53
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2024-12-12 8:17:06
+# @Last Modified Time: 2024-12-15 2:48:53
 ###
 
 cmake_minimum_required(VERSION 3.10)
@@ -20,7 +20,7 @@ SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 LINK_DIRECTORIES(${LIBRARY_OUTPUT_PATH})
 SET(CMAKE_VERBOSE_MAKEFILE on)
-ADD_DEFINITIONS("-std=c++17")
+ADD_DEFINITIONS("-std=c++17 -O3")
 
 ## static option
 option(STATIC "Build as a static library" OFF)

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-13 9:04:11
+ * @Last Modified Time: 2024-12-15 12:44:33
  */
 
 #include "similarMatrix.h"
@@ -15,10 +15,8 @@
 // option on sigle item
 float Msimilar::get(size_t i, size_t j) const {
   if (i >= nrow || j >= ncol) {
-    cerr << "Error: the index out of matrix at Msimilar::set() for: ("
-         << to_string(i) + ", " + to_string(j) + ") into (" + to_string(nrow) +
-                ", " + to_string(ncol) + ")"
-         << endl;
+    cerr << "Error: the index out of matrix at Msimilar::set() for: "
+         << outIndex(i, j) << " into " << outIndex(nrow, ncol) << endl;
     exit(4);
   }
   return _get(i, j);
@@ -28,10 +26,8 @@ float Msimilar::_get(size_t i, size_t j) const { return data[index(i, j)]; };
 
 void Msimilar::set(size_t i, size_t j, float val) {
   if (i >= nrow || j >= ncol) {
-    cerr << "Error: the index out of matrix at Msimilar::set() for: ("
-         << to_string(i) + ", " + to_string(j) + ") into (" + to_string(nrow) +
-                ", " + to_string(ncol) + ")"
-         << endl;
+    cerr << "Error: the index out of matrix at Msimilar::set() for: "
+         << outIndex(i, j) << " into " << outIndex(nrow, ncol) << endl;
     exit(4);
   }
   _set(i, j, val);
@@ -41,10 +37,8 @@ void Msimilar::_set(size_t i, size_t j, float val) { data[index(i, j)] = val; };
 
 void Msimilar::add(size_t i, size_t j, float val) {
   if (i >= nrow || j >= ncol) {
-    cerr << "Error: the index out of matrix at Msimilar::add() for: ("
-         << to_string(i) + ", " + to_string(j) + ") into (" + to_string(nrow) +
-                ", " + to_string(ncol) + ")"
-         << endl;
+    cerr << "Error: the index out of matrix at Msimilar::add() for: "
+         << outIndex(i, j) << " into " << outIndex(nrow, ncol) << endl;
     exit(4);
   }
   _add(i, j, val);
@@ -55,6 +49,10 @@ void Msimilar::_add(size_t i, size_t j, float val) {
 };
 
 size_t Msimilar::index(size_t i, size_t j) const { return nrow * i + j; };
+
+string Msimilar::outIndex(size_t i, size_t j) const {
+  return "(" + to_string(i) + ", " + to_string(j) + ")";
+};
 
 pair<size_t, size_t> Msimilar::index(size_t ndx) const {
   pair<size_t, size_t> tmp;

@@ -8,7 +8,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-11-25 11:34:53
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-13 7:16:37
+ * @Last Modified Time: 2024-12-15 12:49:54
  */
 
 #ifndef CVARRAY_H
@@ -24,21 +24,18 @@ using namespace std;
 
 enum LPnorm { L0, L1, L2 };
 
-// struct Kblock {
-//   vector<Kitem>::const_iterator _begin;
-//   vector<Kitem>::const_iterator _end;
+struct Kblock {
+  vector<Kitem>::const_iterator _begin;
+  vector<Kitem>::const_iterator _end;
 
-//   Kblock() = default;
-//   Kblock(vector<Kitem>::const_iterator begin_,
-//          vector<Kitem>::const_iterator end_)
-//       : _begin(begin_), _end(end_){};
+  Kblock() = default;
+  Kblock(vector<Kitem>::const_iterator b, vector<Kitem>::const_iterator e)
+      : _begin(b), _end(e){};
 
-//   vector<Kitem>::const_iterator begin() const { return _begin; };
-//   vector<Kitem>::const_iterator end() const { return _end; };
-//   size_t size() const { return _end - _begin; }
-// };
-
-typedef vector<Kitem> Kblock;
+  vector<Kitem>::const_iterator begin() const { return _begin; };
+  vector<Kitem>::const_iterator end() const { return _end; };
+  size_t size() const { return _end - _begin; }
+};
 
 struct CVArray {
   vector<KdimInfo> kdi;
@@ -48,9 +45,9 @@ struct CVArray {
 
   CVArray() = default;
   CVArray(const vector<CVvec> &cvs) { set(cvs); };
-  CVArray(const string& fname){ read(fname); };
+  CVArray(const string &fname) { read(fname); };
 
-  void get(const string &, CVmeth *, int, bool cache=true);
+  void get(const string &, CVmeth *, int, bool cache = true);
   void set(const vector<CVvec> &);
 
   void setNorm(enum LPnorm);

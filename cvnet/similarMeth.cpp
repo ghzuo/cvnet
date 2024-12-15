@@ -7,14 +7,14 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-13 7:39:27
+ * @Last Modified Time: 2024-12-15 5:20:34
  */
 
 #include "similarMeth.h"
 
 /*************************************************************
-* For input cvfiles to similiarity file
-*************************************************************/
+ * For input cvfiles to similiarity file
+ *************************************************************/
 
 string TriFileName::outdir;
 
@@ -35,13 +35,13 @@ void TriFileName::setdir(const string &dir) {
   mkpath(outdir);
 }
 
-ostream& operator<<(ostream& os, const TriFileName& tf) {
+ostream &operator<<(ostream &os, const TriFileName &tf) {
   return os << tf.inputA << " .vs. " << tf.inputB << " -> " << tf.output;
 }
 
 /**************************************************************
-* the similar methods
-**************************************************************/
+ * the similar methods
+ **************************************************************/
 
 SimilarMeth *SimilarMeth::create(const string &methStr) {
 
@@ -69,9 +69,12 @@ SimilarMeth *SimilarMeth::create(const string &methStr) {
   return meth;
 }
 
+
 void SimilarMeth::getSim(const CVArray &cva, const CVArray &cvb, Msimilar &sm) {
   vector<pair<size_t, size_t>> aln;
   alignSortVector(cva.kdi, cvb.kdi, aln);
+
+  long ndx(0);
   for (auto &it : aln) {
     Kblock kba = cva.getKblock(it.first);
     Kblock kbb = cvb.getKblock(it.second);
@@ -103,7 +106,6 @@ void Cosine::_calcOneK(const Kblock &kba, const vector<float> &na,
                        Msimilar &mtx) {
   for (auto ka = kba.begin(); ka != kba.end(); ++ka) {
     for (auto kb = kbb.begin(); kb != kbb.end(); ++kb) {
-      cout << *ka << " and " << *kb << endl;
       mtx.add(ka->index, kb->index, ka->value * kb->value);
     }
   }

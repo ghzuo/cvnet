@@ -7,10 +7,10 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-12 9:49:19
+ * @Last Modified Time: 2024-12-15 12:39:41
  */
 
-#ifndef SIMIlARMATRIX_H
+#ifndef SIMILARMATRIX_H
 #define SIMILARMATRIX_H
 
 #include <cmath>
@@ -48,6 +48,7 @@ struct Msimilar {
   float get(size_t, size_t) const;
   pair<size_t, size_t> index(size_t) const;
   size_t index(size_t, size_t) const;
+  string outIndex(size_t, size_t) const;
 
   // output info
   string info() const;

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-13 11:13:51
+ * @Last Modified Time: 2024-12-15 11:14:09
  */
 
 #include "cva2sm.h"
@@ -19,7 +19,6 @@ int main(int argc, char *argv[]) {
   // do calculation
   for (auto &it : args.flist) {
     if (!gzvalid(it.output)) {
-      cout << it << endl;
       CVArray cva(it.inputA);
       CVArray cvb(it.inputB);
       cva.setNorm(args.smeth->lp);
@@ -79,7 +78,7 @@ Args::Args(int argc, char **argv) {
 
   // setup the output path
   TriFileName::setdir(smdir);
-  
+
   // read the genome list
   map<string, string> nameMap;
   vector<string> glist;
