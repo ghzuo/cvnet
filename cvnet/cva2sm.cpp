@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-15 11:14:09
+ * @Last Modified Time: 2024-12-16 09:59:34
  */
 
 #include "cva2sm.h"
@@ -16,7 +16,8 @@ int main(int argc, char *argv[]) {
   // get the input arguments
   Args args(argc, argv);
 
-  // do calculation
+// do calculation
+#pragma omp parallel for
   for (auto &it : args.flist) {
     if (!gzvalid(it.output)) {
       CVArray cva(it.inputA);

@@ -2,7 +2,6 @@ build
 CMakeLists.txt.user
 .DS_Store
 .vstags
-.vscode
 .history
 cvtreeManual.aux
 cvtreeManual.fdb_latexmk
