@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-15 21:24:05
+ * @Last Modified Time: 2024-12-17 00:16:16
  */
 
 #include "similarMatrix.h"
@@ -59,6 +59,54 @@ pair<size_t, size_t> Msimilar::index(size_t ndx) const {
   tmp.first = ndx / ncol;
   tmp.second = ndx % ncol;
   return tmp;
+};
+
+
+void Msimilar::mutualBestHit(vector<Edge>& edges) {
+  for(size_t i=0; i<nrow; ++i){
+    //initial the condition
+    size_t ibeg = i*ncol;
+    size_t iend = ibeg + ncol;
+    pair<size_t, float> best(0,numeric_limits<float>::lowest());
+    // get the best the row
+    for(size_t j=ibeg; j<iend; ++j){
+      if(best.second < data[j])
+        best = make_pair(j-ibeg, data[j]);
+    }
+    // check whether the test of the col
+    bool isBest(true);
+    for(size_t k=0; k<nrow; ++k){
+      if(data[k*ncol + best.first] > best.second){
+        isBest = false;
+        break;
+      }
+    }
+    if(isBest)
+      edges.emplace_back(make_pair(i, best.first), best.second);
+  }
+};
+
+void Msimilar::cutoff(float floor, vector<Edge>& edges){
+  for(size_t i=0; i<data.size(); ++i){
+    if(data[i] > floor){
+      pair<size_t, size_t> ndx = index(i);
+      edges.emplace_back(ndx, data[i]);
+    }
+  }
+};
+
+void Msimilar::mutualBestCutoff(vector<Edge>&edges){
+  vector<Edge> rbhs;
+  mutualBestHit(rbhs);
+  if(rbhs.empty()){
+    cerr << "No reciprocal was find!" << endl;
+  } else {
+    float floor = numeric_limits<float>::max();
+    for(auto& it : rbhs)
+      if(it.weight < floor)
+        floor = it.weight;
+    cutoff(floor, edges);
+  }
 };
 
 // .. the infomation of matrix

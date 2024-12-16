@@ -19,6 +19,7 @@
     "utility": "cpp",
     "typeinfo": "cpp",
     "*.rmd": "markdown",
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "limits": "cpp"
   }
 }
