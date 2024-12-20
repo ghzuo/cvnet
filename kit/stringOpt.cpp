@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-05-06 19:04:09
+ * @Last Modified Time: 2024-12-20 4:10:46
  */
 
 #include "stringOpt.h"
@@ -138,6 +138,15 @@ string getFileName(const string& path){
 string getDirName(const string& path){
   return path.substr(0, path.find_last_of('/'));
 };
+
+string substrReplace(const string& str, const string& from, const string& to){
+  size_t pos = str.find(from);
+  if(pos != string::npos)
+    return str.substr(0, pos) + to + str.substr(pos + from.size());
+  else
+    return str;
+};
+
 
 /********************************************************************************
  * @brief option on convert string to number

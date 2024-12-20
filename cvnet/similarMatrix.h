@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-17 00:03:57
+ * @Last Modified Time: 2024-12-20 11:14:56
  */
 
 #ifndef SIMILARMATRIX_H
@@ -17,26 +17,28 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <set>
 #include <string>
 #include <vector>
-#include <limits>
 
 #include "kit.h"
 
 using namespace std;
 
 // edges
-struct Edge{
+struct Edge {
   pair<size_t, size_t> index;
   float weight;
 
   Edge() = default;
-  Edge(pair<size_t, size_t> ndx, float val): index(ndx), weight(val){};
+  Edge(pair<size_t, size_t> ndx, float val) : index(ndx), weight(val){};
 };
 
 // basic matrix of distance
 struct Msimilar {
+  string rowName;
+  string colName;
   long nrow = 0;
   long ncol = 0;
   vector<float> data;
@@ -45,9 +47,17 @@ struct Msimilar {
   Msimilar(long irow, long icol, double d0 = 0.0) : nrow(irow), ncol(icol) {
     data.resize(irow * icol, d0);
   };
+  Msimilar(const string &rn, const string &cn, long irow, long icol,
+           double d0 = 0.0)
+      : rowName(rn), colName(cn), nrow(irow), ncol(icol) {
+    data.resize(irow * icol, d0);
+  };
   Msimilar(const Msimilar &rhs)
-      : nrow(rhs.nrow), ncol(rhs.ncol), data(rhs.data.begin(), rhs.data.end()) {
-  }
+      : rowName(rhs.rowName), colName(rhs.colName), nrow(rhs.nrow),
+        ncol(rhs.ncol), data(rhs.data.begin(), rhs.data.end()){};
+
+  // set row name and col name
+  void setName(const string &, const string &);
 
   // get/set value of matrix
   void _set(size_t, size_t, float);
@@ -61,9 +71,9 @@ struct Msimilar {
   string outIndex(size_t, size_t) const;
 
   // select items: cutoff or Reciprocal Best Hit
-  void mutualBestHit(vector<Edge>&);
-  void cutoff(float, vector<Edge>&);
-  void mutualBestCutoff(vector<Edge>&);
+  void mutualBestHit(vector<Edge> &);
+  void cutoff(float, vector<Edge> &);
+  void mutualBestCutoff(vector<Edge> &);
 
   // output info
   string info() const;

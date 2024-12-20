@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-05-06 19:02:23
+ * @Last Modified Time: 2024-12-20 4:10:49
  */
 
 #ifndef STRINGOPT_H
@@ -80,6 +80,7 @@ string addnamelabel(const string&, const string&, char sep = '-');
 bool hasSuffix(const string&, const string&);
 string getFileName(const string&);
 string getDirName(const string&);
+string substrReplace(const string&, const string&, const string&);
 
 /********************************************************************************
  * @brief option on convert string to number

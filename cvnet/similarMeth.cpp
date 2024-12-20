@@ -7,37 +7,11 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-15 21:25:36
+ * @Last Modified Time: 2024-12-18 5:04:29
  */
 
 #include "similarMeth.h"
 
-/*************************************************************
- * For input cvfiles to similiarity file
- *************************************************************/
-
-string TriFileName::outdir;
-
-TriFileName::TriFileName(const string &a, const string &b)
-    : inputA(a), inputB(b) {
-  string fn1 = getFileName(inputA);
-  auto pos = fn1.find_first_of('.');
-  string gn1 = fn1.substr(0, pos);
-  string suf = fn1.substr(pos, fn1.find_last_of('.') - pos);
-  string fn2 = getFileName(inputB);
-  string gn2 = fn2.substr(0, fn2.find_first_of('.'));
-  output = outdir + gn1 + "-" + gn2 + suf + ".sm.gz";
-};
-
-void TriFileName::setdir(const string &dir) {
-  outdir = dir;
-  addsuffix(outdir, "/");
-  mkpath(outdir);
-}
-
-ostream &operator<<(ostream &os, const TriFileName &tf) {
-  return os << tf.inputA << " .vs. " << tf.inputB << " -> " << tf.output;
-}
 
 /**************************************************************
  * the similar methods

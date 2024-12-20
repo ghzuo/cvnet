@@ -10,23 +10,25 @@
 
 include_directories("../kit")
 
-set(CVTREEHEADS
+set(CVKITSHEADS
     readgenome.h
     kstring.h
     karray.h
     cvarray.h
     cvmeth.h
+    filename.h
     similarMatrix.h
     similarMeth.h
     mclmatrix.h)
 
 set(LIBCVKIT_SRC
-    ${CVTREEHEADS}
+    ${CVKITSHEADS}
     readgenome.cpp
     kstring.cpp
     karray.cpp
     cvarray.cpp
     cvmeth.cpp
+    filename.cpp
     similarMatrix.cpp
     similarMeth.cpp
     mclmatrix.cpp

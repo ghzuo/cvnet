@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-13 11:14:28
+ * @Last Modified Time: 2024-12-18 5:04:27
  */
 
 #ifndef SIMILARMETH_H
@@ -28,21 +28,9 @@
 #include "cvarray.h"
 #include "kit.h"
 #include "similarMatrix.h"
+#include "filename.h"
 
 using namespace std;
-
-struct TriFileName {
-  string inputA, inputB, output;
-  static string outdir;
-
-  TriFileName() = default;
-  TriFileName(const string&, const string&);
-  TriFileName(const string &a, const string &b, const string &o)
-      : inputA(a), inputB(b), output(o){};
-
-  static void setdir(const string&);
-  friend ostream &operator<<(ostream &, const TriFileName &);
-};
 
 struct SimilarMeth {
   string name;
