@@ -53,12 +53,12 @@ target_link_libraries(g2cva cvkit kit)
 add_executable(cva2sm ${CVA2SM_SRC})
 target_link_libraries(cva2sm cvkit kit)
 
-# add_executable(sm2mcl ${SM2MCL_SRC})
-# target_link_libraries(sm2mcl cvkit kit)
+add_executable(sm2mcl ${SM2MCL_SRC})
+target_link_libraries(sm2mcl PRIVATE cvkit kit argparse)
 
 install(
   TARGETS g2cva
           # dbquery
           cva2sm
-          # sm2mcl
+          sm2mcl
   RUNTIME DESTINATION bin)

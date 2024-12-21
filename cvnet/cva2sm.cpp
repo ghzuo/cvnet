@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-20 6:43:37
+ * @Last Modified Time: 2024-12-21 11:25:11
  */
 
 #include "cva2sm.h"
@@ -18,7 +18,8 @@ int main(int argc, char *argv[]) {
 
 // do calculation
 #pragma omp parallel for
-  for (auto &it : args.flist) {
+  for (int i = 0; i < args.flist.size(); ++i) {
+    auto it = args.flist[i];
     if (!gzvalid(it.output)) {
       CVArray cva(it.inputA, args.smeth->lp);
       CVArray cvb(it.inputB, args.smeth->lp);

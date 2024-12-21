@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-20 11:14:56
+ * @Last Modified Time: 2024-12-21 12:45:22
  */
 
 #ifndef SIMILARMATRIX_H
@@ -33,28 +33,40 @@ struct Edge {
 
   Edge() = default;
   Edge(pair<size_t, size_t> ndx, float val) : index(ndx), weight(val){};
+  void offset(size_t offrow, size_t offcol) {
+    index.first += offrow;
+    index.second += offcol;
+  }
 };
 
 // basic matrix of distance
-struct Msimilar {
+struct MatrixHeader {
   string rowName;
   string colName;
   long nrow = 0;
   long ncol = 0;
+
+  MatrixHeader() = default;
+  MatrixHeader(long irow, long icol) : nrow(irow), ncol(icol){};
+  MatrixHeader(const string &rn, const string &cn, long irow, long icol)
+      : rowName(rn), colName(cn), nrow(irow), ncol(icol){};
+};
+
+struct Msimilar {
+  MatrixHeader header;
   vector<float> data;
 
   Msimilar() = default;
-  Msimilar(long irow, long icol, double d0 = 0.0) : nrow(irow), ncol(icol) {
+  Msimilar(long irow, long icol, double d0 = 0.0) : header(irow,icol) {
     data.resize(irow * icol, d0);
   };
   Msimilar(const string &rn, const string &cn, long irow, long icol,
            double d0 = 0.0)
-      : rowName(rn), colName(cn), nrow(irow), ncol(icol) {
+      : header(rn, cn, irow, icol) {
     data.resize(irow * icol, d0);
   };
   Msimilar(const Msimilar &rhs)
-      : rowName(rhs.rowName), colName(rhs.colName), nrow(rhs.nrow),
-        ncol(rhs.ncol), data(rhs.data.begin(), rhs.data.end()){};
+      : header(rhs.header), data(rhs.data.begin(), rhs.data.end()){};
 
   // set row name and col name
   void setName(const string &, const string &);
@@ -71,14 +83,15 @@ struct Msimilar {
   string outIndex(size_t, size_t) const;
 
   // select items: cutoff or Reciprocal Best Hit
-  void mutualBestHit(vector<Edge> &);
-  void cutoff(float, vector<Edge> &);
-  void mutualBestCutoff(vector<Edge> &);
+  void mutualBestHit(vector<Edge> &) const;
+  void cutoff(float, vector<Edge> &) const;
+  void mutualBestCutoff(vector<Edge> &) const;
 
   // output info
   string info() const;
   void write(const string &filename) const;
   void read(const string &filename);
+  static MatrixHeader readHeader(const string &filename);
 };
 
 #endif

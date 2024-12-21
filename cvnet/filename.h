@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-20 6:38:55
+ * @Last Modified Time: 2024-12-21 6:32:10
  */
 
 #ifndef FILENAME_H
@@ -39,8 +39,8 @@ struct FileNames {
   string cvdir = "cva/";
   string smdir = "sm/";
   string gnsuf = ".faa";
-  string cvsuf = ".cv5.gz";
-  string smsuf = ".cv5.Cosine.gz";
+  string cvsuf = ".cv5";
+  string smsuf = ".cv5.Cosine";
   vector<string> glist;
   vector<TriFileName> fnl;
 

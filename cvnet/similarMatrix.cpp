@@ -7,22 +7,23 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-19 10:04:03
+ * @Last Modified Time: 2024-12-21 12:46:20
  */
 
 #include "similarMatrix.h"
 
 // set row name and col name
 void Msimilar::setName(const string &rnm, const string &cnm) {
-  rowName = rnm;
-  colName = cnm;
+  header.rowName = rnm;
+  header.colName = cnm;
 }
 
 // option on sigle item
 float Msimilar::get(size_t i, size_t j) const {
-  if (i >= nrow || j >= ncol) {
+  if (i >= header.nrow || j >= header.ncol) {
     cerr << "Error: the index out of matrix at Msimilar::set() for: "
-         << outIndex(i, j) << " into " << outIndex(nrow, ncol) << endl;
+         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol)
+         << endl;
     exit(4);
   }
   return _get(i, j);
@@ -31,9 +32,9 @@ float Msimilar::get(size_t i, size_t j) const {
 float Msimilar::_get(size_t i, size_t j) const { return data[index(i, j)]; };
 
 void Msimilar::set(size_t i, size_t j, float val) {
-  if (i >= nrow || j >= ncol) {
+  if (i >= header.nrow || j >= header.ncol) {
     cerr << "Error: the index out of matrix at Msimilar::set() for: "
-         << outIndex(i, j) << " into " << outIndex(nrow, ncol) << endl;
+         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol) << endl;
     exit(4);
   }
   _set(i, j, val);
@@ -42,9 +43,9 @@ void Msimilar::set(size_t i, size_t j, float val) {
 void Msimilar::_set(size_t i, size_t j, float val) { data[index(i, j)] = val; };
 
 void Msimilar::add(size_t i, size_t j, float val) {
-  if (i >= nrow || j >= ncol) {
+  if (i >= header.nrow || j >= header.ncol) {
     cerr << "Error: the index out of matrix at Msimilar::add() for: "
-         << outIndex(i, j) << " into " << outIndex(nrow, ncol) << endl;
+         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol) << endl;
     exit(4);
   }
   _add(i, j, val);
@@ -54,7 +55,7 @@ void Msimilar::_add(size_t i, size_t j, float val) {
   data[index(i, j)] += val;
 };
 
-size_t Msimilar::index(size_t i, size_t j) const { return ncol * i + j; };
+size_t Msimilar::index(size_t i, size_t j) const { return header.ncol * i + j; };
 
 string Msimilar::outIndex(size_t i, size_t j) const {
   return "(" + to_string(i) + ", " + to_string(j) + ")";
@@ -62,16 +63,16 @@ string Msimilar::outIndex(size_t i, size_t j) const {
 
 pair<size_t, size_t> Msimilar::index(size_t ndx) const {
   pair<size_t, size_t> tmp;
-  tmp.first = ndx / ncol;
-  tmp.second = ndx % ncol;
+  tmp.first = ndx / header.ncol;
+  tmp.second = ndx % header.ncol;
   return tmp;
 };
 
-void Msimilar::mutualBestHit(vector<Edge> &edges) {
-  for (size_t i = 0; i < nrow; ++i) {
+void Msimilar::mutualBestHit(vector<Edge> &edges) const{
+  for (size_t i = 0; i < header.nrow; ++i) {
     // initial the condition
-    size_t ibeg = i * ncol;
-    size_t iend = ibeg + ncol;
+    size_t ibeg = i * header.ncol;
+    size_t iend = ibeg + header.ncol;
     pair<size_t, float> best(0, numeric_limits<float>::lowest());
     // get the best the row
     for (size_t j = ibeg; j < iend; ++j) {
@@ -80,8 +81,8 @@ void Msimilar::mutualBestHit(vector<Edge> &edges) {
     }
     // check whether the test of the col
     bool isBest(true);
-    for (size_t k = 0; k < nrow; ++k) {
-      if (data[k * ncol + best.first] > best.second) {
+    for (size_t k = 0; k < header.nrow; ++k) {
+      if (data[k * header.ncol + best.first] > best.second) {
         isBest = false;
         break;
       }
@@ -91,7 +92,7 @@ void Msimilar::mutualBestHit(vector<Edge> &edges) {
   }
 };
 
-void Msimilar::cutoff(float floor, vector<Edge> &edges) {
+void Msimilar::cutoff(float floor, vector<Edge> &edges) const {
   for (size_t i = 0; i < data.size(); ++i) {
     if (data[i] > floor) {
       pair<size_t, size_t> ndx = index(i);
@@ -100,7 +101,7 @@ void Msimilar::cutoff(float floor, vector<Edge> &edges) {
   }
 };
 
-void Msimilar::mutualBestCutoff(vector<Edge> &edges) {
+void Msimilar::mutualBestCutoff(vector<Edge> &edges) const {
   vector<Edge> rbhs;
   mutualBestHit(rbhs);
   if (rbhs.empty()) {
@@ -116,8 +117,8 @@ void Msimilar::mutualBestCutoff(vector<Edge> &edges) {
 
 // .. the infomation of matrix
 string Msimilar::info() const {
-  return "The dimension of the distance matrix is: " + std::to_string(nrow) +
-         "x" + std::to_string(ncol);
+  return "The dimension of the distance matrix is: " + std::to_string(header.nrow) +
+         "x" + std::to_string(header.ncol);
 }
 
 void Msimilar::write(const string &fname) const {
@@ -128,12 +129,12 @@ void Msimilar::write(const string &fname) const {
     exit(1);
   }
   // write the genome information
-  string str = rowName + "\n" + colName + "\n";
+  string str = header.rowName + "\n" + header.colName + "\n";
   gzputs(fp, str.c_str());
 
   // write the size of CVArray
-  gzwrite(fp, &nrow, sizeof(nrow));
-  gzwrite(fp, &ncol, sizeof(ncol));
+  gzwrite(fp, &(header.nrow), sizeof(header.nrow));
+  gzwrite(fp, &(header.ncol), sizeof(header.ncol));
 
   // write data
   gzwrite(fp, data.data(), data.size() * sizeof(data[0]));
@@ -151,16 +152,35 @@ void Msimilar::read(const string &fname) {
   }
 
   // get the genome information
-  gzline(fp, rowName);
-  gzline(fp, colName);
+  gzline(fp, header.rowName);
+  gzline(fp, header.colName);
 
   // get size of the similar matrix
-  gzread(fp, (char *)&nrow, sizeof(nrow));
-  gzread(fp, (char *)&ncol, sizeof(ncol));
+  gzread(fp, (char *)&(header.nrow), sizeof(header.nrow));
+  gzread(fp, (char *)&(header.ncol), sizeof(header.ncol));
 
   // read data
-  gzread(fp, (char *)data.data(), nrow * ncol * sizeof(float));
+  gzread(fp, (char *)data.data(), header.nrow * header.ncol * sizeof(float));
 
   // close file
   gzclose(fp);
 };
+
+MatrixHeader Msimilar::readHeader(const string &filename){
+  MatrixHeader header;
+  gzFile fp;
+  if ((fp = gzopen(filename.c_str(), "rb")) == NULL) {
+    cerr << "Similar Matrix file not found: \"" << filename << '"' << endl;
+    exit(1);
+  }
+
+  // read header
+  gzline(fp, header.rowName);
+  gzline(fp, header.colName);
+  gzread(fp, (char *)&(header.nrow), sizeof(header.nrow));
+  gzread(fp, (char *)&(header.ncol), sizeof(header.ncol));
+  gzclose(fp);
+
+  return header;
+};
+

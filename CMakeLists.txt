@@ -7,11 +7,11 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2017-09-01 16:22:53
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2024-12-15 2:48:53
+# @Last Modified Time: 2024-12-21 11:32:01
 ###
 
-cmake_minimum_required(VERSION 3.10)
-project (CVOG)
+cmake_minimum_required(VERSION 3.14)
+project (CVNet)
 enable_language(CXX)
 
 ## For Compile
@@ -77,6 +77,15 @@ if(HDF5_INCLUDE AND HDF5_LIBRARY AND HDF5_CXX_LIBRARY)
 else()
   message("-- HDF5 format will not support!")
 endif()
+
+## download argparse
+include(FetchContent)
+FetchContent_Declare(
+  argparse
+  GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+  GIT_TAG        v3.1
+)
+FetchContent_MakeAvailable(argparse)
 
 ## include subdirectories
 ADD_SUBDIRECTORY(kit)

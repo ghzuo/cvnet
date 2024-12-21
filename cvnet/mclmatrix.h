@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:41:51
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-10 10:18:06
+ * @Last Modified Time: 2024-12-21 2:49:06
  */
 
 #include <vector>
@@ -18,6 +18,8 @@
 
 using namespace std;
 
+#ifndef MCLMATRIX_H
+#define MCLMATRIX_H
 struct MclItem {
   long ndx;
   float val;
@@ -39,3 +41,5 @@ struct MclMatrix {
   long size() const;
   void writetxt(const string&);
 };
+
+#endif // MCLMATRIX_H
