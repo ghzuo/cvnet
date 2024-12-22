@@ -19,6 +19,7 @@ set(CVKITSHEADS
     filename.h
     similarMatrix.h
     similarMeth.h
+    edgeMeth.h
     mclmatrix.h)
 
 set(LIBCVKIT_SRC
@@ -31,6 +32,7 @@ set(LIBCVKIT_SRC
     filename.cpp
     similarMatrix.cpp
     similarMeth.cpp
+    edgeMeth.cpp
     mclmatrix.cpp
     )
 
@@ -45,13 +47,13 @@ set(CVA2SM_SRC ${CVTREEHEADS} cva2sm.h cva2sm.cpp)
 set(SM2MCL_SRC ${CVTREEHEADS} sm2mcl.h sm2mcl.cpp)
 
 add_executable(g2cva ${G2CVA_SRC})
-target_link_libraries(g2cva cvkit kit)
+target_link_libraries(g2cva PRIVATE cvkit kit)
 
 # add_executable(dbquery ${DBQUERY_SRC})
 # target_link_libraries(dbquery cvkit kit)
 
 add_executable(cva2sm ${CVA2SM_SRC})
-target_link_libraries(cva2sm cvkit kit)
+target_link_libraries(cva2sm PRIVATE cvkit kit)
 
 add_executable(sm2mcl ${SM2MCL_SRC})
 target_link_libraries(sm2mcl PRIVATE cvkit kit argparse)

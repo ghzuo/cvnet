@@ -7,10 +7,32 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-21 12:46:20
+ * @Last Modified Time: 2024-12-22 8:27:34
  */
 
 #include "similarMatrix.h"
+// for Edge
+ostream &operator<<(ostream &os, const Edge &e) {
+  os << e.index.first << "\t" << e.index.second << "\t" << e.weight;
+  return os;
+};
+
+// construct header by reading file
+MatrixHeader::MatrixHeader(const string &fname) {
+  gzFile fp;
+  string gzfile = addsuffix(fname, ".gz");
+  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
+    cerr << "Similar Matrix file not found: \"" << gzfile << '"' << endl;
+    exit(1);
+  }
+
+  // read header
+  gzline(fp, rowName);
+  gzline(fp, colName);
+  gzread(fp, (char *)&(nrow), sizeof(nrow));
+  gzread(fp, (char *)&(ncol), sizeof(ncol));
+  gzclose(fp);
+};
 
 // set row name and col name
 void Msimilar::setName(const string &rnm, const string &cnm) {
@@ -34,7 +56,8 @@ float Msimilar::_get(size_t i, size_t j) const { return data[index(i, j)]; };
 void Msimilar::set(size_t i, size_t j, float val) {
   if (i >= header.nrow || j >= header.ncol) {
     cerr << "Error: the index out of matrix at Msimilar::set() for: "
-         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol) << endl;
+         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol)
+         << endl;
     exit(4);
   }
   _set(i, j, val);
@@ -45,7 +68,8 @@ void Msimilar::_set(size_t i, size_t j, float val) { data[index(i, j)] = val; };
 void Msimilar::add(size_t i, size_t j, float val) {
   if (i >= header.nrow || j >= header.ncol) {
     cerr << "Error: the index out of matrix at Msimilar::add() for: "
-         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol) << endl;
+         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol)
+         << endl;
     exit(4);
   }
   _add(i, j, val);
@@ -55,7 +79,9 @@ void Msimilar::_add(size_t i, size_t j, float val) {
   data[index(i, j)] += val;
 };
 
-size_t Msimilar::index(size_t i, size_t j) const { return header.ncol * i + j; };
+size_t Msimilar::index(size_t i, size_t j) const {
+  return header.ncol * i + j;
+};
 
 string Msimilar::outIndex(size_t i, size_t j) const {
   return "(" + to_string(i) + ", " + to_string(j) + ")";
@@ -68,7 +94,7 @@ pair<size_t, size_t> Msimilar::index(size_t ndx) const {
   return tmp;
 };
 
-void Msimilar::mutualBestHit(vector<Edge> &edges) const{
+void Msimilar::mutualBestHit(vector<Edge> &edges) const {
   for (size_t i = 0; i < header.nrow; ++i) {
     // initial the condition
     size_t ibeg = i * header.ncol;
@@ -117,15 +143,16 @@ void Msimilar::mutualBestCutoff(vector<Edge> &edges) const {
 
 // .. the infomation of matrix
 string Msimilar::info() const {
-  return "The dimension of the distance matrix is: " + std::to_string(header.nrow) +
-         "x" + std::to_string(header.ncol);
+  return "The dimension of the distance matrix is: " +
+         std::to_string(header.nrow) + "x" + std::to_string(header.ncol);
 }
 
 void Msimilar::write(const string &fname) const {
   // open and test file
   gzFile fp;
-  if ((fp = gzopen(fname.c_str(), "wb")) == NULL) {
-    cerr << "Error happen on write cvfile: " << fname << endl;
+  string gzfile = addsuffix(fname, ".gz");
+  if ((fp = gzopen(gzfile.c_str(), "wb")) == NULL) {
+    cerr << "Error happen on write cvfile: " << gzfile << endl;
     exit(1);
   }
   // write the genome information
@@ -146,8 +173,9 @@ void Msimilar::write(const string &fname) const {
 void Msimilar::read(const string &fname) {
   // open file to read
   gzFile fp;
-  if ((fp = gzopen(fname.c_str(), "rb")) == NULL) {
-    cerr << "Similar Matrix file not found: \"" << fname << '"' << endl;
+  string gzfile = addsuffix(fname, ".gz");
+  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
+    cerr << "Similar Matrix file not found: \"" << gzfile << '"' << endl;
     exit(1);
   }
 
@@ -160,27 +188,9 @@ void Msimilar::read(const string &fname) {
   gzread(fp, (char *)&(header.ncol), sizeof(header.ncol));
 
   // read data
+  data.resize(header.nrow * header.ncol);
   gzread(fp, (char *)data.data(), header.nrow * header.ncol * sizeof(float));
 
   // close file
   gzclose(fp);
 };
-
-MatrixHeader Msimilar::readHeader(const string &filename){
-  MatrixHeader header;
-  gzFile fp;
-  if ((fp = gzopen(filename.c_str(), "rb")) == NULL) {
-    cerr << "Similar Matrix file not found: \"" << filename << '"' << endl;
-    exit(1);
-  }
-
-  // read header
-  gzline(fp, header.rowName);
-  gzline(fp, header.colName);
-  gzread(fp, (char *)&(header.nrow), sizeof(header.nrow));
-  gzread(fp, (char *)&(header.ncol), sizeof(header.ncol));
-  gzclose(fp);
-
-  return header;
-};
-

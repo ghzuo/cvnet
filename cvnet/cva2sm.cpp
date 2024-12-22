@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-21 11:25:11
+ * @Last Modified Time: 2024-12-22 5:39:08
  */
 
 #include "cva2sm.h"
@@ -49,11 +49,11 @@ Args::Args(int argc, char **argv) {
       listfile = optarg;
       break;
     case 's':
-      fnm.setcv(optarg);
+      fnm.setSuffix(optarg);
       break;
     case 'm':
       methStr = optarg;
-      fnm.setsm(methStr);
+      fnm.smsyb = methStr;
       break;
     case 'V':
       fnm.setcvdir(optarg);
@@ -82,7 +82,7 @@ Args::Args(int argc, char **argv) {
   fnm.setfn(glist);
 
   // generate the triplet with two inputs and one output
-  flist = fnm.trifnlist();
+  fnm.trifnlist(flist);
 }
 
 void Args::usage() {

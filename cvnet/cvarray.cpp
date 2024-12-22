@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-15 5:21:19
+ * @Last Modified Time: 2024-12-22 10:57:16
  */
 
 #include "cvarray.h"
@@ -78,8 +78,9 @@ Kblock CVArray::getKblock(size_t ndx) const {
 void CVArray::read(const string &fname) {
   // open file to read
   gzFile fp;
-  if ((fp = gzopen(fname.c_str(), "rb")) == NULL) {
-    cerr << "CV file not found: \"" << fname << '"' << endl;
+  string gzfile = addsuffix(fname, ".gz");
+  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
+    cerr << "CV file not found: \"" << gzfile << '"' << endl;
     exit(1);
   }
 
@@ -106,8 +107,9 @@ void CVArray::read(const string &fname) {
 void CVArray::write(const string &fname) const {
   // open and test file
   gzFile fp;
-  if ((fp = gzopen(fname.c_str(), "wb")) == NULL) {
-    cerr << "Error happen on write cvfile: " << fname << endl;
+  string gzfile = addsuffix(fname, ".gz");
+  if ((fp = gzopen(gzfile.c_str(), "wb")) == NULL) {
+    cerr << "Error happen on write cvfile: " << gzfile << endl;
     exit(1);
   }
 

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-21 9:25:30
+ * @Last Modified Time: 2024-12-22 8:41:45
  */
 
 #include "sm2mcl.h"
@@ -19,15 +19,9 @@ int main(int argc, char *argv[]) {
   // read similar matrix
   MclMatrix mm(args.ngene);
   for (auto &smf : args.smlist) {
-    Msimilar sm;
-    sm.read(smf);
-    vector<Edge> edge;
-    sm.mutualBestHit(edge);
-    for (auto &e : edge) {
-      e.offset(args.offset[sm.header.rowName], args.offset[sm.header.colName]);
-    }
+    Msimilar sm(smf);
+    args.meth->fillmcl(sm, args.offset, mm);
   }
-
   // output MclMatrix
   mm.writetxt(args.outmcl);
 }
@@ -35,30 +29,46 @@ int main(int argc, char *argv[]) {
 Args::Args(int argc, char *argv[]) {
   // Define the available options and parameters
   argparse::ArgumentParser parser("sm2mcl", "0.1");
-  string methStr("RBH");
   FileNames fnm;
 
   parser.add_argument("-m", "--method")
-      .help("method for selecting items: CUT/RBH/RBHP")
-      .default_value(methStr)
-      .nargs(1, 2);
+      .help("method for selecting items, RBH/CUT/RBHP")
+      .choices("RBH", "CUT", "RBHP")
+      .default_value(fnm.clsyb)
+      .nargs(1)
+      .store_into(fnm.clsyb);
+  parser.add_argument("-c", "--cutoff")
+      .help("cutoff for CUT method")
+      .default_value(0.8)
+      .scan<'f', float>()
+      .nargs(1);
+  parser.add_argument("-s", "--suffix")
+      .help("suffix for similarity matrix")
+      .default_value(fnm.smsuf())
+      .nargs(1)
+      .action([&fnm](const auto &val) { fnm.setSuffix(val); });
+  parser.add_argument("-S", "--smdir")
+      .help("directory for similarity matrix")
+      .default_value(fnm.smdir)
+      .nargs(1)
+      .action([&fnm](const auto &val) { fnm.setsmdir(val); });
   parser.add_argument("-i", "--list")
       .help("genome list file")
       .default_value("list")
       .nargs(1);
+  parser.add_argument("-O", "--outdir")
+      .help("output directory")
+      .default_value(fnm.cldir)
+      .nargs(1)
+      .action([&fnm](const auto &val) { fnm.setcldir(val); });
   parser.add_argument("-o", "--output")
       .help("output mcl files")
-      .default_value("grp/mcl" + fnm.smsuf + "." + methStr)
+      .default_value("mcl" + fnm.clsuf())
       .nargs(1);
-  parser.add_argument("-s", "--suffix")
-      .help("suffix for similarity matrix")
-      .default_value(fnm.smsuf)
-      .nargs(1);
-  parser.add_argument("-S", "--smdir")
-      .help("directory for similarity matrix")
-      .default_value(fnm.smdir)
-      .nargs(1);
-  parser.add_description("Select the edges from similarity matrix");
+  parser.add_argument("-f", "--offset")
+      .help("output gene offset")
+      .implicit_value("offset" + fnm.clsuf());
+  parser.add_description("Select the edges from similarity matrix for MCL");
 
   try {
     parser.parse_args(argc, argv);
@@ -66,5 +76,39 @@ Args::Args(int argc, char *argv[]) {
     std::cerr << e.what() << std::endl;
     std::cout << parser;
     exit(1);
+  }
+
+  // set select method
+  meth = EdgeMeth::create(fnm.clsyb);
+  // set cutoff for CUT method
+  if (parser.is_used("-c"))
+    meth->cutoff = parser.get<float>("-c");
+
+  // set output file name
+  fnm.clsyb = meth->methsyb();
+  if (parser.is_used("-o")) {
+    outmcl = parser.get<string>("-o");
+  } else {
+    outmcl = "mcl" + fnm.clsuf();
+  }
+  mkpath(fnm.cldir);
+  outmcl = fnm.cldir + outmcl;
+
+  // setup input file names
+  vector<string> flist;
+  readFileList(parser.get<string>("-i"), flist);
+  fnm.setfn(flist);
+  fnm.smfnlist(smlist);
+
+  // get the offset of gene
+  ngene = fnm.geneOffset(offset);
+  if(parser.is_used("-f")){
+    vector<pair<string, size_t>> tmp(offset.begin(), offset.end());
+    sort(tmp.begin(), tmp.end(), [](auto&a, auto&b){return a.second < b.second;});
+    ofstream fndx(fnm.cldir + parser.get<string>("-f"));
+    for(auto& it : tmp)
+      fndx << it.first <<"\t" << it.second << "\n";
+    fndx << endl;
+    fndx.close();
   }
 }

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:29:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-21 2:50:49
+ * @Last Modified Time: 2024-12-21 10:50:40
  */
 
 #ifndef SM2MCL_H
@@ -15,8 +15,7 @@
 
 #include <iostream>
 #include <vector>
-
-#include "argparse/argparse.hpp"
+#include <argparse/argparse.hpp>
 
 #include "edgeMeth.h"
 #include "filename.h"

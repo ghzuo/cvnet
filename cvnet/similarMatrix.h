@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-21 12:45:22
+ * @Last Modified Time: 2024-12-22 8:17:35
  */
 
 #ifndef SIMILARMATRIX_H
@@ -37,6 +37,8 @@ struct Edge {
     index.first += offrow;
     index.second += offcol;
   }
+
+  friend ostream &operator<<(ostream &, const Edge &);
 };
 
 // basic matrix of distance
@@ -50,6 +52,7 @@ struct MatrixHeader {
   MatrixHeader(long irow, long icol) : nrow(irow), ncol(icol){};
   MatrixHeader(const string &rn, const string &cn, long irow, long icol)
       : rowName(rn), colName(cn), nrow(irow), ncol(icol){};
+  MatrixHeader(const string &);
 };
 
 struct Msimilar {
@@ -57,7 +60,7 @@ struct Msimilar {
   vector<float> data;
 
   Msimilar() = default;
-  Msimilar(long irow, long icol, double d0 = 0.0) : header(irow,icol) {
+  Msimilar(long irow, long icol, double d0 = 0.0) : header(irow, icol) {
     data.resize(irow * icol, d0);
   };
   Msimilar(const string &rn, const string &cn, long irow, long icol,
@@ -67,6 +70,7 @@ struct Msimilar {
   };
   Msimilar(const Msimilar &rhs)
       : header(rhs.header), data(rhs.data.begin(), rhs.data.end()){};
+  Msimilar(const string &fname) { read(fname); }
 
   // set row name and col name
   void setName(const string &, const string &);
@@ -89,9 +93,8 @@ struct Msimilar {
 
   // output info
   string info() const;
-  void write(const string &filename) const;
-  void read(const string &filename);
-  static MatrixHeader readHeader(const string &filename);
+  void write(const string &) const;
+  void read(const string &);
 };
 
 #endif

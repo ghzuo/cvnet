@@ -7,20 +7,21 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-21 6:32:10
+ * @Last Modified Time: 2024-12-22 4:30:04
  */
 
 #ifndef FILENAME_H
 #define FILENAME_H
 
-#include <iostream>
-#include <string>
-#include <set>
-#include <vector>
 #include <algorithm>
+#include <iostream>
 #include <regex>
+#include <set>
+#include <string>
+#include <vector>
 
 #include "kit.h"
+#include "similarMatrix.h"
 using namespace std;
 
 struct TriFileName {
@@ -35,12 +36,14 @@ struct TriFileName {
 };
 
 struct FileNames {
+  string sufsep = ".";
   string gndir = "";
   string cvdir = "cva/";
   string smdir = "sm/";
-  string gnsuf = ".faa";
-  string cvsuf = ".cv5";
-  string smsuf = ".cv5.Cosine";
+  string cldir = "grp/";
+  string cvsyb = "cv5";
+  string smsyb = "Cosine";
+  string clsyb = "RBH";
   vector<string> glist;
   vector<TriFileName> fnl;
 
@@ -48,18 +51,23 @@ struct FileNames {
 
   void setfn(const vector<string> &);
   void setfn(const vector<TriFileName> &);
+  void setSuffix(const string &);
+  void setgndir(const string &);
+  void setcvdir(const string &);
+  void setsmdir(const string &);
+  void setcldir(const string &);
 
-  void setgn(const string&);
-  void setcv(const string&);
-  void setsm(const string&);
-  void setgndir(const string&);
-  void setcvdir(const string&);
-  void setsmdir(const string&);
+  string cvsuf();
+  string smsuf();
+  string clsuf();
 
-  vector<string> cvfnlist();
-  vector<string> smfnlist();
-  vector<TriFileName> trifnlist();
-  string _smFN(const string&, const string&);
+  size_t gnfnlist(vector<string>&);
+  size_t cvfnlist(vector<string>&);
+  size_t smfnlist(vector<string>&);
+  size_t trifnlist(vector<TriFileName>&);
+  size_t geneOffset(map<string,size_t>&);
+  
+  string _smFN(const string &, const string &);
   void _genTriFNList();
   void _genGList();
 };
