@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 4:30:04
+ * @Last Modified Time: 2024-12-22 9:59:30
  */
 
 #ifndef FILENAME_H
@@ -43,7 +43,7 @@ struct FileNames {
   string cldir = "grp/";
   string cvsyb = "cv5";
   string smsyb = "Cosine";
-  string clsyb = "RBH";
+  string clsyb = "RBHP";
   vector<string> glist;
   vector<TriFileName> fnl;
 

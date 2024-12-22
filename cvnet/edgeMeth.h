@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 11:54:59
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 6:00:40
+ * @Last Modified Time: 2024-12-22 10:28:17
  */
 
 #ifndef EDGEMETH_H
@@ -18,35 +18,58 @@
 
 using namespace std;
 
+// edges
+struct Edge {
+  pair<size_t, size_t> index;
+  float weight;
+
+  Edge() = default;
+  Edge(pair<size_t, size_t> ndx, float val) : index(ndx), weight(val){};
+  void offset(size_t offrow, size_t offcol) {
+    index.first += offrow;
+    index.second += offcol;
+  }
+
+  friend ostream &operator<<(ostream &, const Edge &);
+};
+
+//edge method
 struct EdgeMeth {
-  float cutoff = 0.8;
+  float floor = 0.8;
+
   static EdgeMeth *create(const string &methStr);
+
+  //
   void fillmcl(const Msimilar&, const map<string, size_t>&, MclMatrix&);
+
+  // select items: cutoff or Reciprocal Best Hit
+  void mutualBestHit(const Msimilar&, vector<Edge> &) const;
+  void cutoff(const Msimilar&, float, vector<Edge> &) const;
+
+  // method in 
   virtual string methsyb() const = 0;
   virtual void sm2edge(const Msimilar &, vector<Edge> &) const = 0;
 };
 
 struct EdgeByCutoff : public EdgeMeth {
   string methsyb() const override {
-    return "CUT" + to_string(int(cutoff * 100));
+    return "CUT" + to_string(int(floor * 100));
   };
-  void sm2edge(const Msimilar &sm, vector<Edge> &edges) const override {
-    sm.cutoff(cutoff, edges);
+  void sm2edge(const Msimilar &sm, vector<Edge> &edge) const override {
+    cutoff(sm, floor, edge);
   }
 };
 
 struct EdgeByMutualBest : public EdgeMeth {
   string methsyb() const override { return "RBH"; };
-  void sm2edge(const Msimilar &sm, vector<Edge> &edges) const override {
-    sm.mutualBestHit(edges);
+  void sm2edge(const Msimilar &sm, vector<Edge> &edge) const override {
+    mutualBestHit(sm, edge);
   }
 };
 
 struct EdgeByMutualBestPlus : public EdgeMeth {
   string methsyb() const override { return "RBHP"; };
-  void sm2edge(const Msimilar &sm, vector<Edge> &edges) const override {
-    sm.mutualBestCutoff(edges);
-  }
+  void sm2edge(const Msimilar &sm, vector<Edge> &edges) const override;
 };
 
 #endif

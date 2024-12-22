@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 8:41:45
+ * @Last Modified Time: 2024-12-22 10:16:31
  */
 
 #include "sm2mcl.h"
@@ -82,7 +82,7 @@ Args::Args(int argc, char *argv[]) {
   meth = EdgeMeth::create(fnm.clsyb);
   // set cutoff for CUT method
   if (parser.is_used("-c"))
-    meth->cutoff = parser.get<float>("-c");
+    meth->floor = parser.get<float>("-c");
 
   // set output file name
   fnm.clsyb = meth->methsyb();
@@ -100,7 +100,7 @@ Args::Args(int argc, char *argv[]) {
   fnm.setfn(flist);
   fnm.smfnlist(smlist);
 
-  // get the offset of gene
+  // get the offset of gene and output
   ngene = fnm.geneOffset(offset);
   if(parser.is_used("-f")){
     vector<pair<string, size_t>> tmp(offset.begin(), offset.end());
@@ -108,7 +108,6 @@ Args::Args(int argc, char *argv[]) {
     ofstream fndx(fnm.cldir + parser.get<string>("-f"));
     for(auto& it : tmp)
       fndx << it.first <<"\t" << it.second << "\n";
-    fndx << endl;
     fndx.close();
   }
 }

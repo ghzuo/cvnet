@@ -7,15 +7,10 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 8:27:34
+ * @Last Modified Time: 2024-12-22 10:06:48
  */
 
 #include "similarMatrix.h"
-// for Edge
-ostream &operator<<(ostream &os, const Edge &e) {
-  os << e.index.first << "\t" << e.index.second << "\t" << e.weight;
-  return os;
-};
 
 // construct header by reading file
 MatrixHeader::MatrixHeader(const string &fname) {
@@ -92,53 +87,6 @@ pair<size_t, size_t> Msimilar::index(size_t ndx) const {
   tmp.first = ndx / header.ncol;
   tmp.second = ndx % header.ncol;
   return tmp;
-};
-
-void Msimilar::mutualBestHit(vector<Edge> &edges) const {
-  for (size_t i = 0; i < header.nrow; ++i) {
-    // initial the condition
-    size_t ibeg = i * header.ncol;
-    size_t iend = ibeg + header.ncol;
-    pair<size_t, float> best(0, numeric_limits<float>::lowest());
-    // get the best the row
-    for (size_t j = ibeg; j < iend; ++j) {
-      if (best.second < data[j])
-        best = make_pair(j - ibeg, data[j]);
-    }
-    // check whether the test of the col
-    bool isBest(true);
-    for (size_t k = 0; k < header.nrow; ++k) {
-      if (data[k * header.ncol + best.first] > best.second) {
-        isBest = false;
-        break;
-      }
-    }
-    if (isBest)
-      edges.emplace_back(make_pair(i, best.first), best.second);
-  }
-};
-
-void Msimilar::cutoff(float floor, vector<Edge> &edges) const {
-  for (size_t i = 0; i < data.size(); ++i) {
-    if (data[i] > floor) {
-      pair<size_t, size_t> ndx = index(i);
-      edges.emplace_back(ndx, data[i]);
-    }
-  }
-};
-
-void Msimilar::mutualBestCutoff(vector<Edge> &edges) const {
-  vector<Edge> rbhs;
-  mutualBestHit(rbhs);
-  if (rbhs.empty()) {
-    cerr << "No reciprocal was find!" << endl;
-  } else {
-    float floor = numeric_limits<float>::max();
-    for (auto &it : rbhs)
-      if (it.weight < floor)
-        floor = it.weight;
-    cutoff(floor, edges);
-  }
 };
 
 // .. the infomation of matrix

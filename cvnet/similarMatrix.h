@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 8:17:35
+ * @Last Modified Time: 2024-12-22 10:04:00
  */
 
 #ifndef SIMILARMATRIX_H
@@ -25,21 +25,6 @@
 #include "kit.h"
 
 using namespace std;
-
-// edges
-struct Edge {
-  pair<size_t, size_t> index;
-  float weight;
-
-  Edge() = default;
-  Edge(pair<size_t, size_t> ndx, float val) : index(ndx), weight(val){};
-  void offset(size_t offrow, size_t offcol) {
-    index.first += offrow;
-    index.second += offcol;
-  }
-
-  friend ostream &operator<<(ostream &, const Edge &);
-};
 
 // basic matrix of distance
 struct MatrixHeader {
@@ -85,11 +70,6 @@ struct Msimilar {
   pair<size_t, size_t> index(size_t) const;
   size_t index(size_t, size_t) const;
   string outIndex(size_t, size_t) const;
-
-  // select items: cutoff or Reciprocal Best Hit
-  void mutualBestHit(vector<Edge> &) const;
-  void cutoff(float, vector<Edge> &) const;
-  void mutualBestCutoff(vector<Edge> &) const;
 
   // output info
   string info() const;

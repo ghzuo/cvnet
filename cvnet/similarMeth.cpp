@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-18 5:04:29
+ * @Last Modified Time: 2024-12-22 10:47:00
  */
 
 #include "similarMeth.h"
@@ -85,7 +85,7 @@ void Cosine::_calcOneK(const Kblock &kba, const vector<float> &na,
 };
 
 float Cosine::scale(float val, float aNorm, float bNorm) {
-  return 0.5 * (1.0 - val / (aNorm * bNorm));
+  return val / (aNorm * bNorm);
 }
 
 void Euclidean::zeroItem(const Kblock &blk, size_t nCV, Msimilar &mtx) {
