@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 10:04:00
+ * @Last Modified Time: 2024-12-23 11:34:29
  */
 
 #ifndef SIMILARMATRIX_H
@@ -38,6 +38,7 @@ struct MatrixHeader {
   MatrixHeader(const string &rn, const string &cn, long irow, long icol)
       : rowName(rn), colName(cn), nrow(irow), ncol(icol){};
   MatrixHeader(const string &);
+  void read(gzFile&);
 };
 
 struct Msimilar {

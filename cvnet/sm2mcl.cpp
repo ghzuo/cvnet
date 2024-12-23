@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 10:16:31
+ * @Last Modified Time: 2024-12-23 12:01:16
  */
 
 #include "sm2mcl.h"
@@ -18,8 +18,9 @@ int main(int argc, char *argv[]) {
 
   // read similar matrix
   MclMatrix mm(args.ngene);
-  for (auto &smf : args.smlist) {
-    Msimilar sm(smf);
+#pragma omp parallel for
+  for (size_t i = 0; i < args.smlist.size(); ++i) {
+    Msimilar sm(args.smlist[i]);
     args.meth->fillmcl(sm, args.offset, mm);
   }
   // output MclMatrix
@@ -65,6 +66,10 @@ Args::Args(int argc, char *argv[]) {
       .help("output mcl files")
       .default_value("mcl" + fnm.clsuf())
       .nargs(1);
+  parser.add_argument("-q", "--quiet")
+      .help("run command in quiet mode")
+      .nargs(0)
+      .action([](const auto &) { theInfo.quiet = true; });
   parser.add_argument("-f", "--offset")
       .help("output gene offset")
       .implicit_value("offset" + fnm.clsuf());
@@ -102,12 +107,13 @@ Args::Args(int argc, char *argv[]) {
 
   // get the offset of gene and output
   ngene = fnm.geneOffset(offset);
-  if(parser.is_used("-f")){
+  if (parser.is_used("-f")) {
     vector<pair<string, size_t>> tmp(offset.begin(), offset.end());
-    sort(tmp.begin(), tmp.end(), [](auto&a, auto&b){return a.second < b.second;});
+    sort(tmp.begin(), tmp.end(),
+         [](auto &a, auto &b) { return a.second < b.second; });
     ofstream fndx(fnm.cldir + parser.get<string>("-f"));
-    for(auto& it : tmp)
-      fndx << it.first <<"\t" << it.second << "\n";
+    for (auto &it : tmp)
+      fndx << it.first << "\t" << it.second << "\n";
     fndx.close();
   }
 }

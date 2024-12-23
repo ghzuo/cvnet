@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 10:06:48
+ * @Last Modified Time: 2024-12-23 11:38:26
  */
 
 #include "similarMatrix.h"
@@ -22,11 +22,17 @@ MatrixHeader::MatrixHeader(const string &fname) {
   }
 
   // read header
+  read(fp);
+  gzclose(fp);
+};
+
+void MatrixHeader::read(gzFile &fp) {
+  // get the genome name
   gzline(fp, rowName);
   gzline(fp, colName);
+  // get the matrix size
   gzread(fp, (char *)&(nrow), sizeof(nrow));
   gzread(fp, (char *)&(ncol), sizeof(ncol));
-  gzclose(fp);
 };
 
 // set row name and col name
@@ -127,17 +133,13 @@ void Msimilar::read(const string &fname) {
     exit(1);
   }
 
-  // get the genome information
-  gzline(fp, header.rowName);
-  gzline(fp, header.colName);
-
-  // get size of the similar matrix
-  gzread(fp, (char *)&(header.nrow), sizeof(header.nrow));
-  gzread(fp, (char *)&(header.ncol), sizeof(header.ncol));
+  // read the header
+  header.read(fp);
 
   // read data
-  data.resize(header.nrow * header.ncol);
-  gzread(fp, (char *)data.data(), header.nrow * header.ncol * sizeof(float));
+  size_t dsize = header.nrow * header.ncol;
+  data.resize(dsize);
+  gzread(fp, (char *)data.data(), dsize * sizeof(float));
 
   // close file
   gzclose(fp);

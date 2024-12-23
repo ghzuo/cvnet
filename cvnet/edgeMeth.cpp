@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 10:27:20
+ * @Last Modified Time: 2024-12-23 11:59:24
  */
 
 #include "edgeMeth.h"
@@ -42,9 +42,12 @@ void EdgeMeth::fillmcl(const Msimilar &sm, const map<string, size_t> &offset,
   sm2edge(sm, edge);
   size_t offrow = offset.find(sm.header.rowName)->second;
   size_t offcol = offset.find(sm.header.colName)->second;
-  for (auto &e : edge) {
+  for (auto &e : edge)
     e.offset(offrow, offcol);
-    mm.push(e.index, e.weight);
+#pragma omp critical
+  {
+    for (auto &e : edge)
+      mm.push(e.index, e.weight);
   }
 };
 
@@ -53,22 +56,24 @@ void EdgeMeth::mutualBestHit(const Msimilar &sm, vector<Edge> &edges) const {
     // initial the condition
     size_t ibeg = i * sm.header.ncol;
     size_t iend = ibeg + sm.header.ncol;
-    pair<size_t, float> best(0, numeric_limits<float>::lowest());
+    pair<size_t, float> rowBest(ibeg, sm.data[ibeg]);
     // get the best the row
-    for (size_t j = ibeg; j < iend; ++j) {
-      if (best.second < sm.data[j])
-        best = make_pair(j - ibeg, sm.data[j]);
+    for (size_t j = ibeg + 1; j < iend; ++j) {
+      if (rowBest.second < sm.data[j])
+        rowBest = make_pair(j, sm.data[j]);
     }
+    rowBest.first -= ibeg;
+
     // check whether the test of the col
-    bool isBest(true);
-    for (size_t k = 0; k < sm.header.nrow; ++k) {
-      if (sm.data[k * sm.header.ncol + best.first] > best.second) {
-        isBest = false;
+    bool isColBest(true);
+    for (size_t k = rowBest.first; k < sm.data.size(); k += sm.header.ncol) {
+      if (sm.data[k] > rowBest.second) {
+        isColBest = false;
         break;
       }
     }
-    if (isBest)
-      edges.emplace_back(make_pair(i, best.first), best.second);
+    if (isColBest)
+      edges.emplace_back(make_pair(i, rowBest.first), rowBest.second);
   }
 };
 
