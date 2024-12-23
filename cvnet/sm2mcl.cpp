@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 3:46:22
+ * @Last Modified Time: 2024-12-23 3:59:11
  */
 
 #include "sm2mcl.h"
@@ -75,7 +75,7 @@ Args::Args(int argc, char *argv[]) {
       .action([](const auto &) { theInfo.quiet = true; });
   parser.add_argument("-f", "--offset")
       .help("output gene offset")
-      .implicit_value("offset" + fnm.clsuf());
+      .default_value("GenomeOffset.csv");
   parser.add_description("Select the edges from similarity matrix for MCL");
 
   try {

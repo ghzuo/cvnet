@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 3:46:36
+ * @Last Modified Time: 2024-12-23 3:51:28
  */
 
 #include "filename.h"
@@ -184,6 +184,6 @@ void writeGenomeShift(const map<string, size_t>& gShift, const string& fname){
          [](auto &a, auto &b) { return a.second < b.second; });
     ofstream fndx(fname);
     for (auto &it : tmp)
-      fndx << it.first << "\t" << it.second << "\n";
+      fndx << delsuffix(it.first) << "\t" << it.second << "\n";
     fndx.close();
 };
