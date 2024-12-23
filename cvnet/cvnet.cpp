@@ -7,13 +7,14 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:17:28
+ * @Last Modified Time: 2024-12-23 11:40:31
  */
 
 #include "cvnet.h"
 
 int main(int argc, char **argv) {
   Args args(argc, argv);
+  theInfo("Perpare the argments for project");
 
   //  get the cva for every species
   vector<string> flist;
@@ -28,12 +29,14 @@ int main(int argc, char **argv) {
       cva.write(cvfile);
     }
   }
+  theInfo("Get all CVAs for Project");
 
   // get the gene shift
   map<string, size_t> gShift;
   size_t ngene = args.fnm.geneOffsetByCVFile(gShift);
   if (!args.outshift.empty())
     writeGenomeShift(gShift, args.outshift);
+  theInfo("Get the offset for Matrix");
 
   // get the similar matrix and push them into mcl matrix
   MclMatrix mm(ngene);
@@ -61,6 +64,7 @@ int main(int argc, char **argv) {
   }
 
   // resort row and output MclMatrix
+  theInfo("Get data for MCL matrix");
   mm.write(args.outmcl, true);
 }
 
