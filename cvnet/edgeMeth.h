@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 11:54:59
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 10:28:17
+ * @Last Modified Time: 2024-12-23 3:40:37
  */
 
 #ifndef EDGEMETH_H
@@ -25,28 +25,28 @@ struct Edge {
 
   Edge() = default;
   Edge(pair<size_t, size_t> ndx, float val) : index(ndx), weight(val){};
-  void offset(size_t offrow, size_t offcol) {
-    index.first += offrow;
-    index.second += offcol;
+  void shift(const pair<size_t, size_t> &offset) {
+    index.first += offset.first;
+    index.second += offset.second;
   }
 
   friend ostream &operator<<(ostream &, const Edge &);
 };
 
-//edge method
+// edge method
 struct EdgeMeth {
   float floor = 0.8;
 
   static EdgeMeth *create(const string &methStr);
 
   //
-  void fillmcl(const Msimilar&, const map<string, size_t>&, MclMatrix&);
+  void fillmcl(const Msimilar &, const pair<size_t, size_t> &, MclMatrix &);
 
   // select items: cutoff or Reciprocal Best Hit
-  void mutualBestHit(const Msimilar&, vector<Edge> &) const;
-  void cutoff(const Msimilar&, float, vector<Edge> &) const;
+  void mutualBestHit(const Msimilar &, vector<Edge> &) const;
+  void cutoff(const Msimilar &, float, vector<Edge> &) const;
 
-  // method in 
+  // method in
   virtual string methsyb() const = 0;
   virtual void sm2edge(const Msimilar &, vector<Edge> &) const = 0;
 };

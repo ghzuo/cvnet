@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:59:24
+ * @Last Modified Time: 2024-12-23 3:40:28
  */
 
 #include "edgeMeth.h"
@@ -36,14 +36,14 @@ EdgeMeth *EdgeMeth::create(const string &methStr) {
   return meth;
 };
 
-void EdgeMeth::fillmcl(const Msimilar &sm, const map<string, size_t> &offset,
+void EdgeMeth::fillmcl(const Msimilar &sm, const pair<size_t, size_t> &offset,
                        MclMatrix &mm) {
   vector<Edge> edge;
   sm2edge(sm, edge);
-  size_t offrow = offset.find(sm.header.rowName)->second;
-  size_t offcol = offset.find(sm.header.colName)->second;
   for (auto &e : edge)
-    e.offset(offrow, offcol);
+    e.shift(offset);
+
+  // push edge into mcl matrix
 #pragma omp critical
   {
     for (auto &e : edge)

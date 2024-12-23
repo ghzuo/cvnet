@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 12:01:16
+ * @Last Modified Time: 2024-12-23 3:46:22
  */
 
 #include "sm2mcl.h"
@@ -16,15 +16,18 @@ int main(int argc, char *argv[]) {
   // get the argments
   Args args(argc, argv);
 
-  // read similar matrix
+  // get the mcl matrix from similar matrixes
   MclMatrix mm(args.ngene);
 #pragma omp parallel for
   for (size_t i = 0; i < args.smlist.size(); ++i) {
     Msimilar sm(args.smlist[i]);
-    args.meth->fillmcl(sm, args.offset, mm);
+    auto mtxShift = make_pair(args.gShift.find(sm.header.rowName)->second,
+                              args.gShift.find(sm.header.colName)->second);
+    args.meth->fillmcl(sm, mtxShift, mm);
   }
-  // output MclMatrix
-  mm.writetxt(args.outmcl);
+
+  // resort row and output MclMatrix
+  mm.write(args.outmcl, true);
 }
 
 Args::Args(int argc, char *argv[]) {
@@ -106,14 +109,9 @@ Args::Args(int argc, char *argv[]) {
   fnm.smfnlist(smlist);
 
   // get the offset of gene and output
-  ngene = fnm.geneOffset(offset);
+  ngene = fnm.geneOffset(gShift);
   if (parser.is_used("-f")) {
-    vector<pair<string, size_t>> tmp(offset.begin(), offset.end());
-    sort(tmp.begin(), tmp.end(),
-         [](auto &a, auto &b) { return a.second < b.second; });
-    ofstream fndx(fnm.cldir + parser.get<string>("-f"));
-    for (auto &it : tmp)
-      fndx << it.first << "\t" << it.second << "\n";
-    fndx.close();
+    string fname = fnm.cldir + parser.get<string>("-f");
+    writeGenomeShift(gShift, fname);
   }
 }

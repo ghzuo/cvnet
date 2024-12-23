@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:41:51
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-21 2:49:06
+ * @Last Modified Time: 2024-12-23 3:27:26
  */
 
 #include <vector>
@@ -39,7 +39,8 @@ struct MclMatrix {
   void push(pair<size_t, size_t>, float);
   void push(size_t, size_t, float);
   long size() const;
-  void writetxt(const string&);
+  void sortRow();
+  void write(const string&, bool resort=false);
 };
 
 #endif // MCLMATRIX_H

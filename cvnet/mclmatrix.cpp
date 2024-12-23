@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:42:05
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-10 10:18:15
+ * @Last Modified Time: 2024-12-23 3:27:38
  */
 
 #include "mclmatrix.h"
@@ -25,9 +25,22 @@ void MclMatrix::push(size_t i, size_t j, float val) {
 
 long MclMatrix::size() const { return data.size(); };
 
-void MclMatrix::writetxt(const string &file) {
+void MclMatrix::sortRow() {
+  // sort the items of column
+#pragma omp parallel for
+  for (size_t i = 0; i < data.size(); ++i) {
+    sort(data[i].begin(), data[i].end(),
+         [](auto &a, auto &b) { return a.ndx < b.ndx; });
+  }
+};
 
-  mkpath(file);
+void MclMatrix::write(const string &file, bool resort) {
+
+  // sort every row
+  if (resort)
+    sortRow();
+
+  // open file for write
   ofstream ofs(file);
   if (!ofs.is_open()) {
     cerr << "Error opening file: " << file << endl;
@@ -35,8 +48,8 @@ void MclMatrix::writetxt(const string &file) {
   }
 
   // write the header
-  ofs << "(mclheader\nmcltype matrix\ndimensions " 
-      << size() << "x" << size() << "\n)"
+  ofs << "(mclheader\nmcltype matrix\ndimensions " << size() << "x" << size()
+      << "\n)"
       << "\n\n(mclmatrix\nbegin\n\n";
 
   // write the data
