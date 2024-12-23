@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:34:29
+ * @Last Modified Time: 2024-12-23 6:53:51
  */
 
 #ifndef SIMILARMATRIX_H
@@ -46,7 +46,7 @@ struct Msimilar {
   vector<float> data;
 
   Msimilar() = default;
-  Msimilar(long irow, long icol, double d0 = 0.0) : header(irow, icol) {
+  Msimilar(long irow, long icol, float d0 = 0.0) : header(irow, icol) {
     data.resize(irow * icol, d0);
   };
   Msimilar(const string &rn, const string &cn, long irow, long icol,
@@ -59,7 +59,7 @@ struct Msimilar {
   Msimilar(const string &fname) { read(fname); }
 
   // set row name and col name
-  void setName(const string &, const string &);
+  void resetByHeader(const MatrixHeader&, float d0=0.0);
 
   // get/set value of matrix
   void _set(size_t, size_t, float);

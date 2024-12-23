@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-11 2:54:08
+ * @Last Modified Time: 2024-12-23 11:26:20
  */
 
 #include "cvmeth.h"
@@ -32,10 +32,6 @@ CVmeth *CVmeth::create(const string &methStr, const string &cvdir,
 };
 
 void CVmeth::setg(const string &gtype) {
-  // set the genome type
-  gsuff = "." + gtype;
-  cvsuff = gsuff + cvsuff;
-
   // init genome type read file
   theg.init(gtype);
 
@@ -94,9 +90,8 @@ void CVmeth::execute(const string &gname, const vector<size_t> &klist,
   // calculate the CV
   if (!mcv.empty()) {
     // read genomes
-    string gfile = gname + gsuff;
     Genome genome;
-    theg.readgene(gfile, genome);
+    theg.readgene(gname, genome);
 
     // get the cv of all K of the genome
     cv(genome, mcv);
@@ -113,8 +108,7 @@ void CVmeth::getcv(const string &fname, int k, vector<CVvec> &cvs) {
 
   // read genomes
   Genome genome;
-  string gfile = fname + gsuff;
-  theg.readgene(gfile, genome);
+  theg.readgene(fname, genome);
 
   // get the cv in map format
   vector<pair<int, CVmap>> mcv{make_pair(k, CVmap())};
@@ -134,8 +128,7 @@ float CVmeth::getcv(const string &fname, int k, CVvec &aCV, bool save) {
 
     // read genomes
     Genome genome;
-    string gfile = fname + gsuff;
-    theg.readgene(gfile, genome);
+    theg.readgene(fname, genome);
 
     // get the cv in map format
     cv(genome, mcv);
@@ -157,9 +150,8 @@ float CVmeth::getcv(const string &fname, int k, CVvec &aCV, bool save) {
 void CVmeth::bootstrap(const string &gname, const vector<size_t> &klist,
                        const vector<string> &btdirs, bool chk) {
   // read genomes
-  string gfile = gname + gsuff;
   Genome genome;
-  theg.readgene(gfile, genome);
+  theg.readgene(gname, genome);
 
   // get cv for samples
   for (auto &dir : btdirs) {

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 5:39:08
+ * @Last Modified Time: 2024-12-23 8:12:41
  */
 
 #include "cva2sm.h"
@@ -20,13 +20,13 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for
   for (int i = 0; i < args.flist.size(); ++i) {
     auto it = args.flist[i];
-    if (!gzvalid(it.output)) {
-      CVArray cva(it.inputA, args.smeth->lp);
-      CVArray cvb(it.inputB, args.smeth->lp);
-      Msimilar sm(getFileName(it.inputA), getFileName(it.inputB),
-                  cva.norm.size(), cvb.norm.size());
+    if (!gzvalid(it.smf)) {
+      CVArray cva(it.cvfa, args.smeth->lp);
+      CVArray cvb(it.cvfb, args.smeth->lp);
+      Msimilar sm(getFileName(it.cvfa), getFileName(it.cvfb), cva.norm.size(),
+                  cvb.norm.size());
       args.smeth->getSim(cva, cvb, sm);
-      sm.write(it.output);
+      sm.write(it.smf);
     }
   }
 }

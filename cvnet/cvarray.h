@@ -8,7 +8,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-11-25 11:34:53
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-20 11:26:07
+ * @Last Modified Time: 2024-12-23 9:33:33
  */
 
 #ifndef CVARRAY_H
@@ -60,6 +60,7 @@ struct CVArray {
   void read(const string &);
   void write(const string &) const;
 
+  static size_t readng(const string&);
   friend ostream &operator<<(ostream &, const CVArray &);
 };
 

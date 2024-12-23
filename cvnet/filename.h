@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 3:46:10
+ * @Last Modified Time: 2024-12-23 11:15:31
  */
 
 #ifndef FILENAME_H
@@ -20,16 +20,17 @@
 #include <string>
 #include <vector>
 
+#include "cvarray.h"
 #include "kit.h"
 #include "similarMatrix.h"
 using namespace std;
 
 struct TriFileName {
-  string inputA, inputB, output;
+  string cvfa, cvfb, smf;
 
   TriFileName() = default;
   TriFileName(const string &a, const string &b, const string &o)
-      : inputA(a), inputB(b), output(o){};
+      : cvfa(a), cvfb(b), smf(o){};
 
   static void setdir(const string &);
   friend ostream &operator<<(ostream &, const TriFileName &);
@@ -41,15 +42,18 @@ struct FileNames {
   string cvdir = "cva/";
   string smdir = "sm/";
   string cldir = "grp/";
-  string cvsyb = "cv5";
+  string gnsyb = "faa";
+  string cvsyb = "Hao";
   string smsyb = "Cosine";
   string clsyb = "RBHP";
+  int k = 5;
   vector<string> glist;
   vector<TriFileName> fnl;
 
   FileNames() = default;
 
   void setfn(const vector<string> &);
+  void setfn(const string &);
   void setfn(const vector<TriFileName> &);
   void setSuffix(const string &);
   void setgndir(const string &);
@@ -61,12 +65,13 @@ struct FileNames {
   string smsuf();
   string clsuf();
 
-  size_t gnfnlist(vector<string>&);
-  size_t cvfnlist(vector<string>&);
-  size_t smfnlist(vector<string>&);
-  size_t trifnlist(vector<TriFileName>&);
-  size_t geneOffset(map<string,size_t>&);
-  
+  size_t gnfnlist(vector<string> &);
+  size_t cvfnlist(vector<string> &);
+  size_t smfnlist(vector<string> &);
+  size_t trifnlist(vector<TriFileName> &);
+  size_t geneOffsetByCVFile(map<string, size_t> &);
+  size_t geneOffsetBySMFile(map<string, size_t> &);
+
   string _smFN(const string &, const string &);
   void _genTriFNList();
   void _genGList();
@@ -74,5 +79,5 @@ struct FileNames {
 
 void readFileList(const string &, vector<string> &);
 string setFilePath(const string &, const string &, const string &);
-void writeGenomeShift(const map<string, size_t>&, const string&);
+void writeGenomeShift(const map<string, size_t> &, const string &);
 #endif

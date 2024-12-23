@@ -38,13 +38,15 @@ set(LIBCVKIT_SRC
 
 ADD_LIBRARY(cvkit STATIC ${LIBCVKIT_SRC})
 
-set(DBQUERY_SRC ${CVTREEHEADS} dbquery.cpp)
+set(DBQUERY_SRC ${CVKITSHEADS} dbquery.cpp)
 
-set(G2CVA_SRC ${CVTREEHEADS} g2cva.h g2cva.cpp)
+set(G2CVA_SRC ${CVKITSHEADS} g2cva.h g2cva.cpp)
 
-set(CVA2SM_SRC ${CVTREEHEADS} cva2sm.h cva2sm.cpp)
+set(CVA2SM_SRC ${CVKITSHEADS} cva2sm.h cva2sm.cpp)
 
-set(SM2MCL_SRC ${CVTREEHEADS} sm2mcl.h sm2mcl.cpp)
+set(SM2MCL_SRC ${CVKITSHEADS} sm2mcl.h sm2mcl.cpp)
+
+set(CVNET_SRC ${CVKITSHEADS} cvnet.h cvnet.cpp)
 
 add_executable(g2cva ${G2CVA_SRC})
 target_link_libraries(g2cva PRIVATE cvkit kit)
@@ -58,9 +60,13 @@ target_link_libraries(cva2sm PRIVATE cvkit kit)
 add_executable(sm2mcl ${SM2MCL_SRC})
 target_link_libraries(sm2mcl PRIVATE cvkit kit argparse)
 
+add_executable(cvnet ${CVNET_SRC})
+target_link_libraries(cvnet PRIVATE cvkit kit argparse)
+
 install(
   TARGETS g2cva
           # dbquery
           cva2sm
           sm2mcl
+          cvnet
   RUNTIME DESTINATION bin)

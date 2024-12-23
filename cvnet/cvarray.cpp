@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 10:57:16
+ * @Last Modified Time: 2024-12-23 5:41:15
  */
 
 #include "cvarray.h"
@@ -103,6 +103,22 @@ void CVArray::read(const string &fname) {
   // close file
   gzclose(fp);
 };
+
+size_t CVArray::readng(const string &fname) {
+  // open and test file
+  gzFile fp;
+  string gzfile = addsuffix(fname, ".gz");
+  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
+    cerr << "CV file not found: \"" << gzfile << '"' << endl;
+    exit(1);
+  }
+
+  size_t ng;
+  gzread(fp, &ng, sizeof(ng));
+  gzclose(fp);
+
+  return ng;
+}
 
 void CVArray::write(const string &fname) const {
   // open and test file

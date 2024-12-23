@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 3:59:11
+ * @Last Modified Time: 2024-12-23 9:45:48
  */
 
 #include "sm2mcl.h"
@@ -109,7 +109,7 @@ Args::Args(int argc, char *argv[]) {
   fnm.smfnlist(smlist);
 
   // get the offset of gene and output
-  ngene = fnm.geneOffset(gShift);
+  ngene = fnm.geneOffsetBySMFile(gShift);
   if (parser.is_used("-f")) {
     string fname = fnm.cldir + parser.get<string>("-f");
     writeGenomeShift(gShift, fname);

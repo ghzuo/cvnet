@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:38:26
+ * @Last Modified Time: 2024-12-23 8:09:31
  */
 
 #include "similarMatrix.h"
@@ -36,9 +36,10 @@ void MatrixHeader::read(gzFile &fp) {
 };
 
 // set row name and col name
-void Msimilar::setName(const string &rnm, const string &cnm) {
-  header.rowName = rnm;
-  header.colName = cnm;
+void Msimilar::resetByHeader(const MatrixHeader& hd, float d0) {
+  header = hd;
+  vector<float> tmp(hd.nrow*hd.ncol, d0);
+  data.swap(tmp);
 }
 
 // option on sigle item

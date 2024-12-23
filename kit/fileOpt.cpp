@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-05-12 16:45:14
+ * @Last Modified Time: 2024-12-23 9:24:18
  */
 
 #include "fileOpt.h"
@@ -54,9 +54,10 @@ int gzline(gzFile &fp, string &line) {
 
 // check whether a gzip file is exist and not emtpy
 bool gzvalid(const string &filename) {
-  if (fileExists(filename)) {
+  string gzfile = addsuffix(filename, ".gz");
+  if (fileExists(gzfile)) {
     gzFile fp;
-    if ((fp = gzopen(filename.c_str(), "rb")) != NULL) {
+    if ((fp = gzopen(gzfile.c_str(), "rb")) != NULL) {
       if (gzgetc(fp) != -1) {
         gzclose(fp);
         return true;

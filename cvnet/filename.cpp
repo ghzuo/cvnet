@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 3:51:28
+ * @Last Modified Time: 2024-12-23 11:20:58
  */
 
 #include "filename.h"
@@ -17,7 +17,7 @@
  *************************************************************/
 
 ostream &operator<<(ostream &os, const TriFileName &tf) {
-  return os << tf.inputA << " .vs. " << tf.inputB << " -> " << tf.output;
+  return os << tf.cvfa << " .vs. " << tf.cvfb << " -> " << tf.smf;
 }
 
 /*************************************************************
@@ -25,8 +25,14 @@ ostream &operator<<(ostream &os, const TriFileName &tf) {
  *************************************************************/
 void FileNames::setfn(const vector<string> &flist) {
   for (const auto &f : flist) {
-    glist.emplace_back(getFileName(f));
+    glist.emplace_back(f);
   }
+};
+
+void FileNames::setfn(const string &fname) {
+  vector<string> flist;
+  readFileList(fname, flist);
+  setfn(flist);
 };
 
 void FileNames::setfn(const vector<TriFileName> &trilist) {
@@ -36,8 +42,8 @@ void FileNames::setfn(const vector<TriFileName> &trilist) {
   // get the genome file list
   set<string> nmset;
   for (auto fn : trilist) {
-    nmset.insert(fn.inputA);
-    nmset.insert(fn.inputB);
+    nmset.insert(fn.cvfa);
+    nmset.insert(fn.cvfb);
   }
 
   // delete the cv suffix
@@ -65,7 +71,7 @@ size_t FileNames::smfnlist(vector<string> &smlist) {
   if (fnl.empty())
     _genTriFNList();
   for (auto fn : fnl)
-    smlist.push_back(fn.output);
+    smlist.push_back(fn.smf);
   return smlist.size();
 };
 
@@ -77,15 +83,15 @@ size_t FileNames::trifnlist(vector<TriFileName> &trilist) {
   return trilist.size();
 };
 
-size_t FileNames::geneOffset(map<string, size_t> &offset) {
+size_t FileNames::geneOffsetBySMFile(map<string, size_t> &offset) {
   if (fnl.empty())
     _genTriFNList();
 
   size_t ndx = 0;
   for (auto &it : fnl) {
-    if (offset.find(it.inputA) == offset.end() ||
-        offset.find(it.inputB) == offset.end()) {
-      MatrixHeader header(it.output);
+    if (offset.find(it.cvfa) == offset.end() ||
+        offset.find(it.cvfb) == offset.end()) {
+      MatrixHeader header(it.smf);
       if (offset.find(header.rowName) == offset.end()) {
         offset[header.rowName] = ndx;
         ndx += header.nrow;
@@ -99,7 +105,20 @@ size_t FileNames::geneOffset(map<string, size_t> &offset) {
   return ndx;
 };
 
-string FileNames::cvsuf() { return sufsep + cvsyb; };
+size_t FileNames::geneOffsetByCVFile(map<string, size_t> &offset) {
+  size_t ndx = 0;
+  vector<string> cvlist;
+  cvfnlist(cvlist);
+  for(auto &it : cvlist){
+    offset[it] = ndx;
+    size_t ngene = CVArray::readng(it);
+    ndx += ngene;
+  }
+  return ndx;
+};
+
+
+string FileNames::cvsuf() { return sufsep + cvsyb + to_string(k); };
 string FileNames::smsuf() { return cvsuf() + sufsep + smsyb; };
 string FileNames::clsuf() { return smsuf() + sufsep + clsyb; }
 

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-08 7:48:22
+ * @Last Modified Time: 2024-12-23 11:26:46
  */
 
 #ifndef CVMETH_H
@@ -35,8 +35,7 @@
 struct CVmeth {
 
   GeneType theg;
-  string gsuff = ".faa";
-  string cvsuff = ".cv";
+  string cvsuff = ".Hao";
   string ksuff = ".K";
   string cvdir;
   int kmin = 1;
@@ -79,7 +78,7 @@ struct CVmeth {
 
 // son class for Hao method
 struct HaoMethod : public CVmeth {
-  HaoMethod() { kmin = 3; };
+  HaoMethod() { kmin = 3; cvsuff = ".Hao"; };
   void cv(const Genome &, vector<pair<int, CVmap>> &) override;
   void cv(const Gene &, vector<pair<int, CVmap>> &) override;
   void markov(const CVmap &, const CVmap &, const CVmap &, double, CVmap &);
@@ -90,7 +89,7 @@ struct HaoMethod : public CVmeth {
 
 // son class for Li method
 struct Counting : public CVmeth {
-  Counting() { cvsuff = ".ncv"; };
+  Counting() { cvsuff = ".Count"; };
   void cv(const Genome &, vector<pair<int, CVmap>> &) override;
   void cv(const Gene &, vector<pair<int, CVmap>> &) override;
 };
