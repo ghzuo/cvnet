@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-12-07 1:27:08
+@Last Modified Time: 2024-12-24 2:27:24
 '''
 
 import numpy as np
@@ -169,14 +169,15 @@ def runMCL(infile, outfile=None, inf=1.5, te=16):
                     '-I', str(inf), '-te', str(te), '-V', 'all'])
 
 
-def readSeqName(file):
-    df = pd.read_csv(file, header=None)
-    df.columns = ["FileName"]
-    df["Genome"] = df["FileName"].apply(lambda x: x.split('.', 1)[0])
-    df["GeneIndex"] = df["FileName"].apply(lambda x: x.split('.')[2])
-    ggndx = {name: idx for idx, name in enumerate(df["Genome"].unique())}
-    df["GenomeIndex"] = df["Genome"].apply(lambda x: ggndx[x])
-    return df
+def readSeqGenome(file):
+    df = pd.read_csv(file, sep="\t")
+    gname = []
+    gindex = []
+    for index, row in df.iterrows():
+        nItem = row["last"] - row["first"] + 1
+        gname = gname + [row["Genome"]] * nItem
+        gindex = gindex + [index] * nItem
+    return np.array(gname), np.array(gindex)
 
 
 if __name__ == "__main__":

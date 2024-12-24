@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 9:59:58
+ * @Last Modified Time: 2024-12-24 1:38:48
  */
 
 #include "cvnet.h"
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
   map<string, size_t> gShift;
   size_t ngene = args.fnm.geneOffsetByCVFile(gShift);
   if (!args.outshift.empty())
-    writeGenomeShift(gShift, args.outshift);
+    writeGenomeShift(gShift, ngene, args.outshift);
   theInfo("Get offsets for genomes in Matrix");
 
   // Calculate/Read the similar matrix and push them into mcl matrix

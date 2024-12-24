@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 11:14:37
+ * @Last Modified Time: 2024-12-24 2:11:15
  */
 
 #include "filename.h"
@@ -109,14 +109,13 @@ size_t FileNames::geneOffsetByCVFile(map<string, size_t> &offset) {
   size_t ndx = 0;
   vector<string> cvlist;
   cvfnlist(cvlist);
-  for(auto &it : cvlist){
+  for (auto &it : cvlist) {
     offset[it] = ndx;
     CVAinfo hd(it);
     ndx += hd.nCV;
   }
   return ndx;
 };
-
 
 string FileNames::cvsuf() { return sufsep + cvsyb + to_string(k); };
 string FileNames::smsuf() { return cvsuf() + sufsep + smsyb; };
@@ -197,12 +196,16 @@ string setFilePath(const string &supdir, const string &suffix,
   return nstr;
 };
 
-void writeGenomeShift(const map<string, size_t>& gShift, const string& fname){
-    vector<pair<string, size_t>> tmp(gShift.begin(), gShift.end());
-    sort(tmp.begin(), tmp.end(),
-         [](auto &a, auto &b) { return a.second < b.second; });
-    ofstream fndx(fname);
-    for (auto &it : tmp)
-      fndx << delsuffix(it.first) << "\t" << it.second << "\n";
-    fndx.close();
+void writeGenomeShift(const map<string, size_t> &gShift, size_t ngene,
+                      const string &fname) {
+  vector<pair<string, size_t>> tmp(gShift.begin(), gShift.end());
+  sort(tmp.begin(), tmp.end(),
+       [](auto &a, auto &b) { return a.second < b.second; });
+  tmp.push_back(make_pair("End", ngene));
+  ofstream fndx(fname);
+  fndx << "Genome\tfirst\tlast\n";
+  for (int i = 0; i < tmp.size() - 1; ++i)
+    fndx << delsuffix(getFileName(tmp[i].first)) << "\t" << tmp[i].second
+         << "\t" << tmp[i + 1].second - 1 << "\n";
+  fndx.close();
 };

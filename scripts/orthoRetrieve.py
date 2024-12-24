@@ -10,13 +10,13 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:36:39
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-10-01 23:02:59
+@Last Modified Time: 2024-12-24 12:55:27
 '''
 
 
 import argparse
 import numpy as np
-import orthoFinderTools as oft
+import toolkit as oft
 
 
 def getMisGenome(cl, gid):

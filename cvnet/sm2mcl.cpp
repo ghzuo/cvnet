@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 8:55:00
+ * @Last Modified Time: 2024-12-24 1:38:03
  */
 
 #include "sm2mcl.h"
@@ -109,6 +109,6 @@ Args::Args(int argc, char *argv[]) {
   ngene = fnm.geneOffsetBySMFile(gShift);
   if (parser.is_used("-f")) {
     string fname = fnm.cldir + parser.get<string>("-f");
-    writeGenomeShift(gShift, fname);
+    writeGenomeShift(gShift, ngene, fname);
   }
 }
