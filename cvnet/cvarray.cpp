@@ -7,11 +7,31 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 5:41:15
+ * @Last Modified Time: 2024-12-24 11:12:33
  */
 
 #include "cvarray.h"
+// for CV array info/header
+void CVAinfo::read(const string &fname) {
+  // open and test file
+  gzFile fp;
+  string gzfile = addsuffix(fname, ".gz");
+  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
+    cerr << "CV file not found: \"" << gzfile << '"' << endl;
+    exit(1);
+  }
 
+  // get size of the cvarray
+  gzread(fp, (char *)this, sizeof(CVAinfo));
+  gzclose(fp);
+};
+
+ostream &operator<<(ostream &os, const CVAinfo &hd) {
+  os << hd.nCV << "\t" << hd.nKstr << "\t" << hd.nItem;
+  return os;
+};
+
+// for CV array
 void CVArray::get(const string &fname, CVmeth *cmeth, int k, bool cache) {
   string cvfile = cmeth->getCVname(fname, k);
   if (gzvalid(cvfile)) {
@@ -85,40 +105,24 @@ void CVArray::read(const string &fname) {
   }
 
   // get size of the cvarray
-  tuple<size_t, size_t, size_t> size;
-  gzread(fp, (char *)&size, sizeof(tuple<size_t, size_t, size_t>));
+  CVAinfo hd;
+  gzread(fp, (char *)&hd, sizeof(CVAinfo));
 
   // read the cvdiminfo
-  cvdi.resize(std::get<0>(size));
-  gzread(fp, (char *)cvdi.data(), sizeof(CVdimInfo) * std::get<0>(size));
+  cvdi.resize(hd.nCV);
+  gzread(fp, (char *)cvdi.data(), sizeof(CVdimInfo) * hd.nCV);
 
   // read the kdiminfo
-  kdi.resize(std::get<1>(size));
-  gzread(fp, (char *)kdi.data(), sizeof(KdimInfo) * std::get<1>(size));
+  kdi.resize(hd.nKstr);
+  gzread(fp, (char *)kdi.data(), sizeof(KdimInfo) * hd.nKstr);
 
   // read the data
-  data.resize(std::get<2>(size));
-  gzread(fp, (char *)data.data(), sizeof(Kitem) * std::get<2>(size));
+  data.resize(hd.nItem);
+  gzread(fp, (char *)data.data(), sizeof(Kitem) * hd.nItem);
 
   // close file
   gzclose(fp);
 };
-
-size_t CVArray::readng(const string &fname) {
-  // open and test file
-  gzFile fp;
-  string gzfile = addsuffix(fname, ".gz");
-  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
-    cerr << "CV file not found: \"" << gzfile << '"' << endl;
-    exit(1);
-  }
-
-  size_t ng;
-  gzread(fp, &ng, sizeof(ng));
-  gzclose(fp);
-
-  return ng;
-}
 
 void CVArray::write(const string &fname) const {
   // open and test file
@@ -130,8 +134,8 @@ void CVArray::write(const string &fname) const {
   }
 
   // write the size of CVArray
-  auto size = make_tuple(cvdi.size(), kdi.size(), data.size());
-  gzwrite(fp, &size, sizeof(size));
+  CVAinfo hd(cvdi.size(), kdi.size(), data.size());
+  gzwrite(fp, &hd, sizeof(CVAinfo));
 
   // write the diminfo and data
   gzwrite(fp, cvdi.data(), cvdi.size() * sizeof(CVdimInfo));

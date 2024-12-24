@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:20:58
+ * @Last Modified Time: 2024-12-24 11:14:37
  */
 
 #include "filename.h"
@@ -111,8 +111,8 @@ size_t FileNames::geneOffsetByCVFile(map<string, size_t> &offset) {
   cvfnlist(cvlist);
   for(auto &it : cvlist){
     offset[it] = ndx;
-    size_t ngene = CVArray::readng(it);
-    ndx += ngene;
+    CVAinfo hd(it);
+    ndx += hd.nCV;
   }
   return ndx;
 };

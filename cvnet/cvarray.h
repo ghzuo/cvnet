@@ -8,7 +8,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-11-25 11:34:53
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 9:33:33
+ * @Last Modified Time: 2024-12-24 11:13:51
  */
 
 #ifndef CVARRAY_H
@@ -37,6 +37,20 @@ struct Kblock {
   size_t size() const { return _end - _begin; }
 };
 
+struct CVAinfo {
+  size_t nCV;
+  size_t nKstr;
+  size_t nItem;
+
+  CVAinfo() = default;
+  CVAinfo(size_t nc, size_t nk, size_t ni) : nCV(nc), nKstr(nk), nItem(ni){};
+  CVAinfo(const CVAinfo &rhs)
+      : nCV(rhs.nCV), nKstr(rhs.nKstr), nItem(rhs.nItem){};
+  CVAinfo(const string& fn){read(fn);};
+  void read(const string&); 
+  friend ostream &operator<<(ostream &, const CVAinfo &);
+};
+
 struct CVArray {
   vector<KdimInfo> kdi;
   vector<CVdimInfo> cvdi;
@@ -60,7 +74,6 @@ struct CVArray {
   void read(const string &);
   void write(const string &) const;
 
-  static size_t readng(const string&);
   friend ostream &operator<<(ostream &, const CVArray &);
 };
 

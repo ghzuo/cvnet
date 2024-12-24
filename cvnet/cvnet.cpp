@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:40:31
+ * @Last Modified Time: 2024-12-24 9:59:58
  */
 
 #include "cvnet.h"
@@ -29,16 +29,16 @@ int main(int argc, char **argv) {
       cva.write(cvfile);
     }
   }
-  theInfo("Get all CVAs for Project");
+  theInfo("Get all CVAs for Genomes");
 
   // get the gene shift
   map<string, size_t> gShift;
   size_t ngene = args.fnm.geneOffsetByCVFile(gShift);
   if (!args.outshift.empty())
     writeGenomeShift(gShift, args.outshift);
-  theInfo("Get the offset for Matrix");
+  theInfo("Get offsets for genomes in Matrix");
 
-  // get the similar matrix and push them into mcl matrix
+  // Calculate/Read the similar matrix and push them into mcl matrix
   MclMatrix mm(ngene);
   vector<TriFileName> tlist;
   args.fnm.trifnlist(tlist);
@@ -104,9 +104,9 @@ Args::Args(int argc, char *argv[]) {
       .store_into(fnm.k)
       .nargs(1);
   parser.add_argument("-c", "--cutoff")
-      .help("cutoff for CUT method")
-      .default_value(0.8)
-      .scan<'f', float>()
+      .help("cutoff for edge similarity")
+      .default_value(EdgeMeth::threshold)
+      .action([](const auto &val){EdgeMeth::threshold =stof(val);})
       .nargs(1);
   parser.add_argument("-G", "--gndir")
       .help("directory for genome file")
@@ -143,7 +143,7 @@ Args::Args(int argc, char *argv[]) {
   parser.add_argument("-f", "--offset")
       .help("output gene offset")
       .default_value("GenomeOffset.csv");
-  parser.add_description("Select the edges from similarity matrix for MCL");
+  parser.add_description("Generate Network for MCL based on Composition Vector");
 
   try {
     parser.parse_args(argc, argv);
@@ -161,9 +161,6 @@ Args::Args(int argc, char *argv[]) {
 
   // set select method
   emeth = EdgeMeth::create(fnm.clsyb);
-  // set cutoff for CUT method
-  if (parser.is_used("-c"))
-    emeth->floor = parser.get<float>("-c");
 
   // set output file name
   fnm.clsyb = emeth->methsyb();

@@ -7,11 +7,13 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 11:54:59
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 3:40:37
+ * @Last Modified Time: 2024-12-24 10:11:01
  */
 
 #ifndef EDGEMETH_H
 #define EDGEMETH_H
+
+#include <algorithm>
 
 #include "mclmatrix.h"
 #include "similarMatrix.h"
@@ -35,7 +37,7 @@ struct Edge {
 
 // edge method
 struct EdgeMeth {
-  float floor = 0.8;
+  static float threshold;
 
   static EdgeMeth *create(const string &methStr);
 
@@ -53,10 +55,10 @@ struct EdgeMeth {
 
 struct EdgeByCutoff : public EdgeMeth {
   string methsyb() const override {
-    return "CUT" + to_string(int(floor * 100));
+    return "CUT" + to_string(int(threshold * 100));
   };
   void sm2edge(const Msimilar &sm, vector<Edge> &edge) const override {
-    cutoff(sm, floor, edge);
+    cutoff(sm, threshold, edge);
   }
 };
 

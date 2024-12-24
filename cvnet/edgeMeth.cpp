@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 3:40:28
+ * @Last Modified Time: 2024-12-24 10:24:52
  */
 
 #include "edgeMeth.h"
@@ -19,6 +19,8 @@ ostream &operator<<(ostream &os, const Edge &e) {
 };
 
 // for Edge method
+float EdgeMeth::threshold = 0.5;
+
 EdgeMeth *EdgeMeth::create(const string &methStr) {
   // create the distance method
   EdgeMeth *meth;
@@ -43,7 +45,7 @@ void EdgeMeth::fillmcl(const Msimilar &sm, const pair<size_t, size_t> &offset,
   for (auto &e : edge)
     e.shift(offset);
 
-  // push edge into mcl matrix
+    // push edge into mcl matrix
 #pragma omp critical
   {
     for (auto &e : edge)
@@ -62,9 +64,14 @@ void EdgeMeth::mutualBestHit(const Msimilar &sm, vector<Edge> &edges) const {
       if (rowBest.second < sm.data[j])
         rowBest = make_pair(j, sm.data[j]);
     }
-    rowBest.first -= ibeg;
+
+    // abandon small reciprocal best hit
+    if (rowBest.second < threshold) {
+      continue;
+    }
 
     // check whether the test of the col
+    rowBest.first -= ibeg;
     bool isColBest(true);
     for (size_t k = rowBest.first; k < sm.data.size(); k += sm.header.ncol) {
       if (sm.data[k] > rowBest.second) {
@@ -89,13 +96,15 @@ void EdgeByMutualBestPlus::sm2edge(const Msimilar &sm,
                                    vector<Edge> &edge) const {
   vector<Edge> rbhs;
   mutualBestHit(sm, rbhs);
+  float minW = threshold;
   if (rbhs.empty()) {
-    cerr << "No reciprocal was find!" << endl;
+    theInfo("No RBH between " + sm.header.rowName + " and " +
+            sm.header.colName + ", use threshold instead");
   } else {
-    float minRBH = numeric_limits<float>::max();
-    for (auto &it : rbhs)
-      if (it.weight < floor)
-        minRBH = it.weight;
-    cutoff(sm, minRBH, edge);
+    auto minW =
+        min_element(rbhs.begin(), rbhs.end(), [](const auto &a, const auto &b) {
+          return a.weight < b.weight;
+        })->weight;
   }
+  cutoff(sm, minW, edge);
 };

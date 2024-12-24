@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 9:45:48
+ * @Last Modified Time: 2024-12-24 8:55:00
  */
 
 #include "sm2mcl.h"
@@ -32,9 +32,9 @@ int main(int argc, char *argv[]) {
 
 Args::Args(int argc, char *argv[]) {
   // Define the available options and parameters
-  argparse::ArgumentParser parser("sm2mcl", "0.1");
   FileNames fnm;
-
+  
+  argparse::ArgumentParser parser("sm2mcl", "0.1");
   parser.add_argument("-m", "--method")
       .help("method for selecting items, RBH/CUT/RBHP")
       .choices("RBH", "CUT", "RBHP")
@@ -42,9 +42,9 @@ Args::Args(int argc, char *argv[]) {
       .nargs(1)
       .store_into(fnm.clsyb);
   parser.add_argument("-c", "--cutoff")
-      .help("cutoff for CUT method")
-      .default_value(0.8)
-      .scan<'f', float>()
+      .help("cutoff for edge similarity")
+      .default_value(EdgeMeth::threshold)
+      .action([](const auto &val){EdgeMeth::threshold =stof(val);})
       .nargs(1);
   parser.add_argument("-s", "--suffix")
       .help("suffix for similarity matrix")
@@ -88,9 +88,6 @@ Args::Args(int argc, char *argv[]) {
 
   // set select method
   meth = EdgeMeth::create(fnm.clsyb);
-  // set cutoff for CUT method
-  if (parser.is_used("-c"))
-    meth->floor = parser.get<float>("-c");
 
   // set output file name
   fnm.clsyb = meth->methsyb();

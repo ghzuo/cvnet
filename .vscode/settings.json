@@ -21,5 +21,8 @@
     "*.rmd": "markdown",
     "ostream": "cpp",
     "limits": "cpp"
-  }
+  },
+  "cmake.configureArgs": [
+    "-DSTATIC=ON"
+  ],
 }
