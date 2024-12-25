@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-12-25 8:58:48
+@Last Modified Time: 2024-12-25 9:48:09
 '''
 
 import pandas as pd
@@ -22,7 +22,7 @@ if __name__ == "__main__":
     options = sys.argv[1:]
 
     # get gene-genome index
-    _, gIndex = oft.readSeqGenome("GenomeOffset.csv")
+    _, gIndex = oft.readSeqGenome("GeneIndex.csv")
     ngno = gIndex[-1] + 1
 
     # read cluster and do statistics
@@ -33,14 +33,14 @@ if __name__ == "__main__":
                             columns=["Ngenome", "Ngene"])
         ngene = scls['Ngene'].value_counts()
         ngeno = scls['Ngenome'].value_counts()
-        nfcls.append([opt, ngeno[ngno], ngene[ngno]])
+        nfcls.append([opt.replace('grp.', ''), ngeno[ngno], ngene[ngno]])
 
         # write down data
         ngene.to_csv(opt.replace(
-            'grp', 'ngene') + ".csv", index=False, sep='\t')
+            'grp', 'ngene') + ".csv", sep='\t')
         ngeno.to_csv(opt.replace(
-            'grp', 'ngeno') + ".csv", index=False, sep='\t')
+            'grp', 'ngeno') + ".csv", sep='\t')
 
     # write the key feature
     pd.DataFrame(nfcls, columns=['opt', 'FullCover', 'SoloFull']).to_csv(
-        "statCluster.csv", index=False, sep='\t')
+        "FullClustal.csv", index=False, sep='\t')

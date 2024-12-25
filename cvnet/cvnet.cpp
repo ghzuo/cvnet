@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 1:38:48
+ * @Last Modified Time: 2024-12-25 9:41:23
  */
 
 #include "cvnet.h"
@@ -141,8 +141,8 @@ Args::Args(int argc, char *argv[]) {
       .nargs(0)
       .action([](const auto &) { theInfo.quiet = true; });
   parser.add_argument("-f", "--offset")
-      .help("output gene offset")
-      .default_value("GenomeOffset.csv");
+      .help("output gene index for genome")
+      .default_value("GeneIndex.csv");
   parser.add_description("Generate Network for MCL based on Composition Vector");
 
   try {
