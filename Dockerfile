@@ -8,7 +8,7 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2024-12-15 20:15:35
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2024-12-15 23:34:12
+# @Last Modified Time: 2024-12-25 10:55:33
 ###
 
 
@@ -19,20 +19,18 @@ LABEL Version=0.1 \
   description="Docker image for CVNet" 
 
 ## for develop environment
-RUN apk --update add --no-cache g++ make cmake zlib-dev boost-dev
-RUN apk --update add --no-cache nlohmann-json --repository=http://dl-cdn.alpinelinux.org/alpine/edge/community
+RUN apk --update add --no-cache g++ make cmake zlib-dev
 
 ## Build cvtree
 WORKDIR /root
-COPY ./cvnet /root/cvtree/cvnet
-COPY ./kit /root/cvtree/kit
-COPY ./CMakeLists.txt /root/cvtree/
-RUN mkdir cvtree/build/ && cd cvtree/build/ && cmake .. && make 
+COPY ./cvnet /root/cvnet/cvnet
+COPY ./kit /root/cvnet/kit
+COPY ./CMakeLists.txt /root/cvnet/
+RUN mkdir cvnet/build/ && cd cvnet/build/ && cmake .. -DSTATIC=ON && make 
 
 ## Stage for run cvtree 
 FROM alpine AS run
-COPY --from=dev /root/cvtree/build/bin/* /usr/local/bin/
-RUN apk --update add --no-cache libgomp libstdc++
+COPY --from=dev /root/cvnet/build/bin/* /usr/local/bin/
 
 ## for workplace
 WORKDIR /root/data

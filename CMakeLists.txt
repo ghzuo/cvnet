@@ -7,7 +7,7 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2017-09-01 16:22:53
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2024-12-24 7:10:18
+# @Last Modified Time: 2024-12-25 10:52:32
 ###
 
 cmake_minimum_required(VERSION 3.14)
@@ -48,9 +48,6 @@ foreach(LIB ${REQUIRED_LIBRARIES})
     message(FATAL_ERROR ${LIB} " library not found!")
   endif()
 endforeach()
-
-### find the nlohmann json
-find_package(nlohmann_json 3.6 REQUIRED)
 
 ### Check the OPENMP
 find_package(OpenMP REQUIRED)
