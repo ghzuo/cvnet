@@ -7,7 +7,7 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2024-12-24 11:49:31
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2024-12-24 8:53:59
+# @Last Modified Time: 2024-12-25 6:52:03
 
 
 if [ $# -eq 0 ]; then
@@ -18,5 +18,5 @@ fi
 for input in "$@"; do
   output=${input/mcl/grp}
   echo "mcl $input ..."
-  time mcl $input -o $output -I 1.5 -te 20 -V all
+  time mcl $input -o $output -I 1.2 -te 20 -V all
 done

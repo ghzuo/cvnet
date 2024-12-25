@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 11:54:59
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 10:11:01
+ * @Last Modified Time: 2024-12-25 6:08:51
  */
 
 #ifndef EDGEMETH_H
@@ -38,6 +38,7 @@ struct Edge {
 // edge method
 struct EdgeMeth {
   static float threshold;
+  string methSyb;
 
   static EdgeMeth *create(const string &methStr);
 
@@ -47,30 +48,27 @@ struct EdgeMeth {
   // select items: cutoff or Reciprocal Best Hit
   void mutualBestHit(const Msimilar &, vector<Edge> &) const;
   void cutoff(const Msimilar &, float, vector<Edge> &) const;
+  string methsyb() const {
+    return methSyb + to_string(int(threshold * 100));
+  };
 
   // method in
-  virtual string methsyb() const = 0;
   virtual void sm2edge(const Msimilar &, vector<Edge> &) const = 0;
 };
 
 struct EdgeByCutoff : public EdgeMeth {
-  string methsyb() const override {
-    return "CUT" + to_string(int(threshold * 100));
-  };
   void sm2edge(const Msimilar &sm, vector<Edge> &edge) const override {
     cutoff(sm, threshold, edge);
   }
 };
 
 struct EdgeByMutualBest : public EdgeMeth {
-  string methsyb() const override { return "RBH"; };
   void sm2edge(const Msimilar &sm, vector<Edge> &edge) const override {
     mutualBestHit(sm, edge);
   }
 };
 
 struct EdgeByMutualBestPlus : public EdgeMeth {
-  string methsyb() const override { return "RBHP"; };
   void sm2edge(const Msimilar &sm, vector<Edge> &edges) const override;
 };
 

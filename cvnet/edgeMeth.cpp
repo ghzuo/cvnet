@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 10:24:52
+ * @Last Modified Time: 2024-12-25 6:34:29
  */
 
 #include "edgeMeth.h"
@@ -19,7 +19,7 @@ ostream &operator<<(ostream &os, const Edge &e) {
 };
 
 // for Edge method
-float EdgeMeth::threshold = 0.5;
+float EdgeMeth::threshold = 0.1;
 
 EdgeMeth *EdgeMeth::create(const string &methStr) {
   // create the distance method
@@ -35,6 +35,7 @@ EdgeMeth *EdgeMeth::create(const string &methStr) {
     exit(3);
   }
 
+  meth->methSyb = methStr;
   return meth;
 };
 
