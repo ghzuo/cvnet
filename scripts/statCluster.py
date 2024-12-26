@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-12-25 9:48:09
+@Last Modified Time: 2024-12-26 9:28:09
 '''
 
 import pandas as pd
@@ -36,11 +36,9 @@ if __name__ == "__main__":
         nfcls.append([opt.replace('grp.', ''), ngeno[ngno], ngene[ngno]])
 
         # write down data
-        ngene.to_csv(opt.replace(
-            'grp', 'ngene') + ".csv", sep='\t')
-        ngeno.to_csv(opt.replace(
-            'grp', 'ngeno') + ".csv", sep='\t')
+        ngene.to_csv("ngene-" + opt + ".csv", sep='\t')
+        ngeno.to_csv("ngeno-" + opt + ".csv", sep='\t')
 
-    # write the key feature
+    # write the number of full cover cluster
     pd.DataFrame(nfcls, columns=['opt', 'FullCover', 'SoloFull']).to_csv(
         "FullClustal.csv", index=False, sep='\t')
