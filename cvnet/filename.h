@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 6:03:35
+ * @Last Modified Time: 2024-12-26 10:44:02
  */
 
 #ifndef FILENAME_H
@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "cvarray.h"
 #include "kit.h"
+#include "cvarray.h"
 #include "similarMatrix.h"
 using namespace std;
 
@@ -38,24 +38,19 @@ struct TriFileName {
 
 struct FileNames {
   string sufsep = ".";
-
+  string gndir = "";
   string gtype = "faa";
+  string cvdir = "cache/cva/";
+  string cmeth = "Count";
+  int k = 5;
+  string smdir = "cache/sm/";
+  string smeth = "InterList";
+  string cldir = "mcl/";
+  string emeth = "RBH";
+  double cutoff = 0.1;
   vector<string> gflist;
   vector<TriFileName> smplist;
-  string gndir = "";
-
-  string cmeth = "Hao";
-  int k = 5;
-  string cvdir = "cache/cva/";
-
-  string smeth = "Cosine";
-  double cutoff = 0.1;
-  string smdir = "cache/sm/";
-
-  string emeth = "RBH";
-  string cldir = "mcl/";
-
-
+  
   FileNames() = default;
 
   void setfn(const vector<string> &);
@@ -75,8 +70,8 @@ struct FileNames {
   size_t cvfnlist(vector<string> &);
   size_t smfnlist(vector<string> &);
   size_t trifnlist(vector<TriFileName> &);
-  size_t geneOffsetByCVFile(map<string, size_t> &);
-  size_t geneOffsetBySMFile(map<string, size_t> &);
+  size_t geneIndexByCVFile(map<string, size_t> &);
+  size_t geneIndexBySMFile(map<string, size_t> &);
 
   string _smFN(const string &, const string &);
   void _genTriFNList();
@@ -84,5 +79,5 @@ struct FileNames {
 };
 
 string setFilePath(const string &, const string &, const string &);
-void writeGenomeShift(const map<string, size_t> &, size_t, const string &);
+void writeGeneIndex(const map<string, size_t> &, size_t, const string &);
 #endif

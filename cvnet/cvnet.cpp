@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:15:57
+ * @Last Modified Time: 2024-12-26 10:50:07
  */
 
 #include "cvnet.h"
@@ -32,9 +32,9 @@ int main(int argc, char **argv) {
   theInfo("Get all CVAs for Genomes");
 
   // get the gene shift
-  map<string, size_t> gShift;
-  size_t ngene = args.fnm.geneOffsetByCVFile(gShift);
-  writeGenomeShift(gShift, ngene, args.outndx);
+  map<string, size_t> gidx;
+  size_t ngene = args.fnm.geneIndexByCVFile(gidx);
+  writeGeneIndex(gidx, ngene, args.outndx);
   theInfo("Get gene index in Matrix");
 
   // Calculate/Read the similar matrix and push them into mcl matrix
@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
     }
 
     auto mtxShift =
-        make_pair(gShift.find(it.cvfa)->second, gShift.find(it.cvfb)->second);
+        make_pair(gidx.find(it.cvfa)->second, gidx.find(it.cvfb)->second);
     args.emeth->fillmcl(sm, mtxShift, mm);
   }
 

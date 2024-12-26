@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 6:04:45
+ * @Last Modified Time: 2024-12-26 10:49:13
  */
 
 #include "sm2mcl.h"
@@ -21,8 +21,8 @@ int main(int argc, char *argv[]) {
 #pragma omp parallel for
   for (size_t i = 0; i < args.smlist.size(); ++i) {
     Msimilar sm(args.smlist[i]);
-    auto mtxShift = make_pair(args.gShift.find(sm.header.rowName)->second,
-                              args.gShift.find(sm.header.colName)->second);
+    auto mtxShift = make_pair(args.gidx.find(sm.header.rowName)->second,
+                              args.gidx.find(sm.header.colName)->second);
     args.meth->fillmcl(sm, mtxShift, mm);
   }
 
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
   mm.write(args.outmcl, true);
 
   // output the gene index
-  writeGenomeShift(args.gShift, args.ngene, args.outndx);
+  writeGeneIndex(args.gidx, args.ngene, args.outndx);
 }
 
 Args::Args(int argc, char *argv[]) {
@@ -107,6 +107,6 @@ Args::Args(int argc, char *argv[]) {
   fnm.smfnlist(smlist);
 
   // get the offset of gene and output
-  ngene = fnm.geneOffsetBySMFile(gShift);
+  ngene = fnm.geneIndexBySMFile(gidx);
   outndx = fnm.cldir + parser.get<string>("-f");
 }

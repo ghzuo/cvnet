@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 6:03:24
+ * @Last Modified Time: 2024-12-26 10:44:59
  */
 
 #include "filename.h"
@@ -84,7 +84,7 @@ size_t FileNames::trifnlist(vector<TriFileName> &trilist) {
   return trilist.size();
 };
 
-size_t FileNames::geneOffsetBySMFile(map<string, size_t> &offset) {
+size_t FileNames::geneIndexBySMFile(map<string, size_t> &offset) {
   if (smplist.empty())
     _genTriFNList();
 
@@ -106,7 +106,7 @@ size_t FileNames::geneOffsetBySMFile(map<string, size_t> &offset) {
   return ndx;
 };
 
-size_t FileNames::geneOffsetByCVFile(map<string, size_t> &offset) {
+size_t FileNames::geneIndexByCVFile(map<string, size_t> &offset) {
   size_t ndx = 0;
   vector<string> cvlist;
   cvfnlist(cvlist);
@@ -193,8 +193,8 @@ string setFilePath(const string &supdir, const string &suffix,
   return nstr;
 };
 
-void writeGenomeShift(const map<string, size_t> &gShift, size_t ngene,
-                      const string &fname) {
+void writeGeneIndex(const map<string, size_t> &gShift, size_t ngene,
+                    const string &fname) {
   vector<pair<string, size_t>> tmp(gShift.begin(), gShift.end());
   sort(tmp.begin(), tmp.end(),
        [](auto &a, auto &b) { return a.second < b.second; });

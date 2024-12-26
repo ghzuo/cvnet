@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:29:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 10:36:01
+ * @Last Modified Time: 2024-12-26 10:48:53
  */
 
 #ifndef SM2MCL_H
@@ -28,7 +28,7 @@ struct Args {
   string outndx;
   EdgeMeth *meth;
   vector<string> smlist;
-  map<string, size_t> gShift;
+  map<string, size_t> gidx;
 
   Args(int, char *argv[]);
 };
