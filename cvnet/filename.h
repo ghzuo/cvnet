@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:26:00
+ * @Last Modified Time: 2024-12-26 6:03:35
  */
 
 #ifndef FILENAME_H
@@ -83,7 +83,6 @@ struct FileNames {
   void _genGList();
 };
 
-void readFileList(const string &, vector<string> &);
 string setFilePath(const string &, const string &, const string &);
 void writeGenomeShift(const map<string, size_t> &, size_t, const string &);
 #endif

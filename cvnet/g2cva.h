@@ -7,15 +7,15 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-09 7:06:31
+ * @Last Modified Time: 2024-12-26 6:42:18
  */
 
 #ifndef CV2ARRAY_H
 #define CV2ARRAY_H
 
-#include "cvmeth.h"
 #include "kit.h"
-#include "cvarray.h"
+#include "cvmeth.h"
+#include "filename.h"
 using namespace std;
 
 // read arguments

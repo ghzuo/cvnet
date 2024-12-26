@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:17:46
+ * @Last Modified Time: 2024-12-26 6:04:45
  */
 
 #include "sm2mcl.h"
@@ -103,9 +103,7 @@ Args::Args(int argc, char *argv[]) {
   outmcl = fnm.cldir + outmcl;
 
   // setup input file names
-  vector<string> flist;
-  readFileList(parser.get<string>("-i"), flist);
-  fnm.setfn(flist);
+  fnm.setfn(parser.get<string>("-i"));
   fnm.smfnlist(smlist);
 
   // get the offset of gene and output

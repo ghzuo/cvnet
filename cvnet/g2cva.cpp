@@ -33,37 +33,32 @@ int main(int argc, char *argv[]) {
 /******************** End of Main programin **************************/
 /*********************************************************************/
 
-Args::Args(int argc, char **argv) : k(5) {
+Args::Args(int argc, char **argv) {
 
   program = argv[0];
   string listfile("list");
-  string gtype("faa");
-  string gdir("");
-  string cvdir("cva/");
-  string methStr("Hao");
+  FileNames fnm;
 
   char ch;
   while ((ch = getopt(argc, argv, "G:i:k:V:g:m:qh")) != -1) {
     switch (ch) {
     case 'G':
-      gdir = optarg;
-      addsuffix(gdir, '/');
+      fnm.setgndir(optarg);
       break;
     case 'i':
       listfile = optarg;
       break;
     case 'V':
-      cvdir = optarg;
-      addsuffix(cvdir, '/');
+      fnm.setcvdir(optarg);
       break;
     case 'g':
-      gtype = optarg;
+      fnm.gtype = optarg;
       break;
     case 'k':
-      k = str2int(optarg);
+      fnm.k = str2int(optarg);
       break;
     case 'm':
-      methStr = optarg;
+      fnm.cmeth = optarg;
       break;
     case 'q':
       theInfo.quiet = true;
@@ -76,37 +71,21 @@ Args::Args(int argc, char **argv) : k(5) {
   }
 
   // check the genome type
-  if (gtype != "faa" && gtype != "ffn" && gtype != "fna") {
-    cerr << "Only faa/ffn/fna are supported!\n" << endl;
+  if (fnm.gtype != "faa" && fnm.gtype != "ffn") {
+    cerr << "Only faa/ffn are supported!\n" << endl;
     exit(1);
   }
 
   // set the method
-  cmeth = CVmeth::create(methStr, cvdir, gtype);
-  if (!cvdir.empty())
-    mkpath(cvdir);
-
+  cmeth = CVmeth::create(fnm.cmeth, fnm.cvdir, fnm.gtype);
   // check the K value
+  k = fnm.k;
   cmeth->checkK(k);
 
-  // read the genome list
-  map<string, string> nameMap;
-  readNameMap(listfile, flist, nameMap);
-  uniqueWithOrder(flist);
+  // get the genome list
+  fnm.setfn(listfile);
+  fnm.gnfnlist(flist);
 
-  // get the glist by flist and nameMap
-  for (auto &fname : flist) {
-    // delete the suffix of file
-    if (getsuffix(fname) == gtype)
-      fname = delsuffix(fname);
-  }
-
-  // add the surper directory of genome
-  if (!gdir.empty()) {
-    for (auto &fn : flist) {
-      fn = gdir + fn;
-    }
-  }
 };
 
 void Args::usage() {

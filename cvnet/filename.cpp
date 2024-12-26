@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:11:18
+ * @Last Modified Time: 2024-12-26 6:03:24
  */
 
 #include "filename.h"
@@ -31,7 +31,8 @@ void FileNames::setfn(const vector<string> &flist) {
 
 void FileNames::setfn(const string &fname) {
   vector<string> flist;
-  readFileList(fname, flist);
+  readlist(fname, flist);
+  uniqueWithOrder(flist);
   setfn(flist);
 };
 
@@ -175,12 +176,6 @@ void FileNames::_genTriFNList() {
 
 string FileNames::_smFN(const string &astr, const string &bstr) {
   return smdir + getFileName(astr) + "-" + getFileName(bstr) + smsuf();
-};
-
-void readFileList(const string &listfile, vector<string> &glist) {
-  map<string, string> nameMap;
-  readNameMap(listfile, glist, nameMap);
-  uniqueWithOrder(glist);
 };
 
 string setFilePath(const string &supdir, const string &suffix,

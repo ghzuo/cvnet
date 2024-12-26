@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:06:27
+ * @Last Modified Time: 2024-12-26 6:06:34
  */
 
 #include "cva2sm.h"
@@ -74,14 +74,8 @@ Args::Args(int argc, char **argv) {
   // set the similarity method
   smeth = SimilarMeth::create(methStr);
 
-  // read the genome list
-  vector<string> glist;
-  readFileList(listfile, glist);
-
-  // set cvfile path
-  fnm.setfn(glist);
-
-  // generate the triplet with two inputs and one output
+  // read genome file list, generate the triplet
+  fnm.setfn(listfile);
   fnm.trifnlist(flist);
 }
 
