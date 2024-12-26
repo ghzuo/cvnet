@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:26:46
+ * @Last Modified Time: 2024-12-26 11:34:47
  */
 
 #ifndef CVMETH_H
@@ -36,7 +36,6 @@ struct CVmeth {
 
   GeneType theg;
   string cvsuff = ".Hao";
-  string ksuff = ".K";
   string cvdir;
   int kmin = 1;
   int kmax = 14;

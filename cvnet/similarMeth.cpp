@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-22 10:47:00
+ * @Last Modified Time: 2024-12-26 12:01:31
  */
 
 #include "similarMeth.h"
@@ -16,7 +16,6 @@
 /**************************************************************
  * the similar methods
  **************************************************************/
-
 SimilarMeth *SimilarMeth::create(const string &methStr) {
 
   // create the distance method

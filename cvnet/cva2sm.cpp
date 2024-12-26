@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 8:12:41
+ * @Last Modified Time: 2024-12-26 12:06:27
  */
 
 #include "cva2sm.h"
@@ -53,7 +53,7 @@ Args::Args(int argc, char **argv) {
       break;
     case 'm':
       methStr = optarg;
-      fnm.smsyb = methStr;
+      fnm.smeth = methStr;
       break;
     case 'V':
       fnm.setcvdir(optarg);

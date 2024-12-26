@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-25 9:41:57
+ * @Last Modified Time: 2024-12-26 12:17:46
  */
 
 #include "sm2mcl.h"
@@ -28,23 +28,26 @@ int main(int argc, char *argv[]) {
 
   // resort row and output MclMatrix
   mm.write(args.outmcl, true);
+
+  // output the gene index
+  writeGenomeShift(args.gShift, args.ngene, args.outndx);
 }
 
 Args::Args(int argc, char *argv[]) {
   // Define the available options and parameters
   FileNames fnm;
-  
+
   argparse::ArgumentParser parser("sm2mcl", "0.1");
   parser.add_argument("-m", "--method")
       .help("method for selecting items, RBH/CUT/RBHP")
       .choices("RBH", "CUT", "RBHP")
-      .default_value(fnm.clsyb)
+      .default_value(fnm.emeth)
       .nargs(1)
-      .store_into(fnm.clsyb);
+      .store_into(fnm.emeth);
   parser.add_argument("-c", "--cutoff")
       .help("cutoff for edge similarity")
-      .default_value(EdgeMeth::threshold)
-      .action([](const auto &val){EdgeMeth::threshold =stof(val);})
+      .default_value(fnm.cutoff)
+      .store_into(fnm.cutoff)
       .nargs(1);
   parser.add_argument("-s", "--suffix")
       .help("suffix for similarity matrix")
@@ -73,9 +76,10 @@ Args::Args(int argc, char *argv[]) {
       .help("run command in quiet mode")
       .nargs(0)
       .action([](const auto &) { theInfo.quiet = true; });
-  parser.add_argument("-f", "--offset")
+  parser.add_argument("-f", "--gene-index")
       .help("output gene index for genome")
-      .default_value("GeneIndex.csv");
+      .default_value("GeneIndex.tsv")
+      .nargs(1);
   parser.add_description("Select the edges from similarity matrix for MCL");
 
   try {
@@ -87,14 +91,13 @@ Args::Args(int argc, char *argv[]) {
   }
 
   // set select method
-  meth = EdgeMeth::create(fnm.clsyb);
+  meth = EdgeMeth::create(fnm.emeth, fnm.cutoff);
 
   // set output file name
-  fnm.clsyb = meth->methsyb();
   if (parser.is_used("-o")) {
     outmcl = parser.get<string>("-o");
   } else {
-    outmcl = "mcl" + fnm.clsuf();
+    outmcl = fnm.clsuf();
   }
   mkpath(fnm.cldir);
   outmcl = fnm.cldir + outmcl;
@@ -107,8 +110,5 @@ Args::Args(int argc, char *argv[]) {
 
   // get the offset of gene and output
   ngene = fnm.geneOffsetBySMFile(gShift);
-  if (parser.is_used("-f")) {
-    string fname = fnm.cldir + parser.get<string>("-f");
-    writeGenomeShift(gShift, ngene, fname);
-  }
+  outndx = fnm.cldir + parser.get<string>("-f");
 }

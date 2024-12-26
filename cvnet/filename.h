@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-25 6:00:44
+ * @Last Modified Time: 2024-12-26 12:26:00
  */
 
 #ifndef FILENAME_H
@@ -38,17 +38,23 @@ struct TriFileName {
 
 struct FileNames {
   string sufsep = ".";
+
+  string gtype = "faa";
+  vector<string> gflist;
+  vector<TriFileName> smplist;
   string gndir = "";
-  string cvdir = "cva/";
-  string smdir = "sm/";
-  string cldir = "grp/";
-  string gnsyb = "faa";
-  string cvsyb = "Hao";
-  string smsyb = "Cosine";
-  string clsyb = "RBH";
+
+  string cmeth = "Hao";
   int k = 5;
-  vector<string> glist;
-  vector<TriFileName> fnl;
+  string cvdir = "cache/cva/";
+
+  string smeth = "Cosine";
+  double cutoff = 0.1;
+  string smdir = "cache/sm/";
+
+  string emeth = "RBH";
+  string cldir = "mcl/";
+
 
   FileNames() = default;
 

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-25 6:34:29
+ * @Last Modified Time: 2024-12-26 12:19:17
  */
 
 #include "edgeMeth.h"
@@ -19,9 +19,7 @@ ostream &operator<<(ostream &os, const Edge &e) {
 };
 
 // for Edge method
-float EdgeMeth::threshold = 0.1;
-
-EdgeMeth *EdgeMeth::create(const string &methStr) {
+EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
   // create the distance method
   EdgeMeth *meth;
   if (methStr == "CUT") {
@@ -35,7 +33,7 @@ EdgeMeth *EdgeMeth::create(const string &methStr) {
     exit(3);
   }
 
-  meth->methSyb = methStr;
+  meth->threshold = cutoff;
   return meth;
 };
 

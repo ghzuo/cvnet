@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:08:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:00:04
+ * @Last Modified Time: 2024-12-26 12:26:11
  */
 
 #ifndef CVNET_H
@@ -28,9 +28,9 @@ struct Args{
   SimilarMeth *smeth;
   EdgeMeth *emeth;
   FileNames fnm;
-  string outshift;
+  string outndx;
   string outmcl;
-
+  
   Args(int argc, char **argv);
 };
 

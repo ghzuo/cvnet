@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-18 5:04:27
+ * @Last Modified Time: 2024-12-26 12:01:14
  */
 
 #ifndef SIMILARMETH_H
@@ -33,7 +33,6 @@
 using namespace std;
 
 struct SimilarMeth {
-  string name;
   enum LPnorm lp;
 
   // the create function
@@ -55,7 +54,6 @@ struct SimilarMeth {
 // ... distance scaling at L2
 struct Cosine : public SimilarMeth {
   Cosine() {
-    name = "Cosine";
     lp = L2;
   };
 
@@ -68,7 +66,6 @@ struct Cosine : public SimilarMeth {
 
 struct Euclidean : public SimilarMeth {
   Euclidean() {
-    name = "Euclidean";
     lp = L2;
   };
 
@@ -83,7 +80,6 @@ struct Euclidean : public SimilarMeth {
 // ... distance scaling at L1
 struct InterList : public SimilarMeth {
   InterList() {
-    name = "InterList";
     lp = L1;
   };
 
@@ -95,7 +91,6 @@ struct InterList : public SimilarMeth {
 
 struct Min2Max : public SimilarMeth {
   Min2Max() {
-    name = "Min2Max";
     lp = L1;
   };
 
@@ -108,7 +103,6 @@ struct Min2Max : public SimilarMeth {
 // ... distance scaling at L0
 struct InterSet : public SimilarMeth {
   InterSet() {
-    name = "InterSet";
     lp = L0;
   };
 
@@ -120,7 +114,6 @@ struct InterSet : public SimilarMeth {
 
 struct Dice : public SimilarMeth {
   Dice() {
-    name = "Dice";
     lp = L0;
   };
 
@@ -132,7 +125,6 @@ struct Dice : public SimilarMeth {
 
 struct ItoU : public SimilarMeth {
   ItoU() {
-    name = "ItoU";
     lp = L0;
   };
 

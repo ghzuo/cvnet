@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 2:11:15
+ * @Last Modified Time: 2024-12-26 12:11:18
  */
 
 #include "filename.h"
@@ -25,7 +25,7 @@ ostream &operator<<(ostream &os, const TriFileName &tf) {
  *************************************************************/
 void FileNames::setfn(const vector<string> &flist) {
   for (const auto &f : flist) {
-    glist.emplace_back(f);
+    gflist.emplace_back(f);
   }
 };
 
@@ -37,7 +37,7 @@ void FileNames::setfn(const string &fname) {
 
 void FileNames::setfn(const vector<TriFileName> &trilist) {
   // set the trifilelist
-  fnl = trilist;
+  smplist = trilist;
 
   // get the genome file list
   set<string> nmset;
@@ -55,40 +55,40 @@ void FileNames::setfn(const vector<TriFileName> &trilist) {
 };
 
 size_t FileNames::gnfnlist(vector<string> &gnlist) {
-  for (auto &nm : glist)
+  for (auto &nm : gflist)
     gnlist.emplace_back(gndir + nm);
   return gnlist.size();
 }
 
 size_t FileNames::cvfnlist(vector<string> &cvlist) {
   string suff = cvsuf();
-  for (auto &nm : glist)
+  for (auto &nm : gflist)
     cvlist.emplace_back(setFilePath(cvdir, suff, nm));
   return cvlist.size();
 };
 
 size_t FileNames::smfnlist(vector<string> &smlist) {
-  if (fnl.empty())
+  if (smplist.empty())
     _genTriFNList();
-  for (auto fn : fnl)
+  for (auto fn : smplist)
     smlist.push_back(fn.smf);
   return smlist.size();
 };
 
 size_t FileNames::trifnlist(vector<TriFileName> &trilist) {
-  if (fnl.empty())
+  if (smplist.empty())
     _genTriFNList();
   mkpath(smdir);
-  trilist = fnl;
+  trilist = smplist;
   return trilist.size();
 };
 
 size_t FileNames::geneOffsetBySMFile(map<string, size_t> &offset) {
-  if (fnl.empty())
+  if (smplist.empty())
     _genTriFNList();
 
   size_t ndx = 0;
-  for (auto &it : fnl) {
+  for (auto &it : smplist) {
     if (offset.find(it.cvfa) == offset.end() ||
         offset.find(it.cvfb) == offset.end()) {
       MatrixHeader header(it.smf);
@@ -117,9 +117,11 @@ size_t FileNames::geneOffsetByCVFile(map<string, size_t> &offset) {
   return ndx;
 };
 
-string FileNames::cvsuf() { return sufsep + cvsyb + to_string(k); };
-string FileNames::smsuf() { return cvsuf() + sufsep + smsyb; };
-string FileNames::clsuf() { return smsuf() + sufsep + clsyb; }
+string FileNames::cvsuf() { return sufsep + cmeth + to_string(k); };
+string FileNames::smsuf() { return cvsuf() + sufsep + smeth; };
+string FileNames::clsuf() {
+  return gtype + smsuf() + sufsep + emeth + to_string(int(cutoff * 100));
+}
 
 void FileNames::setSuffix(const string &str) {
   vector<string> wd;
@@ -128,11 +130,11 @@ void FileNames::setSuffix(const string &str) {
     wd.erase(wd.begin());
   switch (wd.size()) {
   case 3:
-    clsyb = wd[2];
+    emeth = wd[2];
   case 2:
-    smsyb = wd[1];
+    smeth = wd[1];
   case 1:
-    cvsyb = wd[0];
+    cmeth = wd[0];
     break;
   default:
     cerr << "Too many segments in suffix" << endl;
@@ -166,7 +168,7 @@ void FileNames::_genTriFNList() {
   size_t n = cvfnlist(cvlist);
   for (auto i = 0; i < n; i++) {
     for (auto j = i + 1; j < n; j++) {
-      fnl.emplace_back(cvlist[i], cvlist[j], _smFN(glist[i], glist[j]));
+      smplist.emplace_back(cvlist[i], cvlist[j], _smFN(gflist[i], gflist[j]));
     }
   }
 };

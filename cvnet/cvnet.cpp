@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-25 9:41:23
+ * @Last Modified Time: 2024-12-26 12:15:57
  */
 
 #include "cvnet.h"
@@ -34,9 +34,8 @@ int main(int argc, char **argv) {
   // get the gene shift
   map<string, size_t> gShift;
   size_t ngene = args.fnm.geneOffsetByCVFile(gShift);
-  if (!args.outshift.empty())
-    writeGenomeShift(gShift, ngene, args.outshift);
-  theInfo("Get offsets for genomes in Matrix");
+  writeGenomeShift(gShift, ngene, args.outndx);
+  theInfo("Get gene index in Matrix");
 
   // Calculate/Read the similar matrix and push them into mcl matrix
   MclMatrix mm(ngene);
@@ -70,43 +69,43 @@ int main(int argc, char **argv) {
 
 Args::Args(int argc, char *argv[]) {
   // Define the available options and parameters
-  argparse::ArgumentParser parser("sm2mcl", "0.1");
+  argparse::ArgumentParser parser("cvnet", "0.1",
+                                  argparse::default_arguments::help);
   parser.add_argument("-g", "--genome-type")
-      .help("method for selecting edge, faa/ffn")
+      .help("genome type, faa/ffn")
       .choices("faa", "ffn")
-      .default_value(fnm.gnsyb)
+      .default_value(fnm.gtype)
       .nargs(1)
-      .store_into(fnm.gnsyb);
-  parser.add_argument("-em", "--edge-method")
+      .store_into(fnm.gtype);
+  parser.add_argument("-e", "--edge-method")
       .help("method for selecting edge, RBH/CUT/RBHP")
       .choices("RBH", "CUT", "RBHP")
-      .default_value(fnm.clsyb)
+      .default_value(fnm.emeth)
       .nargs(1)
-      .store_into(fnm.clsyb);
-  parser.add_argument("-cm", "--cv-method")
+      .store_into(fnm.emeth);
+  parser.add_argument("-v", "--cv-method")
       .help("method for compostion vector, Hao/Count")
       .choices("Count", "Hao")
-      .default_value(fnm.cvsyb)
+      .default_value(fnm.cmeth)
       .nargs(1)
-      .store_into(fnm.cvsyb);
-  parser.add_argument("-sm", "--similar-method")
+      .store_into(fnm.cmeth);
+  parser.add_argument("-s", "--similar-method")
       .help("method for similarity, "
             "Cosine/InterList/InterSet/Jaccard/Dice")
       .choices("Cosine", "Euclidean", "InterList", "InterSet", "Jaccard",
                "Dice")
-      .default_value(fnm.smsyb)
+      .default_value(fnm.smeth)
       .nargs(1)
-      .store_into(fnm.smsyb);
+      .store_into(fnm.smeth);
   parser.add_argument("-k", "--kmer-length")
       .help("cutoff for kmer length")
       .default_value(fnm.k)
-      .scan<'d', int>()
       .store_into(fnm.k)
       .nargs(1);
   parser.add_argument("-c", "--cutoff")
       .help("cutoff for edge similarity")
-      .default_value(EdgeMeth::threshold)
-      .action([](const auto &val){EdgeMeth::threshold =stof(val);})
+      .default_value(fnm.cutoff)
+      .store_into(fnm.cutoff)
       .nargs(1);
   parser.add_argument("-G", "--gndir")
       .help("directory for genome file")
@@ -133,17 +132,19 @@ Args::Args(int argc, char *argv[]) {
       .nargs(1)
       .action([&](const auto &val) { fnm.setcldir(val); });
   parser.add_argument("-o", "--output")
-      .help("output mcl files")
-      .default_value("mcl" + fnm.clsuf())
+      .help("output mcl file name")
+      .default_value(fnm.clsuf())
+      .nargs(1);
+  parser.add_argument("-f", "--gene-index")
+      .help("output gene index file name")
+      .default_value("GeneIndex.tsv")
       .nargs(1);
   parser.add_argument("-q", "--quiet")
       .help("run command in quiet mode")
       .nargs(0)
       .action([](const auto &) { theInfo.quiet = true; });
-  parser.add_argument("-f", "--offset")
-      .help("output gene index for genome")
-      .default_value("GeneIndex.csv");
-  parser.add_description("Generate Network for MCL based on Composition Vector");
+  parser.add_description(
+      "Generate Network for MCL based on Composition Vector");
 
   try {
     parser.parse_args(argc, argv);
@@ -154,26 +155,26 @@ Args::Args(int argc, char *argv[]) {
   }
 
   // set cvmeth method
-  cmeth = CVmeth::create(fnm.cvsyb, fnm.cvdir, fnm.gnsyb);
+  cmeth = CVmeth::create(fnm.cmeth, fnm.cvdir, fnm.gtype);
 
   // set select method
-  smeth = SimilarMeth::create(fnm.smsyb);
+  smeth = SimilarMeth::create(fnm.smeth);
 
   // set select method
-  emeth = EdgeMeth::create(fnm.clsyb);
+  emeth = EdgeMeth::create(fnm.emeth, fnm.cutoff);
 
-  // set output file name
-  fnm.clsyb = emeth->methsyb();
+  // setup input file names
+  fnm.setfn(parser.get<string>("-i"));
+
+  // set output mcl matrix file name
   if (parser.is_used("-o")) {
     outmcl = parser.get<string>("-o");
   } else {
-    outmcl = "mcl" + fnm.clsuf();
+    outmcl = fnm.clsuf();
   }
   mkpath(fnm.cldir);
   outmcl = fnm.cldir + outmcl;
 
-  // setup input file names
-  fnm.setfn(parser.get<string>("-i"));
-  if (parser.is_used("-f"))
-    outshift = fnm.cldir + parser.get<string>("-f");
+  // set output gene index
+  outndx = fnm.cldir + parser.get<string>("-f");
 }

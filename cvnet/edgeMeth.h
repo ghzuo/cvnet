@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 11:54:59
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-25 6:08:51
+ * @Last Modified Time: 2024-12-26 12:18:54
  */
 
 #ifndef EDGEMETH_H
@@ -37,22 +37,17 @@ struct Edge {
 
 // edge method
 struct EdgeMeth {
-  static float threshold;
-  string methSyb;
+  double threshold;
+  static EdgeMeth *create(const string&, double);
 
-  static EdgeMeth *create(const string &methStr);
-
-  //
+  // get the mcl matrix
   void fillmcl(const Msimilar &, const pair<size_t, size_t> &, MclMatrix &);
 
   // select items: cutoff or Reciprocal Best Hit
   void mutualBestHit(const Msimilar &, vector<Edge> &) const;
   void cutoff(const Msimilar &, float, vector<Edge> &) const;
-  string methsyb() const {
-    return methSyb + to_string(int(threshold * 100));
-  };
 
-  // method in
+  // method in derived classes
   virtual void sm2edge(const Msimilar &, vector<Edge> &) const = 0;
 };
 
