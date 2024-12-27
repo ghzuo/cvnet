@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 10:44:59
+ * @Last Modified Time: 2024-12-27 6:16:48
  */
 
 #include "filename.h"
@@ -161,6 +161,13 @@ void FileNames::setsmdir(const string &sdir) {
 void FileNames::setcldir(const string &ldir) {
   cldir = ldir;
   addsuffix(cldir, "/");
+};
+
+string FileNames::info() const{
+  string str;
+  //TODO - output the job infomation
+
+  return str;
 };
 
 void FileNames::_genTriFNList() {

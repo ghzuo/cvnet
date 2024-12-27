@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 10:44:02
+ * @Last Modified Time: 2024-12-27 7:16:01
  */
 
 #ifndef FILENAME_H
@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 
-#include "kit.h"
 #include "cvarray.h"
+#include "kit.h"
 #include "similarMatrix.h"
 using namespace std;
 
@@ -43,14 +43,14 @@ struct FileNames {
   string cvdir = "cache/cva/";
   string cmeth = "Count";
   int k = 5;
-  string smdir = "cache/sm/";
   string smeth = "InterList";
-  string cldir = "mcl/";
+  string smdir = "cache/sm/";
   string emeth = "RBH";
+  string cldir = "mcl/";
   double cutoff = 0.1;
   vector<string> gflist;
   vector<TriFileName> smplist;
-  
+
   FileNames() = default;
 
   void setfn(const vector<string> &);
@@ -72,6 +72,8 @@ struct FileNames {
   size_t trifnlist(vector<TriFileName> &);
   size_t geneIndexByCVFile(map<string, size_t> &);
   size_t geneIndexBySMFile(map<string, size_t> &);
+
+  string info() const;
 
   string _smFN(const string &, const string &);
   void _genTriFNList();
