@@ -7,13 +7,14 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:41:51
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-25 10:55:03
+ * @Last Modified Time: 2024-12-27 3:22:14
  */
 
 #include <vector>
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <fstream>
 
 #include "kit.h"
 
@@ -27,6 +28,7 @@ struct MclItem {
 
   MclItem() = default;
   MclItem(long ndx, float val) : ndx(ndx), val(val) {};
+  MclItem(const string&);
 
   friend ostream& operator<<(ostream& os, const MclItem& item) {
     return os << item.ndx << ":" << fixed << setprecision(3) << item.val;
@@ -42,6 +44,7 @@ struct MclMatrix {
   long size() const;
   void sortRow();
   void write(const string&, bool resort=false);
+  void read(const string&);
 };
 
 #endif // MCLMATRIX_H

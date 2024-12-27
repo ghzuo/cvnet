@@ -7,11 +7,20 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:42:05
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 3:27:38
+ * @Last Modified Time: 2024-12-27 3:32:01
  */
 
 #include "mclmatrix.h"
 
+// for MCL item
+MclItem::MclItem(const string &str) {
+  vector<string> wd;
+  separateWord(wd, str, ":");
+  ndx = stol(wd[0]);
+  val = stof(wd[1]);
+}
+
+// for MCL matrix
 MclMatrix::MclMatrix(long n) { data.resize(n); }
 
 void MclMatrix::push(pair<size_t, size_t> ndx, float val) {
@@ -34,16 +43,16 @@ void MclMatrix::sortRow() {
   }
 };
 
-void MclMatrix::write(const string &file, bool resort) {
+void MclMatrix::write(const string &fname, bool resort) {
 
   // sort every row
   if (resort)
     sortRow();
 
   // open file for write
-  ofstream ofs(file);
+  ofstream ofs(fname);
   if (!ofs.is_open()) {
-    cerr << "Error opening file: " << file << endl;
+    cerr << "Error opening file: " << fname << endl;
     exit(1);
   }
 
@@ -60,4 +69,34 @@ void MclMatrix::write(const string &file, bool resort) {
     ofs << "$" << endl;
   }
   ofs << ")" << endl;
+}
+
+void MclMatrix::read(const string &fname) {
+  // open file for read
+  ifstream ifs(fname);
+  if (!ifs.is_open()) {
+    cerr << "Error opening file: " << fname << endl;
+    exit(1);
+  }
+
+  string line;
+  vector<string> wd;
+  // read the head lines
+  for(int i=0; i<3; ++i)
+    getline(ifs, line);
+  separateWord(wd, line, " x");
+  size_t ngene = stol(wd[1]);
+  for(int i=3; i<8; ++i)
+    getline(ifs, line);
+
+  // read the data
+  data.resize(ngene);
+  for(size_t i=0; i<ngene; ++i){
+    getline(ifs, line);
+    separateWord(wd, line);
+    for(size_t j=1; j<wd.size() - 1; ++j){
+      data[i].emplace_back(wd[j]);
+    }
+  }
+  ifs.close();
 }
