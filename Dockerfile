@@ -19,16 +19,17 @@ LABEL Version=0.1 \
   description="Docker image for CVNet" 
 
 ## for develop environment
-RUN apk --update add --no-cache g++ make cmake zlib-dev
+RUN apk --update add --no-cache g++ make cmake git zlib-dev zlib-static
 
-## Build cvtree
+## Build cvnet
 WORKDIR /root
 COPY ./cvnet /root/cvnet/cvnet
 COPY ./kit /root/cvnet/kit
 COPY ./CMakeLists.txt /root/cvnet/
+RUN  git config --global url."https://kkgithub.com".insteadOf https://github.com
 RUN mkdir cvnet/build/ && cd cvnet/build/ && cmake .. -DSTATIC=ON && make 
 
-## Stage for run cvtree 
+## Stage for run cvnet 
 FROM alpine AS run
 COPY --from=dev /root/cvnet/build/bin/* /usr/local/bin/
 
