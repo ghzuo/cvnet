@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:01:31
+ * @Last Modified Time: 2024-12-28 10:29:23
  */
 
 #include "similarMeth.h"
@@ -58,6 +58,9 @@ void SimilarMeth::getSim(const CVArray &cva, const CVArray &cvb, Msimilar &sm) {
       sm.set(i, j, scale(sm.get(i, j), cva.norm[i], cvb.norm[j]));
     }
   }
+
+  // get the reciprocal best hit
+  sm.getRBH();
 };
 
 ///.........................

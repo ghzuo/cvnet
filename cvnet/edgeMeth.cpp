@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:19:17
+ * @Last Modified Time: 2024-12-28 10:21:01
  */
 
 #include "edgeMeth.h"
@@ -53,33 +53,13 @@ void EdgeMeth::fillmcl(const Msimilar &sm, const pair<size_t, size_t> &offset,
 };
 
 void EdgeMeth::mutualBestHit(const Msimilar &sm, vector<Edge> &edges) const {
-  for (size_t i = 0; i < sm.header.nrow; ++i) {
-    // initial the condition
-    size_t ibeg = i * sm.header.ncol;
-    size_t iend = ibeg + sm.header.ncol;
-    pair<size_t, float> rowBest(ibeg, sm.data[ibeg]);
-    // get the best the row
-    for (size_t j = ibeg + 1; j < iend; ++j) {
-      if (rowBest.second < sm.data[j])
-        rowBest = make_pair(j, sm.data[j]);
+  for(size_t i=0; i<sm.rbh.size(); ++i){
+    if(sm.rbh[i] >= 0){
+      size_t j = sm.rbh[i];
+      float val = sm.get(i, j);
+      if(val > threshold)
+        edges.emplace_back(make_pair(i, j), val);
     }
-
-    // abandon small reciprocal best hit
-    if (rowBest.second < threshold) {
-      continue;
-    }
-
-    // check whether the test of the col
-    rowBest.first -= ibeg;
-    bool isColBest(true);
-    for (size_t k = rowBest.first; k < sm.data.size(); k += sm.header.ncol) {
-      if (sm.data[k] > rowBest.second) {
-        isColBest = false;
-        break;
-      }
-    }
-    if (isColBest)
-      edges.emplace_back(make_pair(i, rowBest.first), rowBest.second);
   }
 };
 
@@ -93,17 +73,14 @@ void EdgeMeth::cutoff(const Msimilar &sm, float cut, vector<Edge> &edge) const {
 
 void EdgeByMutualBestPlus::sm2edge(const Msimilar &sm,
                                    vector<Edge> &edge) const {
-  vector<Edge> rbhs;
-  mutualBestHit(sm, rbhs);
-  float minW = threshold;
-  if (rbhs.empty()) {
-    theInfo("No RBH between " + sm.header.rowName + " and " +
-            sm.header.colName + ", use threshold instead");
-  } else {
-    auto minW =
-        min_element(rbhs.begin(), rbhs.end(), [](const auto &a, const auto &b) {
-          return a.weight < b.weight;
-        })->weight;
+  float minW = threshold;                       
+  for(size_t i=0; i<sm.rbh.size(); ++i){
+    if(sm.rbh[i] >= 0){
+      size_t j = sm.rbh[i];
+      float val = sm.get(i, j);
+      if(val > minW)
+        minW = val;
+    }
   }
   cutoff(sm, minW, edge);
 };
