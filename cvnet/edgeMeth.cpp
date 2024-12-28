@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-28 10:21:01
+ * @Last Modified Time: 2024-12-28 11:01:18
  */
 
 #include "edgeMeth.h"
@@ -53,11 +53,11 @@ void EdgeMeth::fillmcl(const Msimilar &sm, const pair<size_t, size_t> &offset,
 };
 
 void EdgeMeth::mutualBestHit(const Msimilar &sm, vector<Edge> &edges) const {
-  for(size_t i=0; i<sm.rbh.size(); ++i){
-    if(sm.rbh[i] >= 0){
+  for (size_t i = 0; i < sm.rbh.size(); ++i) {
+    if (sm.rbh[i] >= 0) {
       size_t j = sm.rbh[i];
       float val = sm.get(i, j);
-      if(val > threshold)
+      if (val > threshold)
         edges.emplace_back(make_pair(i, j), val);
     }
   }
@@ -73,14 +73,15 @@ void EdgeMeth::cutoff(const Msimilar &sm, float cut, vector<Edge> &edge) const {
 
 void EdgeByMutualBestPlus::sm2edge(const Msimilar &sm,
                                    vector<Edge> &edge) const {
-  float minW = threshold;                       
-  for(size_t i=0; i<sm.rbh.size(); ++i){
-    if(sm.rbh[i] >= 0){
+  float minW = std::numeric_limits<float>::max();
+  for (size_t i = 0; i < sm.rbh.size(); ++i) {
+    if (sm.rbh[i] >= 0) {
       size_t j = sm.rbh[i];
       float val = sm.get(i, j);
-      if(val > minW)
+      if (val < minW)
         minW = val;
     }
   }
+  minW = minW < threshold ? threshold : minW;
   cutoff(sm, minW, edge);
 };
