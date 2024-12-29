@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 4:25:12
+ * @Last Modified Time: 2024-12-29 9:48:27
  */
 
 #include "cvnet.h"
@@ -46,16 +46,16 @@ int main(int argc, char **argv) {
     auto &it = tlist[i];
     Msimilar sm;
     if (!gzvalid(it.smf)) {
-      CVArray cva(it.cvfa, args.smeth->lp);
-      CVArray cvb(it.cvfb, args.smeth->lp);
-      // get the head of matrix
-      MatrixHeader hd(getFileName(it.cvfa), getFileName(it.cvfb),
-                      cva.norm.size(), cvb.norm.size());
-      sm.resetByHeader(hd);
-      // calculate the matrix
-      try{
+      try {
+        CVArray cva(it.cvfa, args.smeth->lp);
+        CVArray cvb(it.cvfb, args.smeth->lp);
+        // get the head of matrix
+        MatrixHeader hd(getFileName(it.cvfa), getFileName(it.cvfb),
+                        cva.norm.size(), cvb.norm.size());
+        sm.resetByHeader(hd);
+        // calculate the matrix
         args.smeth->getSim(cva, cvb, sm);
-      }catch(string msg){
+      } catch (string msg) {
         cerr << msg << "\nin calculate similar matrix: " << it.smf << endl;
         exit(2);
       }
