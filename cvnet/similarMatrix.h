@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 4:55:19
+ * @Last Modified Time: 2024-12-29 11:19:21
  */
 
 #ifndef SIMILARMATRIX_H
@@ -21,6 +21,7 @@
 #include <set>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 #include "kit.h"
 

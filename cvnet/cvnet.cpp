@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 9:48:27
+ * @Last Modified Time: 2024-12-29 11:25:29
  */
 
 #include "cvnet.h"
@@ -55,8 +55,8 @@ int main(int argc, char **argv) {
         sm.resetByHeader(hd);
         // calculate the matrix
         args.smeth->getSim(cva, cvb, sm);
-      } catch (string msg) {
-        cerr << msg << "\nin calculate similar matrix: " << it.smf << endl;
+      } catch (const out_of_range& e) {
+        cerr << e.what() << "\nin calculate similar matrix: " << it.smf << endl;
         exit(2);
       }
       sm.write(it.smf);

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 6:14:30
+ * @Last Modified Time: 2024-12-29 11:24:04
  */
 
 #include "similarMatrix.h"
@@ -35,11 +35,10 @@ void MatrixHeader::read(gzFile &fp) {
   gzread(fp, (char *)&(ncol), sizeof(ncol));
 };
 
-ostream &operator<<(ostream & os, const MatrixHeader & hd) {
+ostream &operator<<(ostream &os, const MatrixHeader &hd) {
   os << hd.rowName << ": " << hd.nrow << "\n" << hd.colName << ": " << hd.ncol;
-  return os; 
+  return os;
 };
-
 
 // set row name and col name
 void Msimilar::resetByHeader(const MatrixHeader &hd, float d0) {
@@ -82,8 +81,9 @@ void Msimilar::getRBH() {
 // option on sigle item
 float Msimilar::get(size_t i, size_t j) const {
   if (i >= header.nrow || j >= header.ncol)
-    throw "Error: the index out of matrix at Msimilar::set() for: " +
-        outIndex(i, j) + " into " + outIndex(header.nrow, header.ncol);
+    throw out_of_range("Index " + outIndex(i, j) + " out of " +
+                       outIndex(header.nrow, header.ncol) +
+                       " in Msimilar::get()");
   return _get(i, j);
 };
 
@@ -91,8 +91,9 @@ float Msimilar::_get(size_t i, size_t j) const { return data[index(i, j)]; };
 
 void Msimilar::set(size_t i, size_t j, float val) {
   if (i >= header.nrow || j >= header.ncol)
-    throw "Error: the index out of matrix at Msimilar::set() for: " +
-        outIndex(i, j) + " into " + outIndex(header.nrow, header.ncol);
+    throw out_of_range("Index " + outIndex(i, j) + " out of " +
+                       outIndex(header.nrow, header.ncol) +
+                       " in Msimilar::set()");
   _set(i, j, val);
 };
 
@@ -100,8 +101,9 @@ void Msimilar::_set(size_t i, size_t j, float val) { data[index(i, j)] = val; };
 
 void Msimilar::add(size_t i, size_t j, float val) {
   if (i >= header.nrow || j >= header.ncol)
-    throw "Error: the index out of matrix at Msimilar::add() for: " +
-        outIndex(i, j) + " into " + outIndex(header.nrow, header.ncol);
+    throw out_of_range("Index " + outIndex(i, j) + " out of " +
+                       outIndex(header.nrow, header.ncol) +
+                       " in Msimilar::add()");
   _add(i, j, val);
 };
 
@@ -181,15 +183,15 @@ void Msimilar::read(const string &fname) {
   gzclose(fp);
 };
 
-ostream &operator<<(ostream & os, const Msimilar & sm) {
+ostream &operator<<(ostream &os, const Msimilar &sm) {
   os << sm.header << "\n\n======= the RBH =========\n";
-  for(size_t i=0; i<sm.rbh.size(); ++i)
+  for (size_t i = 0; i < sm.rbh.size(); ++i)
     os << i << "\t" << sm.rbh[i] << "\n";
 
   os << "\n========= the similarity =====" << endl;
-  for(size_t i=0; i<sm.header.nrow; ++i){
-    for(size_t j=0; j<sm.header.ncol; ++j)
-      os << sm.get(i,j)<<" ";
+  for (size_t i = 0; i < sm.header.nrow; ++i) {
+    for (size_t j = 0; j < sm.header.ncol; ++j)
+      os << sm.get(i, j) << " ";
     os << endl;
   }
   return os;
