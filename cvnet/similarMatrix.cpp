@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-28 10:26:49
+ * @Last Modified Time: 2024-12-29 3:12:53
  */
 
 #include "similarMatrix.h"
@@ -36,9 +36,9 @@ void MatrixHeader::read(gzFile &fp) {
 };
 
 // set row name and col name
-void Msimilar::resetByHeader(const MatrixHeader& hd, float d0) {
+void Msimilar::resetByHeader(const MatrixHeader &hd, float d0) {
   header = hd;
-  vector<float> tmp(hd.nrow*hd.ncol, d0);
+  vector<float> tmp(hd.nrow * hd.ncol, d0);
   data.swap(tmp);
 }
 
@@ -56,7 +56,7 @@ void Msimilar::getRBH() {
     rbh[i] = ibeg;
     // get the best the row
     for (long j = ibeg + 1; j < iend; ++j) {
-      if (maxSim < data[j]){
+      if (maxSim < data[j]) {
         rbh[i] = j;
         maxSim = data[j];
       }
@@ -64,7 +64,7 @@ void Msimilar::getRBH() {
     rbh[i] -= ibeg;
 
     // check whether the test of the col
-    for (long k=rbh[i]; k < data.size(); k += header.ncol) {
+    for (long k = rbh[i]; k < data.size(); k += header.ncol) {
       if (data[k] > maxSim) {
         rbh[i] = -1;
         break;
@@ -73,39 +73,29 @@ void Msimilar::getRBH() {
   }
 };
 
-
 // option on sigle item
 float Msimilar::get(size_t i, size_t j) const {
-  if (i >= header.nrow || j >= header.ncol) {
-    cerr << "Error: the index out of matrix at Msimilar::set() for: "
-         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol)
-         << endl;
-    exit(4);
-  }
+  if (i >= header.nrow || j >= header.ncol)
+    throw "Error: the index out of matrix at Msimilar::set() for: " +
+        outIndex(i, j) + " into " + outIndex(header.nrow, header.ncol);
   return _get(i, j);
 };
 
 float Msimilar::_get(size_t i, size_t j) const { return data[index(i, j)]; };
 
 void Msimilar::set(size_t i, size_t j, float val) {
-  if (i >= header.nrow || j >= header.ncol) {
-    cerr << "Error: the index out of matrix at Msimilar::set() for: "
-         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol)
-         << endl;
-    exit(4);
-  }
+  if (i >= header.nrow || j >= header.ncol)
+    throw "Error: the index out of matrix at Msimilar::set() for: " +
+        outIndex(i, j) + " into " + outIndex(header.nrow, header.ncol);
   _set(i, j, val);
 };
 
 void Msimilar::_set(size_t i, size_t j, float val) { data[index(i, j)] = val; };
 
 void Msimilar::add(size_t i, size_t j, float val) {
-  if (i >= header.nrow || j >= header.ncol) {
-    cerr << "Error: the index out of matrix at Msimilar::add() for: "
-         << outIndex(i, j) << " into " << outIndex(header.nrow, header.ncol)
-         << endl;
-    exit(4);
-  }
+  if (i >= header.nrow || j >= header.ncol)
+    throw "Error: the index out of matrix at Msimilar::add() for: " +
+        outIndex(i, j) + " into " + outIndex(header.nrow, header.ncol);
   _add(i, j, val);
 };
 
@@ -154,7 +144,7 @@ void Msimilar::write(const string &fname) const {
   gzwrite(fp, data.data(), data.size() * sizeof(data[0]));
 
   // write reciprocal best hit index
-  gzwrite(fp, rbh.data(), rbh.size()*sizeof(rbh[0]));
+  gzwrite(fp, rbh.data(), rbh.size() * sizeof(rbh[0]));
 
   // close file
   gzclose(fp);

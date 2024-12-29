@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-27 6:16:48
+ * @Last Modified Time: 2024-12-29 3:46:10
  */
 
 #include "filename.h"
@@ -163,10 +163,16 @@ void FileNames::setcldir(const string &ldir) {
   addsuffix(cldir, "/");
 };
 
-string FileNames::info() const{
+string FileNames::info() const {
   string str;
-  //TODO - output the job infomation
-
+  str += "Method for Composition Vector: " + cmeth + ", with Kmer=" + to_string(k);
+  str += "\nMethod for Similarity between CV: " + smeth;
+  str += "\nMethod for Selecting Edge: " + emeth +
+         ", with Cutoff=" + to_string(cutoff);
+  size_t nNode = gflist.size();
+  float degree = smplist.empty() ? nNode - 1 : float(smplist.size()) / nNode;
+  str += "\nNumber of Genomes: " + to_string(nNode) +
+         ", with Average Degree=" + to_string(degree);
   return str;
 };
 

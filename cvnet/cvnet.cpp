@@ -7,14 +7,14 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 10:50:07
+ * @Last Modified Time: 2024-12-29 3:46:36
  */
 
 #include "cvnet.h"
 
 int main(int argc, char **argv) {
   Args args(argc, argv);
-  theInfo("Perpare the argments for project");
+  theInfo(args.fnm.info() + "\nPerpared argments of project");
 
   //  get the cva for every species
   vector<string> flist;
@@ -48,10 +48,17 @@ int main(int argc, char **argv) {
     if (!gzvalid(it.smf)) {
       CVArray cva(it.cvfa, args.smeth->lp);
       CVArray cvb(it.cvfb, args.smeth->lp);
+      // get the head of matrix
       MatrixHeader hd(getFileName(it.cvfa), getFileName(it.cvfb),
                       cva.norm.size(), cvb.norm.size());
       sm.resetByHeader(hd);
-      args.smeth->getSim(cva, cvb, sm);
+      // calculate the matrix
+      try{
+        args.smeth->getSim(cva, cvb, sm);
+      }catch(const char* msg){
+        cerr << msg << "\nin calculate similar matrix: " << it.smf << endl;
+        exit(2);
+      }
       sm.write(it.smf);
     } else {
       sm.read(it.smf);
