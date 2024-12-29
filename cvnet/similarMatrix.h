@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-28 10:06:42
+ * @Last Modified Time: 2024-12-29 4:55:19
  */
 
 #ifndef SIMILARMATRIX_H
@@ -38,7 +38,8 @@ struct MatrixHeader {
   MatrixHeader(const string &rn, const string &cn, long irow, long icol)
       : rowName(rn), colName(cn), nrow(irow), ncol(icol){};
   MatrixHeader(const string &);
-  void read(gzFile&);
+  void read(gzFile &);
+  friend ostream &operator<<(ostream &, const MatrixHeader &);
 };
 
 struct Msimilar {
@@ -60,7 +61,7 @@ struct Msimilar {
   Msimilar(const string &fname) { read(fname); }
 
   // set row name and col name
-  void resetByHeader(const MatrixHeader&, float d0=0.0);
+  void resetByHeader(const MatrixHeader &, float d0 = 0.0);
   void getRBH();
 
   // get/set value of matrix
@@ -78,6 +79,9 @@ struct Msimilar {
   string info() const;
   void write(const string &) const;
   void read(const string &);
+
+  // output stream
+  friend ostream &operator<<(ostream &, const Msimilar &);
 };
 
 #endif

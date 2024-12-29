@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 3:12:53
+ * @Last Modified Time: 2024-12-29 6:14:30
  */
 
 #include "similarMatrix.h"
@@ -34,6 +34,12 @@ void MatrixHeader::read(gzFile &fp) {
   gzread(fp, (char *)&(nrow), sizeof(nrow));
   gzread(fp, (char *)&(ncol), sizeof(ncol));
 };
+
+ostream &operator<<(ostream & os, const MatrixHeader & hd) {
+  os << hd.rowName << ": " << hd.nrow << "\n" << hd.colName << ": " << hd.ncol;
+  return os; 
+};
+
 
 // set row name and col name
 void Msimilar::resetByHeader(const MatrixHeader &hd, float d0) {
@@ -169,8 +175,22 @@ void Msimilar::read(const string &fname) {
 
   // read reciprocal best hit
   rbh.resize(header.nrow);
-  gzread(fp, (char *)data.data(), header.nrow * sizeof(rbh[0]));
+  gzread(fp, (char *)rbh.data(), header.nrow * sizeof(rbh[0]));
 
   // close file
   gzclose(fp);
 };
+
+ostream &operator<<(ostream & os, const Msimilar & sm) {
+  os << sm.header << "\n\n======= the RBH =========\n";
+  for(size_t i=0; i<sm.rbh.size(); ++i)
+    os << i << "\t" << sm.rbh[i] << "\n";
+
+  os << "\n========= the similarity =====" << endl;
+  for(size_t i=0; i<sm.header.nrow; ++i){
+    for(size_t j=0; j<sm.header.ncol; ++j)
+      os << sm.get(i,j)<<" ";
+    os << endl;
+  }
+  return os;
+}

@@ -48,6 +48,8 @@ set(SM2MCL_SRC ${CVKITSHEADS} sm2mcl.h sm2mcl.cpp)
 
 set(CVNET_SRC ${CVKITSHEADS} cvnet.h cvnet.cpp)
 
+set(DUMP_SRC  ${CVKITSHEADS} dump.cpp)
+
 add_executable(g2cva ${G2CVA_SRC})
 target_link_libraries(g2cva PRIVATE cvkit kit)
 
@@ -56,6 +58,9 @@ target_link_libraries(g2cva PRIVATE cvkit kit)
 
 add_executable(cva2sm ${CVA2SM_SRC})
 target_link_libraries(cva2sm PRIVATE cvkit kit)
+
+add_executable(dump ${DUMP_SRC})
+target_link_libraries(dump PRIVATE cvkit kit argparse)
 
 add_executable(sm2mcl ${SM2MCL_SRC})
 target_link_libraries(sm2mcl PRIVATE cvkit kit argparse)

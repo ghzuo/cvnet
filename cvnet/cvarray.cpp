@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 11:12:33
+ * @Last Modified Time: 2024-12-29 4:44:37
  */
 
 #include "cvarray.h"
@@ -148,14 +148,18 @@ void CVArray::write(const string &fname) const {
 
 ostream &operator<<(ostream &os, const CVArray &cva) {
   // output cvdiminfo
-  os << "The number of CV is " << cva.cvdi.size() << endl;
+  os << "The number of CV is " << cva.cvdi.size() << "\nThe number of K is "
+     << cva.kdi.size() << "\nThe number of items is " << cva.data.size()
+     << endl;
+
+  os << "\n==== The Norms ========================\n";
   for (const auto &cd : cva.cvdi) {
-    os << cd << endl;
+    os << cd << "\n";
   }
+  os << endl;
 
   // output data according to kdiminfo
-  os << "\nThe number of K is " << cva.kdi.size() << "\n"
-     << "The number of items is " << cva.data.size() << endl;
+  os << "\n==== The kmer items ====================\n";
   for (const auto &kd : cva.kdi) {
     os << kd.kstr << "\t";
     for (auto i = kd.index.first; i < kd.index.second; ++i) {
