@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 6:10:23
+ * @Last Modified Time: 2024-12-29 8:07:09
  */
 
 #include "cva2sm.h"
@@ -85,9 +85,8 @@ void Args::usage() {
        << " [ -i <infile> ]  Genome list list, default: list\n"
        << " [ -s <suffix> ]  CV array suffix, default: cv5\n"
        << " [ -m <method> ]  Distance methods, default: Cosine\n"
-       << " [ -V <cvdir> ]   Input CV file directory, default: cva/\n"
-       << " [ -S <smdir> ]   Output Similar Matrix file directory, "
-          "default: sm/\n"
+       << " [ -V <cvdir> ]   Input CV file directory, default: cache/cva/\n"
+       << " [ -S <smdir> ]   Output Similar Matrix directory, default: cache/sm/\n"
        << " [ -q ]           Run command in quiet mode\n"
        << " [ -h ]           Display this information\n"
        << endl;
