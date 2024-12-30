@@ -7,10 +7,10 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 3:46:10
+ * @Last Modified Time: 2024-12-30 17:35:33
  */
 
-#include "filename.h"
+#include "fileOption.h"
 
 /*************************************************************
  * For input cvfiles to similiarity file
@@ -23,20 +23,20 @@ ostream &operator<<(ostream &os, const TriFileName &tf) {
 /*************************************************************
  * Options for reading files and setting paths
  *************************************************************/
-void FileNames::setfn(const vector<string> &flist) {
+void FileOption::setfn(const vector<string> &flist) {
   for (const auto &f : flist) {
     gflist.emplace_back(f);
   }
 };
 
-void FileNames::setfn(const string &fname) {
+void FileOption::setfn(const string &fname) {
   vector<string> flist;
   readlist(fname, flist);
   uniqueWithOrder(flist);
   setfn(flist);
 };
 
-void FileNames::setfn(const vector<TriFileName> &trilist) {
+void FileOption::setfn(const vector<TriFileName> &trilist) {
   // set the trifilelist
   smplist = trilist;
 
@@ -55,20 +55,20 @@ void FileNames::setfn(const vector<TriFileName> &trilist) {
   setfn(flist);
 };
 
-size_t FileNames::gnfnlist(vector<string> &gnlist) {
+size_t FileOption::gnfnlist(vector<string> &gnlist) {
   for (auto &nm : gflist)
     gnlist.emplace_back(gndir + nm);
   return gnlist.size();
 }
 
-size_t FileNames::cvfnlist(vector<string> &cvlist) {
+size_t FileOption::cvfnlist(vector<string> &cvlist) {
   string suff = cvsuf();
   for (auto &nm : gflist)
     cvlist.emplace_back(setFilePath(cvdir, suff, nm));
   return cvlist.size();
 };
 
-size_t FileNames::smfnlist(vector<string> &smlist) {
+size_t FileOption::smfnlist(vector<string> &smlist) {
   if (smplist.empty())
     _genTriFNList();
   for (auto fn : smplist)
@@ -76,7 +76,7 @@ size_t FileNames::smfnlist(vector<string> &smlist) {
   return smlist.size();
 };
 
-size_t FileNames::trifnlist(vector<TriFileName> &trilist) {
+size_t FileOption::trifnlist(vector<TriFileName> &trilist) {
   if (smplist.empty())
     _genTriFNList();
   mkpath(smdir);
@@ -84,7 +84,7 @@ size_t FileNames::trifnlist(vector<TriFileName> &trilist) {
   return trilist.size();
 };
 
-size_t FileNames::geneIndexBySMFile(map<string, size_t> &offset) {
+size_t FileOption::geneIndexBySMFile(map<string, size_t> &offset) {
   if (smplist.empty())
     _genTriFNList();
 
@@ -106,7 +106,7 @@ size_t FileNames::geneIndexBySMFile(map<string, size_t> &offset) {
   return ndx;
 };
 
-size_t FileNames::geneIndexByCVFile(map<string, size_t> &offset) {
+size_t FileOption::geneIndexByCVFile(map<string, size_t> &offset) {
   size_t ndx = 0;
   vector<string> cvlist;
   cvfnlist(cvlist);
@@ -118,13 +118,13 @@ size_t FileNames::geneIndexByCVFile(map<string, size_t> &offset) {
   return ndx;
 };
 
-string FileNames::cvsuf() { return sufsep + cmeth + to_string(k); };
-string FileNames::smsuf() { return cvsuf() + sufsep + smeth; };
-string FileNames::clsuf() {
+string FileOption::cvsuf() { return sufsep + cmeth + to_string(k); };
+string FileOption::smsuf() { return cvsuf() + sufsep + smeth; };
+string FileOption::clsuf() {
   return gtype + smsuf() + sufsep + emeth + to_string(int(cutoff * 100));
 }
 
-void FileNames::setSuffix(const string &str) {
+void FileOption::setSuffix(const string &str) {
   vector<string> wd;
   separateWord(wd, str, sufsep);
   if (wd[0].empty())
@@ -143,27 +143,27 @@ void FileNames::setSuffix(const string &str) {
   }
 }
 
-void FileNames::setgndir(const string &gdir) {
+void FileOption::setgndir(const string &gdir) {
   gndir = gdir;
   addsuffix(gndir, "/");
 };
 
-void FileNames::setcvdir(const string &cdir) {
+void FileOption::setcvdir(const string &cdir) {
   cvdir = cdir;
   addsuffix(cvdir, "/");
 };
 
-void FileNames::setsmdir(const string &sdir) {
+void FileOption::setsmdir(const string &sdir) {
   smdir = sdir;
   addsuffix(smdir, "/");
 };
 
-void FileNames::setcldir(const string &ldir) {
+void FileOption::setcldir(const string &ldir) {
   cldir = ldir;
   addsuffix(cldir, "/");
 };
 
-string FileNames::info() const {
+string FileOption::info() const {
   string str;
   str += "Method for Composition Vector: " + cmeth + ", with Kmer=" + to_string(k);
   str += "\nMethod for Similarity between CV: " + smeth;
@@ -176,7 +176,7 @@ string FileNames::info() const {
   return str;
 };
 
-void FileNames::_genTriFNList() {
+void FileOption::_genTriFNList() {
   // get cvlist
   vector<string> cvlist;
   size_t n = cvfnlist(cvlist);
@@ -187,7 +187,7 @@ void FileNames::_genTriFNList() {
   }
 };
 
-string FileNames::_smFN(const string &astr, const string &bstr) {
+string FileOption::_smFN(const string &astr, const string &bstr) {
   return smdir + getFileName(astr) + "-" + getFileName(bstr) + smsuf();
 };
 

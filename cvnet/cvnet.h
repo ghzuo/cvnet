@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:08:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:26:11
+ * @Last Modified Time: 2024-12-30 17:37:54
  */
 
 #ifndef CVNET_H
@@ -21,13 +21,13 @@
 #include "edgeMeth.h"
 #include "similarMeth.h"
 #include "cvmeth.h"
-#include "filename.h"
+#include "fileOption.h"
 
 struct Args{
   CVmeth *cmeth;
   SimilarMeth *smeth;
   EdgeMeth *emeth;
-  FileNames fnm;
+  FileOption fnm;
   string outndx;
   string outmcl;
   

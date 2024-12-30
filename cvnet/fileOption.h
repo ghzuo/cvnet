@@ -7,11 +7,11 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-27 7:16:01
+ * @Last Modified Time: 2024-12-30 17:34:44
  */
 
-#ifndef FILENAME_H
-#define FILENAME_H
+#ifndef FILEOPTION_H
+#define FILEOPTION_H
 
 #include <algorithm>
 #include <iostream>
@@ -36,7 +36,7 @@ struct TriFileName {
   friend ostream &operator<<(ostream &, const TriFileName &);
 };
 
-struct FileNames {
+struct FileOption {
   string sufsep = ".";
   string gndir = "";
   string gtype = "faa";
@@ -51,7 +51,7 @@ struct FileNames {
   vector<string> gflist;
   vector<TriFileName> smplist;
 
-  FileNames() = default;
+  FileOption() = default;
 
   void setfn(const vector<string> &);
   void setfn(const string &);

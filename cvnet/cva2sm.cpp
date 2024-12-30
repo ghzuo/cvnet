@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 8:07:09
+ * @Last Modified Time: 2024-12-30 17:36:37
  */
 
 #include "cva2sm.h"
@@ -40,7 +40,7 @@ Args::Args(int argc, char **argv) {
   program = argv[0];
   string methStr("Cosine");
   string listfile("list");
-  FileNames fnm;
+  FileOption fnm;
 
   char ch;
   while ((ch = getopt(argc, argv, "i:s:m:V:S:qh")) != -1) {

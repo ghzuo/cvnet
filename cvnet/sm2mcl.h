@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:29:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 10:48:53
+ * @Last Modified Time: 2024-12-30 17:36:17
  */
 
 #ifndef SM2MCL_H
@@ -18,7 +18,7 @@
 #include <argparse/argparse.hpp>
 
 #include "edgeMeth.h"
-#include "filename.h"
+#include "fileOption.h"
 
 using namespace std;
 

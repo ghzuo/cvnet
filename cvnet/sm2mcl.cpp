@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-30 17:25:31
+ * @Last Modified Time: 2024-12-30 17:37:18
  */
 
 #include "sm2mcl.h"
@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
 
 Args::Args(int argc, char *argv[]) {
   // Define the available options and parameters
-  FileNames fnm;
+  FileOption fnm;
 
   argparse::ArgumentParser parser("sm2mcl", "0.1");
   parser.add_argument("-m", "--method")

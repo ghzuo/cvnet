@@ -37,7 +37,7 @@ Args::Args(int argc, char **argv) {
 
   program = argv[0];
   string listfile("list");
-  FileNames fnm;
+  FileOption fnm;
 
   char ch;
   while ((ch = getopt(argc, argv, "G:i:k:V:g:m:qh")) != -1) {

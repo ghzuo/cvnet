@@ -16,7 +16,7 @@ set(CVKITSHEADS
     karray.h
     cvarray.h
     cvmeth.h
-    filename.h
+    fileOption.h
     similarMatrix.h
     similarMeth.h
     edgeMeth.h
@@ -29,7 +29,7 @@ set(LIBCVKIT_SRC
     karray.cpp
     cvarray.cpp
     cvmeth.cpp
-    filename.cpp
+    fileOption.cpp
     similarMatrix.cpp
     similarMeth.cpp
     edgeMeth.cpp

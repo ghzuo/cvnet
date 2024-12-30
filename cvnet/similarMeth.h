@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:01:14
+ * @Last Modified Time: 2024-12-30 17:36:08
  */
 
 #ifndef SIMILARMETH_H
@@ -28,7 +28,7 @@
 #include "cvarray.h"
 #include "kit.h"
 #include "similarMatrix.h"
-#include "filename.h"
+#include "fileOption.h"
 
 using namespace std;
 
