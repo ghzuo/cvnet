@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 8:37:01
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 10:49:13
+ * @Last Modified Time: 2024-12-30 17:25:31
  */
 
 #include "sm2mcl.h"
@@ -15,6 +15,7 @@
 int main(int argc, char *argv[]) {
   // get the argments
   Args args(argc, argv);
+  theInfo("Perpared argments of project");
 
   // get the mcl matrix from similar matrixes
   MclMatrix mm(args.ngene);
@@ -39,8 +40,8 @@ Args::Args(int argc, char *argv[]) {
 
   argparse::ArgumentParser parser("sm2mcl", "0.1");
   parser.add_argument("-m", "--method")
-      .help("method for selecting items, RBH/CUT/RBHP")
-      .choices("RBH", "CUT", "RBHP")
+      .help("method for selecting items, RBH/CUT/BRB")
+      .choices("RBH", "CUT", "BRB")
       .default_value(fnm.emeth)
       .nargs(1)
       .store_into(fnm.emeth);

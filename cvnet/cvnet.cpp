@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 11:25:29
+ * @Last Modified Time: 2024-12-30 17:26:13
  */
 
 #include "cvnet.h"
@@ -85,8 +85,8 @@ Args::Args(int argc, char *argv[]) {
       .nargs(1)
       .store_into(fnm.gtype);
   parser.add_argument("-e", "--edge-method")
-      .help("method for selecting edge, RBH/CUT/RBHP")
-      .choices("RBH", "CUT", "RBHP")
+      .help("method for selecting edge, RBH/CUT/BRB")
+      .choices("RBH", "CUT", "BRB")
       .default_value(fnm.emeth)
       .nargs(1)
       .store_into(fnm.emeth);

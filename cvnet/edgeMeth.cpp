@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-28 11:01:18
+ * @Last Modified Time: 2024-12-30 17:24:54
  */
 
 #include "edgeMeth.h"
@@ -26,7 +26,7 @@ EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
     meth = new EdgeByCutoff();
   } else if (methStr == "RBH") {
     meth = new EdgeByMutualBest();
-  } else if (methStr == "RBHP") {
+  } else if (methStr == "BRB") {
     meth = new EdgeByMutualBestPlus();
   } else {
     cerr << "Unknow Edge Method: " << methStr << endl;
