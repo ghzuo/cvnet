@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 11:35:27
+ * @Last Modified Time: 2024-12-31 2:31:12
  */
 
 #include "edgeMeth.h"
@@ -40,8 +40,6 @@ EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
 void EdgeMeth::fillmcl(const string &smf, const map<string, size_t> &gidx,
                        MclMatrix &mm) {
   Msimilar sm(smf);
-  cout << delsuffix(sm.header.rowName) << endl;
-  cout << gidx.find(delsuffix(sm.header.rowName))->second << endl;
   auto mtxShift = make_pair(gidx.find(delsuffix(sm.header.rowName))->second,
                             gidx.find(delsuffix(sm.header.colName))->second);
   fillmcl(sm, mtxShift, mm);

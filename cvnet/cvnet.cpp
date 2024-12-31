@@ -7,15 +7,25 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 1:25:16
+ * @Last Modified Time: 2024-12-31 2:51:13
  */
 
 #include "cvnet.h"
 
 int main(int argc, char **argv) {
   CVNet net(argc, argv);
+
+  // get cva
   net.gn2cva();
+  if (net.breakpoint.compare("cva") == 0)
+    return 0;
+
+  // get sm matrix
   net.cva2sm();
+  if (net.breakpoint.compare("sm") == 0)
+    return 0;
+
+  // get mcl matrix
   net.sm2mcl();
 }
 
@@ -75,14 +85,19 @@ CVNet::CVNet(int argc, char *argv[]) {
       .action([&](const auto &val) { fnm.setcache(val); });
   parser.add_argument("-o", "--mclfn")
       .help("output mcl file name")
-      .default_value(fnm.outfn())
-      .nargs(1)
-      .store_into(fnm.mclfn);
+      .default_value(fnm.clsuf())
+      .nargs(1);
   parser.add_argument("-O", "--outdir")
       .help("output directory")
       .default_value(fnm.outdir)
       .nargs(1)
       .action([&](const auto &val) { fnm.setoutdir(val); });
+  parser.add_argument("-B", "--break-point")
+      .help("stop program after obtained cva/sm")
+      .choices("cva", "sm", "None")
+      .default_value(breakpoint)
+      .nargs(1)
+      .store_into(breakpoint);
   parser.add_argument("-q", "--quiet")
       .help("run command in quiet mode")
       .nargs(0)
@@ -107,23 +122,32 @@ CVNet::CVNet(int argc, char *argv[]) {
   // set select method
   emeth = EdgeMeth::create(fnm.emeth, fnm.cutoff);
 
-  // setup input file names
+  // setup the input file names
   fnm.setfn(parser.get<string>("-i"));
+  
+  // setup output file names
+  if(parser.is_used("-o") == true) {
+    fnm.outfn = fnm.outdir + parser.get<string>("-o");
+  } else {
+    fnm.outfn = fnm.outdir + fnm.clsuf();
+  }
 
   theInfo(fnm.info() + "\nPerpared argments of project");
 }
 
 void CVNet::gn2cva() {
   //  get the cva for every species
-  vector<string> flist;
-  fnm.gnfnlist(flist);
+  map<string, size_t> gsize;
+  for (auto &f : fnm.gflist)
+    gsize[getFileName(f)] = 0;
 #pragma omp parallel for
-  for (size_t i = 0; i < flist.size(); ++i) {
-    if (!gzvalid(cmeth->getCVname(flist[i], fnm.k))) {
-      size_t gsz = cmeth->getcva(flist[i], fnm.k);
-      fnm.setgsz(getFileName(flist[i]), gsz);
+  for (size_t i = 0; i < fnm.gflist.size(); ++i) {
+    if (!gzvalid(cmeth->getCVname(fnm.gflist[i], fnm.k))) {
+      size_t gsz = cmeth->getcva(fnm.gflist[i], fnm.k);
+      gsize[getFileName(fnm.gflist[i])] = gsz;
     }
   }
+  fnm.updateGeneSizeFile(gsize);
   theInfo("Get all CVAs for Genomes");
 }
 
@@ -146,9 +170,7 @@ void CVNet::sm2mcl() {
 
   // get the gene shift
   map<string, size_t> gidx;
-  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outfn() + ".ndx");
-  for (auto &it : gidx)
-    cout << it.first << " : " << it.second << endl;
+  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outfn + ".ndx");
   theInfo("Prepared gene index in Matrix");
 
   // push edge into mcl matrix
@@ -161,5 +183,5 @@ void CVNet::sm2mcl() {
   theInfo("Get data for MCL matrix");
 
   // resort row and output MclMatrix
-  mm.write(fnm.outfn(), true);
+  mm.write(fnm.outfn, true);
 }

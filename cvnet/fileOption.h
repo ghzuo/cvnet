@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 1:13:39
+ * @Last Modified Time: 2024-12-31 2:42:21
  */
 
 #ifndef FILEOPTION_H
@@ -49,10 +49,9 @@ struct FileOption {
   string emeth = "RBH";
   double cutoff = 0.1;
   string outdir = "mcl/";
-  string mclfn;
+  string outfn;
 
   vector<string> gflist;
-  map<string, size_t> gsize;
   vector<TriFileName> smplist;
 
   FileOption() = default;
@@ -69,9 +68,7 @@ struct FileOption {
   string cvsuf();
   string smsuf();
   string clsuf();
-  string outfn();
 
-  size_t gnfnlist(vector<string> &);
   size_t cvfnlist(vector<string> &);
   size_t smfnlist(vector<string> &);
   size_t trifnlist(vector<TriFileName> &);
@@ -80,7 +77,7 @@ struct FileOption {
   size_t geneIndexBySMFile(map<string, size_t> &);
   size_t obtainGeneIndex(map<string, size_t> &, const string &);
   void setgsz(const string &, size_t);
-  void _updateGeneSizeFile();
+  void updateGeneSizeFile(map<string, size_t> &);
 
   string info() const;
 

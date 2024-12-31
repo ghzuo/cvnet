@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 1:14:02
+ * @Last Modified Time: 2024-12-31 2:41:52
  */
 
 #include "fileOption.h"
@@ -26,8 +26,7 @@ ostream &operator<<(ostream &os, const TriFileName &tf) {
 void FileOption::setfn(const vector<string> &flist) {
   gflist.reserve(flist.size());
   for (const auto &f : flist) {
-    gflist.emplace_back(f);
-    gsize[getFileName(f)] = 0;
+    gflist.emplace_back(gndir + f);
   }
 };
 
@@ -56,12 +55,6 @@ void FileOption::setfn(const vector<TriFileName> &trilist) {
     regex_replace(fn, regex(suff + "$"), "");
   setfn(flist);
 };
-
-size_t FileOption::gnfnlist(vector<string> &gnlist) {
-  for (auto &nm : gflist)
-    gnlist.emplace_back(gndir + nm);
-  return gnlist.size();
-}
 
 size_t FileOption::cvfnlist(vector<string> &cvlist) {
   string suff = cvsuf();
@@ -122,8 +115,16 @@ size_t FileOption::geneIndexByCVFile(map<string, size_t> &offset) {
 
 size_t FileOption::obtainGeneIndex(map<string, size_t> &gShift,
                                    const string &fname) {
-  _updateGeneSizeFile();
 
+  // read gene size file into gene size map
+  map<string, size_t> gsize;
+  pair<string, size_t> gsz;
+  ifstream igs(gszfn);
+  while (igs >> gsz.first >> gsz.second)
+    gsize.insert(gsz);
+  igs.close();
+
+  // obtained gene index from gene size map
   ofstream fndx(fname);
   fndx << "Genome\tStart\n";
   size_t ndx = 0;
@@ -137,9 +138,7 @@ size_t FileOption::obtainGeneIndex(map<string, size_t> &gShift,
   return ndx;
 };
 
-void FileOption::setgsz(const string &gn, size_t sz) { gsize[gn] = sz; };
-
-void FileOption::_updateGeneSizeFile() {
+void FileOption::updateGeneSizeFile(map<string, size_t> &gsize) {
   // read old gene size file into gene size map
   string gn;
   size_t sz;
@@ -163,7 +162,6 @@ string FileOption::smsuf() { return cvsuf() + sufsep + smeth; };
 string FileOption::clsuf() {
   return gtype + smsuf() + sufsep + emeth + to_string(int(cutoff * 100));
 }
-string FileOption::outfn() { return mclfn.empty() ? clsuf() : mclfn; }
 
 void FileOption::setSuffix(const string &str) {
   vector<string> wd;

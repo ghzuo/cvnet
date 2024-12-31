@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:08:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 12:59:56
+ * @Last Modified Time: 2024-12-31 2:03:51
  */
 
 #ifndef CVNET_H
@@ -30,6 +30,7 @@ struct CVNet {
   SimilarMeth *smeth;
   EdgeMeth *emeth;
   FileOption fnm;
+  string breakpoint = "None";
 
   CVNet(int argc, char **argv);
   void gn2cva();
