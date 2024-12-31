@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-30 17:35:33
+ * @Last Modified Time: 2024-12-31 1:14:02
  */
 
 #include "fileOption.h"
@@ -24,8 +24,10 @@ ostream &operator<<(ostream &os, const TriFileName &tf) {
  * Options for reading files and setting paths
  *************************************************************/
 void FileOption::setfn(const vector<string> &flist) {
+  gflist.reserve(flist.size());
   for (const auto &f : flist) {
     gflist.emplace_back(f);
+    gsize[getFileName(f)] = 0;
   }
 };
 
@@ -118,11 +120,50 @@ size_t FileOption::geneIndexByCVFile(map<string, size_t> &offset) {
   return ndx;
 };
 
+size_t FileOption::obtainGeneIndex(map<string, size_t> &gShift,
+                                   const string &fname) {
+  _updateGeneSizeFile();
+
+  ofstream fndx(fname);
+  fndx << "Genome\tStart\n";
+  size_t ndx = 0;
+  for (const auto &fn : gflist) {
+    string gn = getFileName(fn);
+    gShift[gn] = ndx;
+    fndx << gn << "\t" << ndx << "\n";
+    ndx += gsize[gn];
+  }
+  fndx.close();
+  return ndx;
+};
+
+void FileOption::setgsz(const string &gn, size_t sz) { gsize[gn] = sz; };
+
+void FileOption::_updateGeneSizeFile() {
+  // read old gene size file into gene size map
+  string gn;
+  size_t sz;
+  ifstream igs(gszfn);
+  while (igs >> gn >> sz) {
+    auto it = gsize.find(gn);
+    if (it == gsize.end() || it->second == 0)
+      gsize[gn] = sz;
+  }
+  igs.close();
+
+  // update gene size file with new genome sizes
+  ofstream ogs(gszfn);
+  for (auto &it : gsize)
+    ogs << it.first << "\t" << it.second << "\n";
+  ogs.close();
+};
+
 string FileOption::cvsuf() { return sufsep + cmeth + to_string(k); };
 string FileOption::smsuf() { return cvsuf() + sufsep + smeth; };
 string FileOption::clsuf() {
   return gtype + smsuf() + sufsep + emeth + to_string(int(cutoff * 100));
 }
+string FileOption::outfn() { return mclfn.empty() ? clsuf() : mclfn; }
 
 void FileOption::setSuffix(const string &str) {
   vector<string> wd;
@@ -148,24 +189,23 @@ void FileOption::setgndir(const string &gdir) {
   addsuffix(gndir, "/");
 };
 
-void FileOption::setcvdir(const string &cdir) {
-  cvdir = cdir;
-  addsuffix(cvdir, "/");
+void FileOption::setcache(string dir) {
+  if (dir.back() == '/')
+    dir.pop_back();
+  cvdir = cvdir.replace(0, 5, dir);
+  smdir = smdir.replace(0, 5, dir);
+  gszfn = gszfn.replace(0, 5, dir);
 };
 
-void FileOption::setsmdir(const string &sdir) {
-  smdir = sdir;
-  addsuffix(smdir, "/");
-};
-
-void FileOption::setcldir(const string &ldir) {
-  cldir = ldir;
-  addsuffix(cldir, "/");
+void FileOption::setoutdir(const string &dir) {
+  outdir = dir;
+  addsuffix(outdir, "/");
 };
 
 string FileOption::info() const {
   string str;
-  str += "Method for Composition Vector: " + cmeth + ", with Kmer=" + to_string(k);
+  str +=
+      "Method for Composition Vector: " + cmeth + ", with Kmer=" + to_string(k);
   str += "\nMethod for Similarity between CV: " + smeth;
   str += "\nMethod for Selecting Edge: " + emeth +
          ", with Cutoff=" + to_string(cutoff);
@@ -204,18 +244,4 @@ string setFilePath(const string &supdir, const string &suffix,
     nstr = supdir + getFileName(nstr);
 
   return nstr;
-};
-
-void writeGeneIndex(const map<string, size_t> &gShift, size_t ngene,
-                    const string &fname) {
-  vector<pair<string, size_t>> tmp(gShift.begin(), gShift.end());
-  sort(tmp.begin(), tmp.end(),
-       [](auto &a, auto &b) { return a.second < b.second; });
-  tmp.push_back(make_pair("End", ngene));
-  ofstream fndx(fname);
-  fndx << "Genome\tfirst\tlast\n";
-  for (int i = 0; i < tmp.size() - 1; ++i)
-    fndx << delsuffix(getFileName(tmp[i].first)) << "\t" << tmp[i].second
-         << "\t" << tmp[i + 1].second - 1 << "\n";
-  fndx.close();
 };

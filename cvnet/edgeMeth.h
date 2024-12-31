@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 11:54:59
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 12:18:54
+ * @Last Modified Time: 2024-12-31 11:25:44
  */
 
 #ifndef EDGEMETH_H
@@ -42,6 +42,7 @@ struct EdgeMeth {
 
   // get the mcl matrix
   void fillmcl(const Msimilar &, const pair<size_t, size_t> &, MclMatrix &);
+  void fillmcl(const string&, const map<string, size_t>&, MclMatrix &);
 
   // select items: cutoff or Reciprocal Best Hit
   void mutualBestHit(const Msimilar &, vector<Edge> &) const;

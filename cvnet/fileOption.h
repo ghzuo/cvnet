@@ -7,13 +7,14 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-30 17:34:44
+ * @Last Modified Time: 2024-12-31 1:13:39
  */
 
 #ifndef FILEOPTION_H
 #define FILEOPTION_H
 
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <regex>
 #include <set>
@@ -32,7 +33,6 @@ struct TriFileName {
   TriFileName(const string &a, const string &b, const string &o)
       : cvfa(a), cvfb(b), smf(o){};
 
-  static void setdir(const string &);
   friend ostream &operator<<(ostream &, const TriFileName &);
 };
 
@@ -41,14 +41,18 @@ struct FileOption {
   string gndir = "";
   string gtype = "faa";
   string cvdir = "cache/cva/";
+  string gszfn = "cache/GenomeSize.tsv";
   string cmeth = "Count";
   int k = 5;
   string smeth = "InterList";
   string smdir = "cache/sm/";
   string emeth = "RBH";
-  string cldir = "mcl/";
   double cutoff = 0.1;
+  string outdir = "mcl/";
+  string mclfn;
+
   vector<string> gflist;
+  map<string, size_t> gsize;
   vector<TriFileName> smplist;
 
   FileOption() = default;
@@ -57,21 +61,26 @@ struct FileOption {
   void setfn(const string &);
   void setfn(const vector<TriFileName> &);
   void setSuffix(const string &);
+
   void setgndir(const string &);
-  void setcvdir(const string &);
-  void setsmdir(const string &);
-  void setcldir(const string &);
+  void setcache(string);
+  void setoutdir(const string &);
 
   string cvsuf();
   string smsuf();
   string clsuf();
+  string outfn();
 
   size_t gnfnlist(vector<string> &);
   size_t cvfnlist(vector<string> &);
   size_t smfnlist(vector<string> &);
   size_t trifnlist(vector<TriFileName> &);
+
   size_t geneIndexByCVFile(map<string, size_t> &);
   size_t geneIndexBySMFile(map<string, size_t> &);
+  size_t obtainGeneIndex(map<string, size_t> &, const string &);
+  void setgsz(const string &, size_t);
+  void _updateGeneSizeFile();
 
   string info() const;
 
@@ -81,5 +90,4 @@ struct FileOption {
 };
 
 string setFilePath(const string &, const string &, const string &);
-void writeGeneIndex(const map<string, size_t> &, size_t, const string &);
 #endif

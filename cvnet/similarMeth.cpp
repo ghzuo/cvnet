@@ -7,11 +7,10 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-28 10:29:23
+ * @Last Modified Time: 2024-12-31 11:01:58
  */
 
 #include "similarMeth.h"
-
 
 /**************************************************************
  * the similar methods
@@ -42,8 +41,26 @@ SimilarMeth *SimilarMeth::create(const string &methStr) {
   return meth;
 }
 
+void SimilarMeth::getMatrix(const TriFileName &tf) {
+  Msimilar sm;
+  try {
+    CVArray cva(tf.cvfa, lp);
+    CVArray cvb(tf.cvfb, lp);
+    // get the head of matrix
+    MatrixHeader hd(getFileName(tf.cvfa), getFileName(tf.cvfb), cva.norm.size(),
+                    cvb.norm.size());
+    sm.resetByHeader(hd);
+    // calculate the matrix
+    calcSim(cva, cvb, sm);
+  } catch (const out_of_range &e) {
+    cerr << e.what() << "\nin calculate similar matrix: " << tf.smf << endl;
+    exit(2);
+  }
+  sm.write(tf.smf);
+};
 
-void SimilarMeth::getSim(const CVArray &cva, const CVArray &cvb, Msimilar &sm) {
+void SimilarMeth::calcSim(const CVArray &cva, const CVArray &cvb,
+                          Msimilar &sm) {
   vector<pair<size_t, size_t>> aln;
   alignSortVector(cva.kdi, cvb.kdi, aln);
 

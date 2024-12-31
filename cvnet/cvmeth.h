@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-26 11:34:47
+ * @Last Modified Time: 2024-12-31 11:06:29
  */
 
 #ifndef CVMETH_H
@@ -31,6 +31,7 @@
 #include "kstring.h"
 #include "readgenome.h"
 #include "stringOpt.h"
+#include "cvarray.h"
 
 struct CVmeth {
 
@@ -59,6 +60,7 @@ struct CVmeth {
   void execute(const string &, const vector<size_t> &, bool chk = true);
   void getcv(const string&, int, vector<CVvec>&);
   float getcv(const string&, int, CVvec&, bool save=false);
+  size_t getcva(const string&, int);
 
   // bootstrap genome
   Genome bootGenome(const Genome &);

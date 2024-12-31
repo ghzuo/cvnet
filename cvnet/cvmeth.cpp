@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 11:26:20
+ * @Last Modified Time: 2024-12-31 11:10:31
  */
 
 #include "cvmeth.h"
@@ -140,10 +140,18 @@ float CVmeth::getcv(const string &fname, int k, CVvec &aCV, bool save) {
     // convert CV map into CV vector
     aCV = cvmap2vec(mcv.front().second);
     float norm = 0.0;
-    for(auto& it : aCV)
+    for (auto &it : aCV)
       norm += it.second * it.second;
     return sqrt(norm);
   }
+};
+
+size_t CVmeth::getcva(const string &fname, int k) {
+  vector<CVvec> cvs;
+  getcv(fname, k, cvs);
+  CVArray cva(cvs);
+  cva.write(getCVname(fname, k));
+  return cva.cvdi.size();
 };
 
 /** do bootstrape */

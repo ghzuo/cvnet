@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 4:44:37
+ * @Last Modified Time: 2024-12-31 11:15:19
  */
 
 #include "cvarray.h"
@@ -29,20 +29,6 @@ void CVAinfo::read(const string &fname) {
 ostream &operator<<(ostream &os, const CVAinfo &hd) {
   os << hd.nCV << "\t" << hd.nKstr << "\t" << hd.nItem;
   return os;
-};
-
-// for CV array
-void CVArray::get(const string &fname, CVmeth *cmeth, int k, bool cache) {
-  string cvfile = cmeth->getCVname(fname, k);
-  if (gzvalid(cvfile)) {
-    read(cvfile);
-  } else {
-    vector<CVvec> cvs;
-    cmeth->getcv(fname, k, cvs);
-    set(cvs);
-    if (cache)
-      write(cvfile);
-  }
 };
 
 void CVArray::set(const vector<CVvec> &cvs) {

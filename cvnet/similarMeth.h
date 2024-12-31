@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-30 17:36:08
+ * @Last Modified Time: 2024-12-31 11:01:37
  */
 
 #ifndef SIMILARMETH_H
@@ -39,7 +39,8 @@ struct SimilarMeth {
   static SimilarMeth *create(const string &);
 
   // get the similarity matrix
-  void getSim(const CVArray &, const CVArray &, Msimilar &);
+  void getMatrix(const TriFileName&);
+  void calcSim(const CVArray &, const CVArray &, Msimilar &);
 
   // the virtual function for different methods
   virtual void _calcOneK(const Kblock &, const vector<float> &, Msimilar &) = 0;

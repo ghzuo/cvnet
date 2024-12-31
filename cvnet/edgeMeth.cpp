@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-30 17:24:54
+ * @Last Modified Time: 2024-12-31 11:35:27
  */
 
 #include "edgeMeth.h"
@@ -35,6 +35,16 @@ EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
 
   meth->threshold = cutoff;
   return meth;
+};
+
+void EdgeMeth::fillmcl(const string &smf, const map<string, size_t> &gidx,
+                       MclMatrix &mm) {
+  Msimilar sm(smf);
+  cout << delsuffix(sm.header.rowName) << endl;
+  cout << gidx.find(delsuffix(sm.header.rowName))->second << endl;
+  auto mtxShift = make_pair(gidx.find(delsuffix(sm.header.rowName))->second,
+                            gidx.find(delsuffix(sm.header.colName))->second);
+  fillmcl(sm, mtxShift, mm);
 };
 
 void EdgeMeth::fillmcl(const Msimilar &sm, const pair<size_t, size_t> &offset,

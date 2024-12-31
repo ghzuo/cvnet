@@ -8,7 +8,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-11-25 11:34:53
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-24 11:13:51
+ * @Last Modified Time: 2024-12-31 11:15:32
  */
 
 #ifndef CVARRAY_H
@@ -64,8 +64,6 @@ struct CVArray {
     read(fname);
     setNorm(normType);
   }
-
-  void get(const string &, CVmeth *, int, bool cache = true);
   void set(const vector<CVvec> &);
 
   void setNorm(enum LPnorm);
