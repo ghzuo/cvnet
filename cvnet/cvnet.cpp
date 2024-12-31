@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 2:51:13
+ * @Last Modified Time: 2024-12-31 3:45:28
  */
 
 #include "cvnet.h"
@@ -170,7 +170,7 @@ void CVNet::sm2mcl() {
 
   // get the gene shift
   map<string, size_t> gidx;
-  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outfn + ".ndx");
+  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outdir + fnm.outndx);
   theInfo("Prepared gene index in Matrix");
 
   // push edge into mcl matrix

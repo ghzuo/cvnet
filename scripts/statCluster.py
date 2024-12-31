@@ -9,25 +9,33 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-12-26 12:32:22
+@Last Modified Time: 2024-12-31 4:14:13
 '''
 
 import pandas as pd
 import toolkit as oft
-import sys
+import argparse
 
 
 if __name__ == "__main__":
     # get options
-    options = sys.argv[1:]
+    # default options
+    parser = argparse.ArgumentParser(
+        description='Perform statistics for MCL output results')
+    parser.add_argument('-f', '--infiles', nargs='+', type=str,
+                        required=True, help="The input files to statistic")
+    parser.add_argument('-I', '--IndexFile', type=str, default="GeneIndex.tsv",
+                        help="Gene Index File, default: GeneIndex.tsv")
+    args = parser.parse_args()
 
     # get gene-genome index
-    _, gIndex = oft.readSeqGenome("GeneIndex.tsv")
+    _, gIndex = oft.readSeqGenome(args.IndexFile)
     ngno = gIndex[-1] + 1
 
     # read cluster and do statistics
     nfcls = []
-    for opt in options:
+    for opt in args.infiles:
+        # read cluster file
         cls = oft.fileClusters(opt)
         scls = pd.DataFrame(oft.statCl(cls, gIndex).T,
                             columns=["Ngenome", "Ngene"])

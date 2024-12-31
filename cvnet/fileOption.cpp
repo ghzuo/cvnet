@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 2:41:52
+ * @Last Modified Time: 2024-12-31 3:59:19
  */
 
 #include "fileOption.h"
@@ -115,27 +115,44 @@ size_t FileOption::geneIndexByCVFile(map<string, size_t> &offset) {
 
 size_t FileOption::obtainGeneIndex(map<string, size_t> &gShift,
                                    const string &fname) {
+  if (fileExists(fname)) {
+    string line;
+    size_t start;
+    size_t size;      
+    string genome;
+    ifstream igi(fname);
+    getline(igi, line);
+    while (getline(igi, line)) {
+      line = trim(line);
+      if (line.empty() || line[0] == '#') continue;
+      stringstream ss(line);
+      ss >> genome >> start >> size;
+      gShift[genome] = start ;
+    }
+    igi.close();
+    return start + size;
+  } else {
+    // read gene size file into gene size map
+    map<string, size_t> gsize;
+    pair<string, size_t> gsz;
+    ifstream igs(gszfn);
+    while (igs >> gsz.first >> gsz.second)
+      gsize.insert(gsz);
+    igs.close();
 
-  // read gene size file into gene size map
-  map<string, size_t> gsize;
-  pair<string, size_t> gsz;
-  ifstream igs(gszfn);
-  while (igs >> gsz.first >> gsz.second)
-    gsize.insert(gsz);
-  igs.close();
-
-  // obtained gene index from gene size map
-  ofstream fndx(fname);
-  fndx << "Genome\tStart\n";
-  size_t ndx = 0;
-  for (const auto &fn : gflist) {
-    string gn = getFileName(fn);
-    gShift[gn] = ndx;
-    fndx << gn << "\t" << ndx << "\n";
-    ndx += gsize[gn];
+    // obtained gene index from gene size map
+    ofstream fndx(fname);
+    size_t ndx = 0;
+    fndx << "Genome\tStart\tSize\n";
+    for (const auto &fn : gflist) {
+      string gn = getFileName(fn);
+      gShift[gn] = ndx;
+      fndx << gn << "\t" << ndx << "\t" << gsize[gn] << "\n";
+      ndx += gsize[gn];
+    }
+    fndx.close();
+    return ndx;
   }
-  fndx.close();
-  return ndx;
 };
 
 void FileOption::updateGeneSizeFile(map<string, size_t> &gsize) {

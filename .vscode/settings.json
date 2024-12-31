@@ -20,7 +20,8 @@
     "typeinfo": "cpp",
     "*.rmd": "markdown",
     "ostream": "cpp",
-    "limits": "cpp"
+    "limits": "cpp",
+    "fstream": "cpp"
   },
   "cmake.configureArgs": [
     "-DSTATIC=ON"

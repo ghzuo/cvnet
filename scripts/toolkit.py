@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-12-24 2:27:24
+@Last Modified Time: 2024-12-31 3:23:22
 '''
 
 import numpy as np
@@ -174,9 +174,8 @@ def readSeqGenome(file):
     gname = []
     gindex = []
     for index, row in df.iterrows():
-        nItem = row["last"] - row["first"] + 1
-        gname = gname + [row["Genome"]] * nItem
-        gindex = gindex + [index] * nItem
+        gname = gname + [row["Genome"]] * row["Size"]
+        gindex = gindex + [index] * row["Size"]
     return np.array(gname), np.array(gindex)
 
 

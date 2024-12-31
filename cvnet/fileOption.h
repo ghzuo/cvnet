@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 2:42:21
+ * @Last Modified Time: 2024-12-31 3:44:34
  */
 
 #ifndef FILEOPTION_H
@@ -49,6 +49,7 @@ struct FileOption {
   string emeth = "RBH";
   double cutoff = 0.1;
   string outdir = "mcl/";
+  string outndx = "GeneIndex.tsv";
   string outfn;
 
   vector<string> gflist;
