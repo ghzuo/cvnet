@@ -9,12 +9,13 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-12-31 4:14:13
+@Last Modified Time: 2024-12-31 5:44:02
 '''
 
 import pandas as pd
 import toolkit as oft
 import argparse
+import os
 
 
 if __name__ == "__main__":
@@ -26,6 +27,9 @@ if __name__ == "__main__":
                         required=True, help="The input files to statistic")
     parser.add_argument('-I', '--IndexFile', type=str, default="GeneIndex.tsv",
                         help="Gene Index File, default: GeneIndex.tsv")
+    parser.add_argument('-O', '--OrthogroupFull', type=str,
+                        default="OrthogroupAllspecies.tsv",
+                        help="Statistics of All Species Orthogroup, default: OrthogroupAllspecies.tsv")
     args = parser.parse_args()
 
     # get gene-genome index
@@ -48,5 +52,8 @@ if __name__ == "__main__":
         ngeno.to_csv("ngeno-" + opt + ".tsv", sep='\t')
 
     # write the number of full cover cluster
-    pd.DataFrame(nfcls, columns=['opt', '# of group', '# single copy']).to_csv(
-        "OrthogroupAllspecies.tsv", index=False, sep='\t')
+    ofg = pd.DataFrame(nfcls, columns=['opt', '# of group', '# single copy'])
+    if (os.exists(args.OrthogroupFull)):
+        ofold = pd.read_csv(args.OrthogroupFull)
+        ofg = pd.concat([ofg, ofold]).drop_duplicates(subset='opt')
+    ofg.to_csv(args.OrthogroupFull, index=False, sep='\t')
