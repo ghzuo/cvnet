@@ -7,8 +7,11 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:41:51
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-27 3:22:14
+ * @Last Modified Time: 2025-01-01 10:14:27
  */
+
+#ifndef MCLMATRIX_H
+#define MCLMATRIX_H
 
 #include <vector>
 #include <iostream>
@@ -20,8 +23,21 @@
 
 using namespace std;
 
-#ifndef MCLMATRIX_H
-#define MCLMATRIX_H
+// edges
+struct Edge {
+  pair<size_t, size_t> index;
+  float weight;
+
+  Edge() = default;
+  Edge(pair<size_t, size_t> ndx, float val) : index(ndx), weight(val){};
+  void shift(const pair<size_t, size_t> &offset) {
+    index.first += offset.first;
+    index.second += offset.second;
+  }
+
+  friend ostream &operator<<(ostream &, const Edge &);
+};
+
 struct MclItem {
   long ndx;
   float val;
@@ -41,6 +57,8 @@ struct MclMatrix {
   MclMatrix(long);
   void push(pair<size_t, size_t>, float);
   void push(size_t, size_t, float);
+  void push(const Edge&);
+  void push(const vector<Edge>&);
   long size() const;
   void sortRow();
   void write(const string&, bool resort=false);

@@ -7,16 +7,10 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 2:31:12
+ * @Last Modified Time: 2025-01-01 10:28:33
  */
 
 #include "edgeMeth.h"
-
-// for Edge
-ostream &operator<<(ostream &os, const Edge &e) {
-  os << e.index.first << "\t" << e.index.second << "\t" << e.weight;
-  return os;
-};
 
 // for Edge method
 EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
@@ -37,27 +31,14 @@ EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
   return meth;
 };
 
-void EdgeMeth::fillmcl(const string &smf, const map<string, size_t> &gidx,
-                       MclMatrix &mm) {
+void EdgeMeth::getEdge(const string &smf, const map<string, size_t> &gidx,
+                       vector<Edge> &edge) {
   Msimilar sm(smf);
   auto mtxShift = make_pair(gidx.find(delsuffix(sm.header.rowName))->second,
                             gidx.find(delsuffix(sm.header.colName))->second);
-  fillmcl(sm, mtxShift, mm);
-};
-
-void EdgeMeth::fillmcl(const Msimilar &sm, const pair<size_t, size_t> &offset,
-                       MclMatrix &mm) {
-  vector<Edge> edge;
   sm2edge(sm, edge);
   for (auto &e : edge)
-    e.shift(offset);
-
-    // push edge into mcl matrix
-#pragma omp critical
-  {
-    for (auto &e : edge)
-      mm.push(e.index, e.weight);
-  }
+    e.shift(mtxShift);
 };
 
 void EdgeMeth::mutualBestHit(const Msimilar &sm, vector<Edge> &edges) const {

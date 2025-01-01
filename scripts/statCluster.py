@@ -52,8 +52,8 @@ if __name__ == "__main__":
         ngeno.to_csv("ngeno-" + opt + ".tsv", sep='\t')
 
     # write the number of full cover cluster
-    ofg = pd.DataFrame(nfcls, columns=['opt', '# of group', '# single copy'])
-    if (os.exists(args.OrthogroupFull)):
-        ofold = pd.read_csv(args.OrthogroupFull)
+    ofg = pd.DataFrame(nfcls, columns=['opt', '#Orthogroup', '#SingleCopy'])
+    if (os.path.isfile(args.OrthogroupFull)):
+        ofold = pd.read_csv(args.OrthogroupFull, sep='\t')
         ofg = pd.concat([ofg, ofold]).drop_duplicates(subset='opt')
-    ofg.to_csv(args.OrthogroupFull, index=False, sep='\t')
+    ofg.sort_values(by=['#SingleCopy', '#Orthogroup']).to_csv(args.OrthogroupFull, index=False, sep='\t')

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 3:45:28
+ * @Last Modified Time: 2025-01-01 10:27:37
  */
 
 #include "cvnet.h"
@@ -124,9 +124,9 @@ CVNet::CVNet(int argc, char *argv[]) {
 
   // setup the input file names
   fnm.setfn(parser.get<string>("-i"));
-  
+
   // setup output file names
-  if(parser.is_used("-o") == true) {
+  if (parser.is_used("-o") == true) {
     fnm.outfn = fnm.outdir + parser.get<string>("-o");
   } else {
     fnm.outfn = fnm.outdir + fnm.clsuf();
@@ -178,8 +178,12 @@ void CVNet::sm2mcl() {
   fnm.smfnlist(smlist);
   MclMatrix mm(ngene);
 #pragma omp parallel for
-  for (int i = 0; i < smlist.size(); ++i)
-    emeth->fillmcl(smlist[i], gidx, mm);
+  for (int i = 0; i < smlist.size(); ++i) {
+    vector<Edge> edge;
+    emeth->getEdge(smlist[i], gidx, edge);
+#pragma omp critical
+    mm.push(edge);
+  }
   theInfo("Get data for MCL matrix");
 
   // resort row and output MclMatrix

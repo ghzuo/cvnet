@@ -7,10 +7,16 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:42:05
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-27 3:32:01
+ * @Last Modified Time: 2025-01-01 10:24:28
  */
 
 #include "mclmatrix.h"
+
+// for Edge
+ostream &operator<<(ostream &os, const Edge &e) {
+  os << e.index.first << "\t" << e.index.second << "\t" << e.weight;
+  return os;
+};
 
 // for MCL item
 MclItem::MclItem(const string &str) {
@@ -22,6 +28,15 @@ MclItem::MclItem(const string &str) {
 
 // for MCL matrix
 MclMatrix::MclMatrix(long n) { data.resize(n); }
+
+void MclMatrix::push(const Edge &e) { push(e.index, e.weight); };
+
+void MclMatrix::push(const vector<Edge> &ve) {
+  // push edge into mcl matrix
+  for (const auto &e : ve) {
+    push(e.index, e.weight);
+  }
+};
 
 void MclMatrix::push(pair<size_t, size_t> ndx, float val) {
   push(ndx.first, ndx.second, val);
@@ -82,19 +97,19 @@ void MclMatrix::read(const string &fname) {
   string line;
   vector<string> wd;
   // read the head lines
-  for(int i=0; i<3; ++i)
+  for (int i = 0; i < 3; ++i)
     getline(ifs, line);
   separateWord(wd, line, " x");
   size_t ngene = stol(wd[1]);
-  for(int i=3; i<8; ++i)
+  for (int i = 3; i < 8; ++i)
     getline(ifs, line);
 
   // read the data
   data.resize(ngene);
-  for(size_t i=0; i<ngene; ++i){
+  for (size_t i = 0; i < ngene; ++i) {
     getline(ifs, line);
     separateWord(wd, line);
-    for(size_t j=1; j<wd.size() - 1; ++j){
+    for (size_t j = 1; j < wd.size() - 1; ++j) {
       data[i].emplace_back(wd[j]);
     }
   }
