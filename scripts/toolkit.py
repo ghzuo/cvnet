@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2024-12-31 3:23:22
+@Last Modified Time: 2025-01-01 22:17:41
 '''
 
 import numpy as np
@@ -177,6 +177,15 @@ def readSeqGenome(file):
         gname = gname + [row["Genome"]] * row["Size"]
         gindex = gindex + [index] * row["Size"]
     return np.array(gname), np.array(gindex)
+
+
+def readEdges(file):
+    edges = []
+    with open(file, "r") as file:
+        for line in file:
+            parts = line.split()
+            edges.append((int(parts[0]), int(parts[1])))
+    return edges
 
 
 if __name__ == "__main__":

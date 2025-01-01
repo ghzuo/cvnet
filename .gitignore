@@ -7,5 +7,6 @@ __pycache__
 data
 .ipynb_checkpoints/
 a.out
-example/cache
-example/mcl
+example
+!example/faa/
+!example/list

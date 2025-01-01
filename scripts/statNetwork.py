@@ -9,13 +9,14 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-01 21:04:18
+@Last Modified Time: 2025-01-01 22:19:57
 '''
 
 import pandas as pd
 import toolkit as oft
 import argparse
 import os
+from igraph import Graph
 
 
 if __name__ == "__main__":
@@ -40,7 +41,8 @@ if __name__ == "__main__":
     nfcls = []
     for opt in args.infiles:
         # read cluster file
-        cls = oft.fileClusters(opt)
+        g = Graph(oft.readEdges(opt), directed=False)
+        cls = g.connected_components()        
         scls = pd.DataFrame(oft.statCl(cls, gIndex).T,
                             columns=["Ngenome", "Ngene"])
         ngene = scls.value_counts()
