@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:08:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 2:03:51
+ * @Last Modified Time: 2025-01-01 1:24:27
  */
 
 #ifndef CVNET_H
@@ -36,6 +36,7 @@ struct CVNet {
   void gn2cva();
   void cva2sm();
   void sm2mcl();
+  void sm2edge();
 };
 
 #endif

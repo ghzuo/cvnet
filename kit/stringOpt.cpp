@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-20 4:10:46
+ * @Last Modified Time: 2025-01-01 1:50:09
  */
 
 #include "stringOpt.h"
@@ -94,9 +94,8 @@ string delsuffix(const string &nm) {
 }
 
 void addsuffix(string &str, char c) {
-  string::iterator iter = str.end();
-  if (*(--iter) != c)
-    str += c;
+  if (str.back() != c) 
+    str.push_back(c);
 }
 
 string addsuffix(const string &str, char c) {

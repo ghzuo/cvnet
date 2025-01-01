@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-01 10:27:37
+ * @Last Modified Time: 2025-01-01 1:58:00
  */
 
 #include "cvnet.h"
@@ -25,8 +25,11 @@ int main(int argc, char **argv) {
   if (net.breakpoint.compare("sm") == 0)
     return 0;
 
-  // get mcl matrix
-  net.sm2mcl();
+  // get sparse matrix
+  if(net.fnm.outfmt.compare("edge") == 0)
+    net.sm2edge();
+  else
+    net.sm2mcl();
 }
 
 CVNet::CVNet(int argc, char *argv[]) {
@@ -83,10 +86,16 @@ CVNet::CVNet(int argc, char *argv[]) {
       .default_value("cache")
       .nargs(1)
       .action([&](const auto &val) { fnm.setcache(val); });
-  parser.add_argument("-o", "--mclfn")
-      .help("output mcl file name")
+  parser.add_argument("-o", "--outfile")
+      .help("output file name")
       .default_value(fnm.clsuf())
       .nargs(1);
+  parser.add_argument("-F", "--out-format")
+      .choices("mcl", "edge")
+      .help("output file format: mcl/edge")
+      .default_value(fnm.outfmt)
+      .nargs(1)
+      .store_into(fnm.outfmt);
   parser.add_argument("-O", "--outdir")
       .help("output directory")
       .default_value(fnm.outdir)
@@ -124,6 +133,11 @@ CVNet::CVNet(int argc, char *argv[]) {
 
   // setup the input file names
   fnm.setfn(parser.get<string>("-i"));
+
+  // set default outdir when out format changed
+  if (parser.is_used("-F") == true && parser.is_used("-O") == false) {
+    fnm.setoutdir(fnm.outfmt);
+  }
 
   // setup output file names
   if (parser.is_used("-o") == true) {
@@ -188,4 +202,41 @@ void CVNet::sm2mcl() {
 
   // resort row and output MclMatrix
   mm.write(fnm.outfn, true);
+}
+
+void CVNet::sm2edge() {
+  // make output directory
+  mkpath(fnm.outdir);
+
+  // get the gene shift
+  map<string, size_t> gidx;
+  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outdir + fnm.outndx);
+  theInfo("Prepared gene index in Matrix");
+
+  // push edge into mcl matrix
+  vector<string> smlist;
+  fnm.smfnlist(smlist);
+  vector<Edge> edges;
+#pragma omp parallel for
+  for (int i = 0; i < smlist.size(); ++i) {
+    vector<Edge> edge;
+    emeth->getEdge(smlist[i], gidx, edge);
+#pragma omp critical
+    edges.insert(edges.end(), edge.begin(), edge.end());
+  }
+  theInfo("Get sparse matrix");
+
+  // sort edge by index
+  sort(edges.begin(), edges.end(), [](const Edge &a, const Edge &b) {
+    if (a.index.first == b.index.first)
+      return a.index.second < b.index.second;
+    return a.index.first < b.index.first;
+  });
+
+  // output edges to file
+  theInfo("Sort edges");
+  ofstream ofs(fnm.outfn);
+  for (auto &e : edges)
+    ofs << e << endl;
+  ofs.close();
 }

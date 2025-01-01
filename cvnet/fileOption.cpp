@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 3:59:19
+ * @Last Modified Time: 2025-01-01 1:54:58
  */
 
 #include "fileOption.h"
@@ -118,16 +118,17 @@ size_t FileOption::obtainGeneIndex(map<string, size_t> &gShift,
   if (fileExists(fname)) {
     string line;
     size_t start;
-    size_t size;      
+    size_t size;
     string genome;
     ifstream igi(fname);
     getline(igi, line);
     while (getline(igi, line)) {
       line = trim(line);
-      if (line.empty() || line[0] == '#') continue;
+      if (line.empty() || line[0] == '#')
+        continue;
       stringstream ss(line);
       ss >> genome >> start >> size;
-      gShift[genome] = start ;
+      gShift[genome] = start;
     }
     igi.close();
     return start + size;
@@ -200,8 +201,10 @@ void FileOption::setSuffix(const string &str) {
 }
 
 void FileOption::setgndir(const string &gdir) {
-  gndir = gdir;
-  addsuffix(gndir, "/");
+  if(gdir.back() == '/')
+    gndir = gdir;
+  else
+    gndir += gdir + '/';
 };
 
 void FileOption::setcache(string dir) {
@@ -213,8 +216,10 @@ void FileOption::setcache(string dir) {
 };
 
 void FileOption::setoutdir(const string &dir) {
-  outdir = dir;
-  addsuffix(outdir, "/");
+  if (dir.back() == '/')
+    outdir = dir;
+  else
+    outdir = dir + '/';
 };
 
 string FileOption::info() const {
@@ -228,6 +233,7 @@ string FileOption::info() const {
   float degree = smplist.empty() ? nNode - 1 : float(smplist.size()) / nNode;
   str += "\nNumber of Genomes: " + to_string(nNode) +
          ", with Average Degree=" + to_string(degree);
+  str += "\nOutput file format: " + outfmt;
   return str;
 };
 
