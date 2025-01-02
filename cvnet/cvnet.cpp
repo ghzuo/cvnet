@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-01 1:58:00
+ * @Last Modified Time: 2025-01-02 5:25:23
  */
 
 #include "cvnet.h"
@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     return 0;
 
   // get sparse matrix
-  if(net.fnm.outfmt.compare("edge") == 0)
+  if (net.fnm.outfmt.compare("edge") == 0)
     net.sm2edge();
   else
     net.sm2mcl();
@@ -36,9 +36,13 @@ CVNet::CVNet(int argc, char *argv[]) {
   // Define the available options and parameters
   argparse::ArgumentParser parser("cvnet", "0.1",
                                   argparse::default_arguments::help);
-  parser.add_argument("-i", "--inlist")
-      .help("genome list file")
+  parser.add_argument("-i", "--genome-file-list")
+      .help("genome file list")
       .default_value("list")
+      .nargs(1);
+  parser.add_argument("-I", "--pair-index")
+      .help("Index for comparing genomes")
+      .default_value("pairs")
       .nargs(1);
   parser.add_argument("-g", "--genome-type")
       .help("genome file type, faa/ffn")
@@ -134,6 +138,11 @@ CVNet::CVNet(int argc, char *argv[]) {
   // setup the input file names
   fnm.setfn(parser.get<string>("-i"));
 
+  // setup the compare pairs
+  if (parser.is_used("-I")) {
+    fnm.setpair(parser.get<string>("-I"));
+  }
+
   // set default outdir when out format changed
   if (parser.is_used("-F") == true && parser.is_used("-O") == false) {
     fnm.setoutdir(fnm.outfmt);
@@ -143,7 +152,7 @@ CVNet::CVNet(int argc, char *argv[]) {
   if (parser.is_used("-o") == true) {
     fnm.outfn = fnm.outdir + parser.get<string>("-o");
   } else {
-    fnm.outfn = fnm.outdir + fnm.clsuf();
+    fnm.setoutfnm();
   }
 
   theInfo(fnm.info() + "\nPerpared argments of project");

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-01 1:32:48
+ * @Last Modified Time: 2025-01-02 5:21:28
  */
 
 #ifndef FILEOPTION_H
@@ -51,6 +51,7 @@ struct FileOption {
   string outdir = "mcl/";
   string outndx = "GeneIndex.tsv";
   string outfmt = "mcl";
+  string netsuf;
   string outfn;
 
   vector<string> gflist;
@@ -61,11 +62,13 @@ struct FileOption {
   void setfn(const vector<string> &);
   void setfn(const string &);
   void setfn(const vector<TriFileName> &);
-  void setSuffix(const string &);
+  void setpair(const string&);
 
+  void setSuffix(const string &);
   void setgndir(const string &);
   void setcache(string);
   void setoutdir(const string &);
+  void setoutfnm();
 
   string cvsuf();
   string smsuf();
@@ -84,8 +87,8 @@ struct FileOption {
   string info() const;
 
   string _smFN(const string &, const string &);
+  void _genTriFNList(const vector<pair<size_t, size_t>> &);
   void _genTriFNList();
-  void _genGList();
 };
 
 string setFilePath(const string &, const string &, const string &);

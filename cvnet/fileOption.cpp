@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-01 1:54:58
+ * @Last Modified Time: 2025-01-02 5:30:07
  */
 
 #include "fileOption.h"
@@ -48,12 +48,49 @@ void FileOption::setfn(const vector<TriFileName> &trilist) {
     nmset.insert(fn.cvfb);
   }
 
-  // delete the cv suffix
+  // delete the cv suffix and swap it with gflist
   vector<string> flist(nmset.begin(), nmset.end());
   string suff = cvsuf();
   for (auto &fn : flist)
     regex_replace(fn, regex(suff + "$"), "");
-  setfn(flist);
+  gflist.swap(flist);
+};
+
+void FileOption::setpair(const string &fname) {
+  ifstream infile(fname);
+  if (!infile) {
+    cerr << "\nCannot found the input file " << fname << endl;
+    exit(1);
+  }
+
+  // read the pair file
+  string line;
+  set<size_t> gIndexs;
+  vector<pair<size_t, size_t>> pairs;
+  while (getline(infile, line)) {
+    if (!line.empty()) {
+      stringstream ss(line);
+      size_t idxa, idxb;
+      ss >> idxa >> idxb;
+      pairs.emplace_back(idxa, idxb);
+      gIndexs.insert(idxa);
+      gIndexs.insert(idxb);
+    }
+  }
+  infile.close();
+
+  // setup trifilelist
+  _genTriFNList(pairs);
+
+  // reset the gflist
+  vector<string> flist;
+  for (auto &ndx : gIndexs) {
+    flist.emplace_back(gflist[ndx]);
+  }
+  gflist.swap(flist);
+
+  // set pair file name as net suffix
+  netsuf = fname;
 };
 
 size_t FileOption::cvfnlist(vector<string> &cvlist) {
@@ -181,6 +218,15 @@ string FileOption::clsuf() {
   return gtype + smsuf() + sufsep + emeth + to_string(int(cutoff * 100));
 }
 
+void FileOption::setoutfnm() {
+  outfn = outdir + clsuf();
+  if (!netsuf.empty()) {
+    string suf = sufsep + netsuf;
+    outfn += suf;
+    outndx = "GeneIndex" + suf + ".tsv";
+  }
+}
+
 void FileOption::setSuffix(const string &str) {
   vector<string> wd;
   separateWord(wd, str, sufsep);
@@ -201,7 +247,7 @@ void FileOption::setSuffix(const string &str) {
 }
 
 void FileOption::setgndir(const string &gdir) {
-  if(gdir.back() == '/')
+  if (gdir.back() == '/')
     gndir = gdir;
   else
     gndir += gdir + '/';
@@ -230,7 +276,7 @@ string FileOption::info() const {
   str += "\nMethod for Selecting Edge: " + emeth +
          ", with Cutoff=" + to_string(cutoff);
   size_t nNode = gflist.size();
-  float degree = smplist.empty() ? nNode - 1 : float(smplist.size()) / nNode;
+  float degree = smplist.empty() ? nNode - 1 : float(smplist.size()) * 2.0/ nNode;
   str += "\nNumber of Genomes: " + to_string(nNode) +
          ", with Average Degree=" + to_string(degree);
   str += "\nOutput file format: " + outfmt;
@@ -238,13 +284,22 @@ string FileOption::info() const {
 };
 
 void FileOption::_genTriFNList() {
+  vector<pair<size_t, size_t>> pairs;
+  for (auto i = 0; i < gflist.size(); i++) {
+    for (auto j = i + 1; j < gflist.size(); j++) {
+      pairs.emplace_back(i, j);
+    }
+  }
+  _genTriFNList(pairs);
+};
+
+void FileOption::_genTriFNList(const vector<pair<size_t, size_t>> &pairs) {
   // get cvlist
   vector<string> cvlist;
-  size_t n = cvfnlist(cvlist);
-  for (auto i = 0; i < n; i++) {
-    for (auto j = i + 1; j < n; j++) {
-      smplist.emplace_back(cvlist[i], cvlist[j], _smFN(gflist[i], gflist[j]));
-    }
+  cvfnlist(cvlist);
+  for (const auto &pr : pairs) {
+    smplist.emplace_back(cvlist[pr.first], cvlist[pr.second],
+                         _smFN(gflist[pr.first], gflist[pr.second]));
   }
 };
 
