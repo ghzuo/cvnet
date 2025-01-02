@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 11:01:58
+ * @Last Modified Time: 2025-01-03 00:40:49
  */
 
 #include "similarMeth.h"
@@ -107,28 +107,6 @@ float Cosine::scale(float val, float aNorm, float bNorm) {
   return val / (aNorm * bNorm);
 }
 
-void Euclidean::zeroItem(const Kblock &blk, size_t nCV, Msimilar &mtx) {
-  if (blk.size() < nCV) {
-    vector<int> fullndx(nCV);
-    iota(fullndx.begin(), fullndx.end(), 0);
-    for (auto &b : blk)
-      fullndx[b.index] = -1;
-
-    vector<int> ndx;
-    for (auto &it : fullndx) {
-      if (it != -1)
-        ndx.emplace_back(it);
-
-      for (auto it = blk.begin(); it != blk.end(); ++it) {
-        float d = it->value * it->value;
-        for (auto idx : ndx) {
-          mtx.add(it->index, idx, d);
-        }
-      }
-    }
-  }
-};
-
 void Euclidean::_calcOneK(const Kblock &blk, const vector<float> &norm,
                           Msimilar &mtx) {
   // normalize vector and get index for zero item
@@ -136,7 +114,6 @@ void Euclidean::_calcOneK(const Kblock &blk, const vector<float> &norm,
   for (auto it = blk.begin(); it != blk.end(); ++it)
     blkNorm.emplace_back(it->index, it->value / norm[it->index]);
 
-  // for the non zero items
   if (blkNorm.size() > 1) {
     for (auto ita = blkNorm.begin(); ita != blkNorm.end(); ++ita) {
       for (auto itb = ita + 1; itb != blkNorm.end(); ++itb) {
@@ -145,9 +122,6 @@ void Euclidean::_calcOneK(const Kblock &blk, const vector<float> &norm,
       }
     }
   }
-
-  // for zero items with non zero items
-  zeroItem(Kblock(blkNorm.begin(), blkNorm.end()), norm.size(), mtx);
 }
 
 void Euclidean::_calcOneK(const Kblock &kba, const vector<float> &na,
@@ -169,16 +143,13 @@ void Euclidean::_calcOneK(const Kblock &kba, const vector<float> &na,
       mtx.add(ka.index, kb.index, d * d);
     }
   }
-
-  // for zero dimension
-  // the sum of them equal 2 - sum(nozero items)
-  zeroItem(Kblock(blkA.begin(), blkA.end()), nb.size(), mtx);
-  // TODO: the order is wrong
-  zeroItem(Kblock(blkB.begin(), blkB.end()), na.size(), mtx);
 };
 
 float Euclidean::scale(float val, float aNorm, float bNorm) {
-  return 1 - sqrt(val);
+  // for vector a{a1, a2, 0} and b{b1, 0, b3}
+  // d^2 = (a1-b1)^2 + a2^2 + b3^2 = (a1^2 + a2^2) + (b1^2 + b3^2) - 2*a1*b1
+  // d = sqrt(2 - 2 * a1 *b1)
+  return 1 - 0.5*sqrt(2)*sqrt(1 - val);
 }
 
 // ... distance scaling at L1
