@@ -10,12 +10,13 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-01 22:17:41
+@Last Modified Time: 2025-01-02 9:26:13
 '''
 
 import numpy as np
 import pandas as pd
 import subprocess
+from igraph import Graph
 
 
 def parseROW(row):
@@ -179,13 +180,14 @@ def readSeqGenome(file):
     return np.array(gname), np.array(gindex)
 
 
-def readEdges(file):
+def graphClusters(file):
     edges = []
     with open(file, "r") as file:
         for line in file:
             parts = line.split()
             edges.append((int(parts[0]), int(parts[1])))
-    return edges
+    g = Graph(edges, directed=False)
+    return g.connected_components()
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-01 21:04:18
+@Last Modified Time: 2025-01-02 9:30:31
 '''
 
 import pandas as pd
@@ -29,8 +29,17 @@ if __name__ == "__main__":
                         help="Gene Index File, default: GeneIndex.tsv")
     parser.add_argument('-O', '--OrthogroupFull', type=str,
                         default="OrthogroupAllspecies.tsv",
-                        help="Statistics of All Species Orthogroup, default: OrthogroupAllspecies.tsv")
+                        help="Statistics of All Species Orthogroup, "
+                        "default: OrthogroupAllspecies.tsv")
+    parser.add_argument('-S', "--SourceType", type=str, default="file",
+                        help="Source Type of Cluster, default: file",
+                        choices=["file", "edge"])
     args = parser.parse_args()
+
+    # set cluster source type method
+    getCluster = oft.fileClusters
+    if args.SourceType == "edge":
+        getCluster = oft.graphClusters
 
     # get gene-genome index
     _, gIndex = oft.readSeqGenome(args.IndexFile)
@@ -40,7 +49,7 @@ if __name__ == "__main__":
     nfcls = []
     for opt in args.infiles:
         # read cluster file
-        cls = oft.fileClusters(opt)
+        cls = getCluster(opt)
         scls = pd.DataFrame(oft.statCl(cls, gIndex).T,
                             columns=["Ngenome", "Ngene"])
         ngene = scls.value_counts()
@@ -56,4 +65,5 @@ if __name__ == "__main__":
     if (os.path.isfile(args.OrthogroupFull)):
         ofold = pd.read_csv(args.OrthogroupFull, sep='\t')
         ofg = pd.concat([ofg, ofold]).drop_duplicates(subset='opt')
-    ofg.sort_values(by=['#SingleCopy', '#Orthogroup']).to_csv(args.OrthogroupFull, index=False, sep='\t')
+    ofg.sort_values(by=['#SingleCopy', '#Orthogroup']).to_csv(
+        args.OrthogroupFull, index=False, sep='\t')
