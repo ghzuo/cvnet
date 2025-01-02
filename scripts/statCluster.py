@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-02 9:30:31
+@Last Modified Time: 2025-01-02 9:40:42
 '''
 
 import pandas as pd
@@ -20,7 +20,6 @@ import os
 
 if __name__ == "__main__":
     # get options
-    # default options
     parser = argparse.ArgumentParser(
         description='Perform statistics for MCL output results')
     parser.add_argument('-f', '--infiles', nargs='+', type=str,
@@ -33,7 +32,7 @@ if __name__ == "__main__":
                         "default: OrthogroupAllspecies.tsv")
     parser.add_argument('-S', "--SourceType", type=str, default="file",
                         help="Source Type of Cluster, default: file",
-                        choices=["file", "edge"])
+                        choices=["mcl", "edge"])
     args = parser.parse_args()
 
     # set cluster source type method
@@ -52,8 +51,8 @@ if __name__ == "__main__":
         cls = getCluster(opt)
         scls = pd.DataFrame(oft.statCl(cls, gIndex).T,
                             columns=["Ngenome", "Ngene"])
-        ngene = scls.value_counts()
         ngeno = scls['Ngenome'].value_counts()
+        ngene = scls.value_counts()
         nfcls.append([opt, ngeno[ngno], ngene[(ngno, ngno)]])
 
         # write down data
