@@ -9,11 +9,11 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-02 9:40:42
+@Last Modified Time: 2025-01-04 4:19:17
 '''
 
 import pandas as pd
-import toolkit as oft
+import toolkit as tk
 import argparse
 import os
 
@@ -36,12 +36,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # set cluster source type method
-    getCluster = oft.fileClusters
+    getCluster = tk.fileClusters
     if args.SourceType == "edge":
-        getCluster = oft.graphClusters
+        getCluster = tk.graphClusters
 
     # get gene-genome index
-    _, gIndex = oft.readSeqGenome(args.IndexFile)
+    _, gIndex = tk.readSeqGenome(args.IndexFile)
     ngno = gIndex[-1] + 1
 
     # read cluster and do statistics
