@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-02 9:26:13
+@Last Modified Time: 2025-01-04 11:39:40
 '''
 
 import numpy as np
@@ -181,12 +181,8 @@ def readSeqGenome(file):
 
 
 def graphClusters(file):
-    edges = []
-    with open(file, "r") as file:
-        for line in file:
-            parts = line.split()
-            edges.append((int(parts[0]), int(parts[1])))
-    g = Graph(edges, directed=False)
+    edges = pd.read_csv(file, header=None, sep='\t', usecols=[0,1])
+    g = Graph.DataFrame(edges, directed=False)
     return g.connected_components()
 
 
