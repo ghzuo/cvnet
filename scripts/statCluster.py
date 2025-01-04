@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-04 4:19:17
+@Last Modified Time: 2025-01-04 4:20:04
 '''
 
 import pandas as pd
@@ -49,7 +49,7 @@ if __name__ == "__main__":
     for opt in args.infiles:
         # read cluster file
         cls = getCluster(opt)
-        scls = pd.DataFrame(oft.statCl(cls, gIndex).T,
+        scls = pd.DataFrame(tk.statCl(cls, gIndex).T,
                             columns=["Ngenome", "Ngene"])
         ngeno = scls['Ngenome'].value_counts()
         ngene = scls.value_counts()
