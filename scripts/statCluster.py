@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-04 4:20:04
+@Last Modified Time: 2025-01-04 4:36:46
 '''
 
 import pandas as pd
@@ -18,7 +18,7 @@ import argparse
 import os
 
 
-if __name__ == "__main__":
+def parseArgs():
     # get options
     parser = argparse.ArgumentParser(
         description='Perform statistics for MCL output results')
@@ -33,7 +33,12 @@ if __name__ == "__main__":
     parser.add_argument('-S', "--SourceType", type=str, default="file",
                         help="Source Type of Cluster, default: file",
                         choices=["mcl", "edge"])
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    # get args
+    args = parseArgs()
 
     # set cluster source type method
     getCluster = tk.fileClusters
@@ -47,10 +52,12 @@ if __name__ == "__main__":
     # read cluster and do statistics
     nfcls = []
     for opt in args.infiles:
-        # read cluster file
+        # get cluster and do statistics
         cls = getCluster(opt)
         scls = pd.DataFrame(tk.statCl(cls, gIndex).T,
                             columns=["Ngenome", "Ngene"])
+
+        # count number of cluster with same numbers of genome and gene
         ngeno = scls['Ngenome'].value_counts()
         ngene = scls.value_counts()
         nfcls.append([opt, ngeno[ngno], ngene[(ngno, ngno)]])
