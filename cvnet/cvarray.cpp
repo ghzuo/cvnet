@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 11:15:19
+ * @Last Modified Time: 2025-01-12 9:21:55
  */
 
 #include "cvarray.h"
@@ -82,32 +82,38 @@ Kblock CVArray::getKblock(size_t ndx) const {
 };
 
 void CVArray::read(const string &fname) {
-  // open file to read
-  gzFile fp;
-  string gzfile = addsuffix(fname, ".gz");
-  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
-    cerr << "CV file not found: \"" << gzfile << '"' << endl;
+  try {
+    // open file to read
+    gzFile fp;
+    string gzfile = addsuffix(fname, ".gz");
+    fp = gzopen(gzfile.c_str(), "rb");
+
+    // get size of the cvarray
+    CVAinfo hd;
+    gzread(fp, (char *)&hd, sizeof(CVAinfo));
+
+    // read the cvdiminfo
+    cvdi.resize(hd.nCV);
+    gzread(fp, (char *)cvdi.data(), sizeof(CVdimInfo) * hd.nCV);
+
+    // read the kdiminfo
+    kdi.resize(hd.nKstr);
+    gzread(fp, (char *)kdi.data(), sizeof(KdimInfo) * hd.nKstr);
+
+    // read the data
+    data.resize(hd.nItem);
+    gzread(fp, (char *)data.data(), sizeof(Kitem) * hd.nItem);
+
+    // close file
+    gzclose(fp);
+
+  } catch (std::exception &e) {
+    cerr << "Error reading file: " << fname << "\n" << e.what() << endl;
+    exit(1);
+  } catch (...) {
+    cerr << "Error reading file: " << fname << "\n" << endl;
     exit(1);
   }
-
-  // get size of the cvarray
-  CVAinfo hd;
-  gzread(fp, (char *)&hd, sizeof(CVAinfo));
-
-  // read the cvdiminfo
-  cvdi.resize(hd.nCV);
-  gzread(fp, (char *)cvdi.data(), sizeof(CVdimInfo) * hd.nCV);
-
-  // read the kdiminfo
-  kdi.resize(hd.nKstr);
-  gzread(fp, (char *)kdi.data(), sizeof(KdimInfo) * hd.nKstr);
-
-  // read the data
-  data.resize(hd.nItem);
-  gzread(fp, (char *)data.data(), sizeof(Kitem) * hd.nItem);
-
-  // close file
-  gzclose(fp);
 };
 
 void CVArray::write(const string &fname) const {

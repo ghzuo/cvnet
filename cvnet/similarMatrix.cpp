@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 11:24:04
+ * @Last Modified Time: 2025-01-12 9:10:45
  */
 
 #include "similarMatrix.h"
@@ -159,28 +159,33 @@ void Msimilar::write(const string &fname) const {
 };
 
 void Msimilar::read(const string &fname) {
-  // open file to read
-  gzFile fp;
-  string gzfile = addsuffix(fname, ".gz");
-  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
-    cerr << "Similar Matrix file not found: \"" << gzfile << '"' << endl;
+  try {
+    // open file to read
+    gzFile fp;
+    string gzfile = addsuffix(fname, ".gz");
+    fp = gzopen(gzfile.c_str(), "rb");
+
+    // read the header
+    header.read(fp);
+
+    // read data
+    size_t dsize = header.nrow * header.ncol;
+    data.resize(dsize);
+    gzread(fp, (char *)data.data(), dsize * sizeof(data[0]));
+
+    // read reciprocal best hit
+    rbh.resize(header.nrow);
+    gzread(fp, (char *)rbh.data(), header.nrow * sizeof(rbh[0]));
+
+    // close file
+    gzclose(fp);
+  } catch (std::exception &e){
+    cerr << "Error reading file: " << fname << "\n" << e.what() << endl;
+    exit(1);
+  } catch (...) {
+    cerr << "Error reading file: " << fname << "\n" << endl;
     exit(1);
   }
-
-  // read the header
-  header.read(fp);
-
-  // read data
-  size_t dsize = header.nrow * header.ncol;
-  data.resize(dsize);
-  gzread(fp, (char *)data.data(), dsize * sizeof(data[0]));
-
-  // read reciprocal best hit
-  rbh.resize(header.nrow);
-  gzread(fp, (char *)rbh.data(), header.nrow * sizeof(rbh[0]));
-
-  // close file
-  gzclose(fp);
 };
 
 ostream &operator<<(ostream &os, const Msimilar &sm) {
