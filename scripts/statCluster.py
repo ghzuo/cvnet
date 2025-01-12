@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-04 4:36:46
+@Last Modified Time: 2025-01-12 10:29:41
 '''
 
 import pandas as pd
@@ -60,14 +60,17 @@ if __name__ == "__main__":
         # count number of cluster with same numbers of genome and gene
         ngeno = scls['Ngenome'].value_counts()
         ngene = scls.value_counts()
-        nfcls.append([opt, ngeno[ngno], ngene[(ngno, ngno)]])
 
         # write down data
         ngene.to_csv("ngene-" + opt + ".tsv", sep='\t')
         ngeno.to_csv("ngeno-" + opt + ".tsv", sep='\t')
 
+        # Number of full cover Orthorgroup
+        nfcls.append([opt, ngeno.get(ngno), ngene.get((ngno, ngno))])
+
     # write the number of full cover cluster
-    ofg = pd.DataFrame(nfcls, columns=['opt', '#Orthogroup', '#SingleCopy'])
+    ofg = pd.DataFrame(nfcls, columns=['opt', '#Orthogroup', '#SingleCopy']).fillna(0)
+    ofg[['#Orthogroup','#SingleCopy']] = ofg[['#Orthogroup', '#SingleCopy']].astype(int)
     if (os.path.isfile(args.OrthogroupFull)):
         ofold = pd.read_csv(args.OrthogroupFull, sep='\t')
         ofg = pd.concat([ofg, ofold]).drop_duplicates(subset='opt')
