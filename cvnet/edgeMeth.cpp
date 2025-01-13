@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-01 10:28:33
+ * @Last Modified Time: 2025-01-13 12:35:07
  */
 
 #include "edgeMeth.h"
@@ -34,8 +34,13 @@ EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
 void EdgeMeth::getEdge(const string &smf, const map<string, size_t> &gidx,
                        vector<Edge> &edge) {
   Msimilar sm(smf);
-  auto mtxShift = make_pair(gidx.find(delsuffix(sm.header.rowName))->second,
-                            gidx.find(delsuffix(sm.header.colName))->second);
+  auto itrow = gidx.find(delsuffix(sm.header.rowName));
+  auto itcol = gidx.find(delsuffix(sm.header.colName));
+  if (itrow == gidx.end())
+    throw runtime_error("Row not found in GIdx: " + delsuffix(sm.header.rowName));
+  if (itcol == gidx.end()) 
+    throw runtime_error("Col not found in GIdx: " + delsuffix(sm.header.colName));
+  auto mtxShift = make_pair(itrow->second, itcol->second);
   sm2edge(sm, edge);
   for (auto &e : edge)
     e.shift(mtxShift);

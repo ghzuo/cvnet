@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-09 5:10:18
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-12 9:21:55
+ * @Last Modified Time: 2025-01-13 11:18:54
  */
 
 #include "cvarray.h"
@@ -86,7 +86,8 @@ void CVArray::read(const string &fname) {
     // open file to read
     gzFile fp;
     string gzfile = addsuffix(fname, ".gz");
-    fp = gzopen(gzfile.c_str(), "rb");
+    if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL)
+      throw runtime_error("Cannot open file for reading: " + gzfile);
 
     // get size of the cvarray
     CVAinfo hd;

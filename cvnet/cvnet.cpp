@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-02 5:25:23
+ * @Last Modified Time: 2025-01-13 9:08:59
  */
 
 #include "cvnet.h"
@@ -200,6 +200,7 @@ void CVNet::sm2mcl() {
   vector<string> smlist;
   fnm.smfnlist(smlist);
   MclMatrix mm(ngene);
+  theInfo("Prepared the blank MCL matrix");
 #pragma omp parallel for
   for (int i = 0; i < smlist.size(); ++i) {
     vector<Edge> edge;

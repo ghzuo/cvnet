@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-12 9:10:45
+ * @Last Modified Time: 2025-01-13 11:18:05
  */
 
 #include "similarMatrix.h"
@@ -163,7 +163,8 @@ void Msimilar::read(const string &fname) {
     // open file to read
     gzFile fp;
     string gzfile = addsuffix(fname, ".gz");
-    fp = gzopen(gzfile.c_str(), "rb");
+    if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL)
+      throw runtime_error("Cannot open file for reading: " + gzfile);
 
     // read the header
     header.read(fp);
@@ -179,7 +180,7 @@ void Msimilar::read(const string &fname) {
 
     // close file
     gzclose(fp);
-  } catch (std::exception &e){
+  } catch (std::exception &e) {
     cerr << "Error reading file: " << fname << "\n" << e.what() << endl;
     exit(1);
   } catch (...) {
