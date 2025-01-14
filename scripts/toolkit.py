@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-04 4:17:45
+@Last Modified Time: 2025-01-14 6:54:43
 '''
 
 import numpy as np
@@ -184,6 +184,24 @@ def graphClusters(file):
     edges = pd.read_csv(file, header=None, sep='\t', usecols=[0, 1])
     g = Graph.DataFrame(edges, directed=False)
     return g.connected_components()
+
+
+def lineClusters(file):
+    cls = []
+    with open(file) as f:
+        for line in f:
+            line = line.strip()
+            cls.append(np.array(line.split('\t'), dtype='int'))
+    return cls
+
+
+def byFileName(file):
+    if file.endswith('.cln'):
+        return lineClusters(file)
+    elif file.endswith('.mcl'):
+        return fileClusters(file)
+    else:
+        return graphClusters(file)
 
 
 if __name__ == "__main__":

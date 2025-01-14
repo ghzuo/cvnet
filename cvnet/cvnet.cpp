@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-13 9:08:59
+ * @Last Modified Time: 2025-01-14 11:42:18
  */
 
 #include "cvnet.h"
@@ -26,10 +26,10 @@ int main(int argc, char **argv) {
     return 0;
 
   // get sparse matrix
-  if (net.fnm.outfmt.compare("edge") == 0)
-    net.sm2edge();
-  else
+  if (net.fnm.outfmt.compare("mcl") == 0)
     net.sm2mcl();
+  else
+    net.sm2edge();
 }
 
 CVNet::CVNet(int argc, char *argv[]) {
@@ -100,6 +100,10 @@ CVNet::CVNet(int argc, char *argv[]) {
       .default_value(fnm.outfmt)
       .nargs(1)
       .store_into(fnm.outfmt);
+  parser.add_argument("-N", "--index-file")
+      .help("gene index file name")
+      .default_value(fnm.outndx)
+      .nargs(1);
   parser.add_argument("-O", "--outdir")
       .help("output directory")
       .default_value(fnm.outdir)
@@ -155,6 +159,13 @@ CVNet::CVNet(int argc, char *argv[]) {
     fnm.setoutfnm();
   }
 
+  // setup output index file name
+  if (parser.is_used("-N") == true) {
+    fnm.outndx = fnm.outdir + parser.get<string>("-N");
+  } else {
+    fnm.outndx = fnm.outdir + fnm.outndx;
+  }
+
   theInfo(fnm.info() + "\nPerpared argments of project");
 }
 
@@ -193,7 +204,7 @@ void CVNet::sm2mcl() {
 
   // get the gene shift
   map<string, size_t> gidx;
-  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outdir + fnm.outndx);
+  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outndx);
   theInfo("Prepared gene index in Matrix");
 
   // push edge into mcl matrix
@@ -220,7 +231,7 @@ void CVNet::sm2edge() {
 
   // get the gene shift
   map<string, size_t> gidx;
-  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outdir + fnm.outndx);
+  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outndx);
   theInfo("Prepared gene index in Matrix");
 
   // push edge into mcl matrix

@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-13 11:08:59
+@Last Modified Time: 2025-01-14 9:20:30
 '''
 
 import pandas as pd
@@ -32,7 +32,7 @@ def parseArgs():
                         "default: OrthogroupAllspecies.tsv")
     parser.add_argument('-S', "--SourceType", type=str, default="file",
                         help="Source Type of Cluster, default: file",
-                        choices=["mcl", "edge"])
+                        choices=["mcl", "line", 'edge'])
     return parser.parse_args()
 
 
@@ -41,9 +41,13 @@ if __name__ == "__main__":
     args = parseArgs()
 
     # set cluster source type method
-    getCluster = tk.fileClusters
+    getCluster = tk.byFileName
     if args.SourceType == "edge":
         getCluster = tk.graphClusters
+    elif args.SourceType == "line":
+        getCluster = tk.lineClusters
+    elif args.SourceType == "mcl":
+        getCluster = tk.mclClusters
 
     # get gene-genome index
     _, gIndex = tk.readSeqGenome(args.IndexFile)

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-02 5:21:28
+ * @Last Modified Time: 2025-01-14 11:33:13
  */
 
 #ifndef FILEOPTION_H
@@ -48,9 +48,9 @@ struct FileOption {
   string smdir = "cache/sm/";
   string emeth = "RBH";
   double cutoff = 0.1;
-  string outdir = "mcl/";
+  string outdir = "edge/";
   string outndx = "GeneIndex.tsv";
-  string outfmt = "mcl";
+  string outfmt = "edge";
   string netsuf;
   string outfn;
 
