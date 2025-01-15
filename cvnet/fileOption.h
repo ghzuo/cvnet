@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-14 11:33:13
+ * @Last Modified Time: 2025-01-15 8:45:48
  */
 
 #ifndef FILEOPTION_H
@@ -39,6 +39,7 @@ struct TriFileName {
 struct FileOption {
   string sufsep = ".";
   string gndir = "";
+  string lstfn = "list";
   string gtype = "faa";
   string cvdir = "cache/cva/";
   string gszfn = "cache/GenomeSize.tsv";
@@ -59,8 +60,8 @@ struct FileOption {
 
   FileOption() = default;
 
+  void setfn();
   void setfn(const vector<string> &);
-  void setfn(const string &);
   void setfn(const vector<TriFileName> &);
   void setpair(const string&);
 
@@ -80,7 +81,9 @@ struct FileOption {
 
   size_t geneIndexByCVFile(map<string, size_t> &);
   size_t geneIndexBySMFile(map<string, size_t> &);
-  size_t obtainGeneIndex(map<string, size_t> &, const string &);
+  size_t obtainGeneIndex(map<string, size_t> &);
+  size_t readGeneIndex(map<string, size_t> &);
+  size_t genGeneIndex(map<string, size_t> &);
   void setgsz(const string &, size_t);
   void updateGeneSizeFile(map<string, size_t> &);
 

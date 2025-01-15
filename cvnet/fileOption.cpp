@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-02 5:30:07
+ * @Last Modified Time: 2025-01-15 8:51:35
  */
 
 #include "fileOption.h"
@@ -30,11 +30,14 @@ void FileOption::setfn(const vector<string> &flist) {
   }
 };
 
-void FileOption::setfn(const string &fname) {
+void FileOption::setfn() {
   vector<string> flist;
-  readlist(fname, flist);
+  readlist(lstfn, flist);
   uniqueWithOrder(flist);
   setfn(flist);
+
+  if (!netsuf.empty())
+    setpair(netsuf);
 };
 
 void FileOption::setfn(const vector<TriFileName> &trilist) {
@@ -58,10 +61,8 @@ void FileOption::setfn(const vector<TriFileName> &trilist) {
 
 void FileOption::setpair(const string &fname) {
   ifstream infile(fname);
-  if (!infile) {
-    cerr << "\nCannot found the input file " << fname << endl;
-    exit(1);
-  }
+  if (!infile)
+    throw(std::runtime_error("\nCannot found the input file " + fname));
 
   // read the pair file
   string line;
@@ -88,9 +89,6 @@ void FileOption::setpair(const string &fname) {
     flist.emplace_back(gflist[ndx]);
   }
   gflist.swap(flist);
-
-  // set pair file name as net suffix
-  netsuf = fname;
 };
 
 size_t FileOption::cvfnlist(vector<string> &cvlist) {
@@ -150,47 +148,68 @@ size_t FileOption::geneIndexByCVFile(map<string, size_t> &offset) {
   return ndx;
 };
 
-size_t FileOption::obtainGeneIndex(map<string, size_t> &gShift,
-                                   const string &fname) {
-  if (fileExists(fname)) {
-    string line;
-    size_t start;
-    size_t size;
-    string genome;
-    ifstream igi(fname);
-    getline(igi, line);
-    while (getline(igi, line)) {
-      line = trim(line);
-      if (line.empty() || line[0] == '#')
-        continue;
-      stringstream ss(line);
-      ss >> genome >> start >> size;
-      gShift[genome] = start;
-    }
-    igi.close();
-    return start + size;
-  } else {
-    // read gene size file into gene size map
-    map<string, size_t> gsize;
-    pair<string, size_t> gsz;
-    ifstream igs(gszfn);
-    while (igs >> gsz.first >> gsz.second)
-      gsize.insert(gsz);
-    igs.close();
+size_t FileOption::readGeneIndex(map<string, size_t> &gShift) {
+  string line;
+  size_t start;
+  size_t size;
+  string genome;
+  ifstream igi(outndx);
+  getline(igi, line);
+  while (getline(igi, line)) {
+    line = trim(line);
+    if (line.empty() || line[0] == '#')
+      continue;
+    stringstream ss(line);
+    ss >> genome >> start >> size;
+    gShift[genome] = start;
+  }
+  igi.close();
+  return start + size;
+}
 
-    // obtained gene index from gene size map
-    ofstream fndx(fname);
-    size_t ndx = 0;
-    fndx << "Genome\tStart\tSize\n";
+size_t FileOption::genGeneIndex(map<string, size_t> &gShift) {
+  // read cache files
+  map<string, size_t> gsize;
+  pair<string, size_t> gsz;
+  ifstream igs(gszfn);
+  while (igs >> gsz.first >> gsz.second)
+    gsize.insert(gsz);
+  igs.close();
+
+  // obtained gene index from gene size map
+  size_t ndx = 0;
+  gShift.clear();
+  ofstream fndx(outndx);
+  fndx << "Genome\tStart\tSize\n";
+  for (const auto &fn : gflist) {
+    string gn = getFileName(fn);
+    gShift[gn] = ndx;
+    fndx << gn << "\t" << ndx << "\t" << gsize[gn] << "\n";
+    ndx += gsize[gn];
+  }
+  fndx.close();
+  
+  theInfo("Generate new gene index file");
+  return ndx;
+}
+
+size_t FileOption::obtainGeneIndex(map<string, size_t> &gShift) {
+  if (fileExists(outndx)) {
+    // read gene index
+    size_t ngene = readGeneIndex(gShift);
+
+    // check gene list
     for (const auto &fn : gflist) {
       string gn = getFileName(fn);
-      gShift[gn] = ndx;
-      fndx << gn << "\t" << ndx << "\t" << gsize[gn] << "\n";
-      ndx += gsize[gn];
+      if (gShift.find(gn) == gShift.end()) 
+        return genGeneIndex(gShift);
     }
-    fndx.close();
-    return ndx;
+    theInfo("Used existing gene index file");
+    return ngene;
   }
+
+  // read gene size file into gene size map
+  return genGeneIndex(gShift);
 };
 
 void FileOption::updateGeneSizeFile(map<string, size_t> &gsize) {
@@ -215,15 +234,19 @@ void FileOption::updateGeneSizeFile(map<string, size_t> &gsize) {
 string FileOption::cvsuf() { return sufsep + cmeth + to_string(k); };
 string FileOption::smsuf() { return cvsuf() + sufsep + smeth; };
 string FileOption::clsuf() {
-  return gtype + smsuf() + sufsep + emeth + to_string(int(cutoff * 100));
+  ostringstream oss;
+  oss << gtype << smsuf() << sufsep << emeth << setw(2) << setfill('0')
+      << int(cutoff * 100);
+  return oss.str();
 }
 
 void FileOption::setoutfnm() {
-  outfn = outdir + clsuf();
+  outfn = outdir + outfn;
+  outndx = outdir + outndx;
   if (!netsuf.empty()) {
     string suf = sufsep + netsuf;
     outfn += suf;
-    outndx = "GeneIndex" + suf + ".tsv";
+    outndx += suf;
   }
 }
 
@@ -275,11 +298,17 @@ string FileOption::info() const {
   str += "\nMethod for Similarity between CV: " + smeth;
   str += "\nMethod for Selecting Edge: " + emeth +
          ", with Cutoff=" + to_string(cutoff);
+  str += "\nInput List file: " + lstfn;
+  if (!netsuf.empty())
+    str += "\nWith pairs file: " + netsuf;
   size_t nNode = gflist.size();
-  float degree = smplist.empty() ? nNode - 1 : float(smplist.size()) * 2.0/ nNode;
+  float degree =
+      smplist.empty() ? nNode - 1 : float(smplist.size()) * 2.0 / nNode;
   str += "\nNumber of Genomes: " + to_string(nNode) +
          ", with Average Degree=" + to_string(degree);
-  str += "\nOutput file format: " + outfmt;
+  str += "\nOutput graph file: " + outfn;
+  str += "\nWith graph format: " + outfmt;
+  str += "\nGene index file: " + outndx;
   return str;
 };
 

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-14 11:42:18
+ * @Last Modified Time: 2025-01-15 8:44:47
  */
 
 #include "cvnet.h"
@@ -38,12 +38,13 @@ CVNet::CVNet(int argc, char *argv[]) {
                                   argparse::default_arguments::help);
   parser.add_argument("-i", "--genome-file-list")
       .help("genome file list")
-      .default_value("list")
-      .nargs(1);
+      .default_value(fnm.lstfn)
+      .nargs(1)
+      .store_into(fnm.lstfn);
   parser.add_argument("-I", "--pair-index")
       .help("Index for comparing genomes")
-      .default_value("pairs")
-      .nargs(1);
+      .nargs(1)
+      .store_into(fnm.netsuf);
   parser.add_argument("-g", "--genome-type")
       .help("genome file type, faa/ffn")
       .choices("faa", "ffn")
@@ -93,7 +94,8 @@ CVNet::CVNet(int argc, char *argv[]) {
   parser.add_argument("-o", "--outfile")
       .help("output file name")
       .default_value(fnm.clsuf())
-      .nargs(1);
+      .nargs(1)
+      .store_into(fnm.outfn);
   parser.add_argument("-F", "--out-format")
       .choices("mcl", "edge")
       .help("output file format: mcl/edge")
@@ -103,7 +105,8 @@ CVNet::CVNet(int argc, char *argv[]) {
   parser.add_argument("-N", "--index-file")
       .help("gene index file name")
       .default_value(fnm.outndx)
-      .nargs(1);
+      .nargs(1)
+      .store_into(fnm.outndx);
   parser.add_argument("-O", "--outdir")
       .help("output directory")
       .default_value(fnm.outdir)
@@ -140,12 +143,7 @@ CVNet::CVNet(int argc, char *argv[]) {
   emeth = EdgeMeth::create(fnm.emeth, fnm.cutoff);
 
   // setup the input file names
-  fnm.setfn(parser.get<string>("-i"));
-
-  // setup the compare pairs
-  if (parser.is_used("-I")) {
-    fnm.setpair(parser.get<string>("-I"));
-  }
+  fnm.setfn();
 
   // set default outdir when out format changed
   if (parser.is_used("-F") == true && parser.is_used("-O") == false) {
@@ -153,19 +151,11 @@ CVNet::CVNet(int argc, char *argv[]) {
   }
 
   // setup output file names
-  if (parser.is_used("-o") == true) {
-    fnm.outfn = fnm.outdir + parser.get<string>("-o");
-  } else {
-    fnm.setoutfnm();
-  }
+  if(parser.is_used("-o") == false)
+    fnm.outfn = fnm.clsuf();
+  fnm.setoutfnm();
 
-  // setup output index file name
-  if (parser.is_used("-N") == true) {
-    fnm.outndx = fnm.outdir + parser.get<string>("-N");
-  } else {
-    fnm.outndx = fnm.outdir + fnm.outndx;
-  }
-
+  // output information
   theInfo(fnm.info() + "\nPerpared argments of project");
 }
 
@@ -204,8 +194,7 @@ void CVNet::sm2mcl() {
 
   // get the gene shift
   map<string, size_t> gidx;
-  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outndx);
-  theInfo("Prepared gene index in Matrix");
+  size_t ngene = fnm.obtainGeneIndex(gidx);
 
   // push edge into mcl matrix
   vector<string> smlist;
@@ -231,8 +220,7 @@ void CVNet::sm2edge() {
 
   // get the gene shift
   map<string, size_t> gidx;
-  size_t ngene = fnm.obtainGeneIndex(gidx, fnm.outndx);
-  theInfo("Prepared gene index in Matrix");
+  size_t ngene = fnm.obtainGeneIndex(gidx);
 
   // push edge into mcl matrix
   vector<string> smlist;
