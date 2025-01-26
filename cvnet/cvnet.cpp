@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-15 8:44:47
+ * @Last Modified Time: 2025-01-25 10:59:10
  */
 
 #include "cvnet.h"
@@ -26,10 +26,7 @@ int main(int argc, char **argv) {
     return 0;
 
   // get sparse matrix
-  if (net.fnm.outfmt.compare("mcl") == 0)
-    net.sm2mcl();
-  else
-    net.sm2edge();
+  net.sm2net();
 }
 
 CVNet::CVNet(int argc, char *argv[]) {
@@ -76,8 +73,8 @@ CVNet::CVNet(int argc, char *argv[]) {
       .nargs(1)
       .store_into(fnm.smeth);
   parser.add_argument("-e", "--edge-method")
-      .help("method for selecting edge, RBH/CUT/BRB")
-      .choices("RBH", "CUT", "BRB")
+      .help("method for selecting edge, RBH/GRB/CUT/SRB")
+      .choices("RBH", "GRB", "CUT", "SRB")
       .default_value(fnm.emeth)
       .nargs(1)
       .store_into(fnm.emeth);
@@ -146,14 +143,12 @@ CVNet::CVNet(int argc, char *argv[]) {
   fnm.setfn();
 
   // set default outdir when out format changed
-  if (parser.is_used("-F") == true && parser.is_used("-O") == false) {
+  if (parser.is_used("-O") == false) {
     fnm.setoutdir(fnm.outfmt);
   }
 
   // setup output file names
-  if(parser.is_used("-o") == false)
-    fnm.outfn = fnm.clsuf();
-  fnm.setoutfnm();
+  fnm.setoutfn(parser.is_used("-o"));
 
   // output information
   theInfo(fnm.info() + "\nPerpared argments of project");
@@ -188,64 +183,23 @@ void CVNet::cva2sm() {
   theInfo("Get All Similar Matrix");
 }
 
-void CVNet::sm2mcl() {
+void CVNet::sm2net() {
   // make output directory
   mkpath(fnm.outdir);
-
   // get the gene shift
   map<string, size_t> gidx;
   size_t ngene = fnm.obtainGeneIndex(gidx);
-
-  // push edge into mcl matrix
+  // get similar matrix filename
   vector<string> smlist;
   fnm.smfnlist(smlist);
-  MclMatrix mm(ngene);
-  theInfo("Prepared the blank MCL matrix");
-#pragma omp parallel for
-  for (int i = 0; i < smlist.size(); ++i) {
-    vector<Edge> edge;
-    emeth->getEdge(smlist[i], gidx, edge);
-#pragma omp critical
-    mm.push(edge);
+  // get net
+  if (fnm.outfmt.compare("mcl") == 0) {
+    MclMatrix mm(ngene, emeth->directed);
+    emeth->getNet(smlist, gidx, ngene, mm);
+    mm.write(fnm.outfn, true);
+  } else {
+    EdgeList es;
+    emeth->getNet(smlist, gidx, ngene, es);
+    es.write(fnm.outfn, true);
   }
-  theInfo("Get data for MCL matrix");
-
-  // resort row and output MclMatrix
-  mm.write(fnm.outfn, true);
-}
-
-void CVNet::sm2edge() {
-  // make output directory
-  mkpath(fnm.outdir);
-
-  // get the gene shift
-  map<string, size_t> gidx;
-  size_t ngene = fnm.obtainGeneIndex(gidx);
-
-  // push edge into mcl matrix
-  vector<string> smlist;
-  fnm.smfnlist(smlist);
-  vector<Edge> edges;
-#pragma omp parallel for
-  for (int i = 0; i < smlist.size(); ++i) {
-    vector<Edge> edge;
-    emeth->getEdge(smlist[i], gidx, edge);
-#pragma omp critical
-    edges.insert(edges.end(), edge.begin(), edge.end());
-  }
-  theInfo("Get sparse matrix");
-
-  // sort edge by index
-  sort(edges.begin(), edges.end(), [](const Edge &a, const Edge &b) {
-    if (a.index.first == b.index.first)
-      return a.index.second < b.index.second;
-    return a.index.first < b.index.first;
-  });
-
-  // output edges to file
-  theInfo("Sort edges");
-  ofstream ofs(fnm.outfn);
-  for (auto &e : edges)
-    ofs << e << endl;
-  ofs.close();
 }

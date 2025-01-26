@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:41:51
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-01 10:14:27
+ * @Last Modified Time: 2025-01-25 2:30:27
  */
 
 #ifndef MCLMATRIX_H
@@ -18,25 +18,12 @@
 #include <iomanip>
 #include <algorithm>
 #include <fstream>
+#include <functional>
 
-#include "kit.h"
+#include "../kit/kit.h"
+#include "edges.h"
 
 using namespace std;
-
-// edges
-struct Edge {
-  pair<size_t, size_t> index;
-  float weight;
-
-  Edge() = default;
-  Edge(pair<size_t, size_t> ndx, float val) : index(ndx), weight(val){};
-  void shift(const pair<size_t, size_t> &offset) {
-    index.first += offset.first;
-    index.second += offset.second;
-  }
-
-  friend ostream &operator<<(ostream &, const Edge &);
-};
 
 struct MclItem {
   long ndx;
@@ -54,11 +41,12 @@ struct MclItem {
 struct MclMatrix {
   vector<vector<MclItem>> data;
 
-  MclMatrix(long);
-  void push(pair<size_t, size_t>, float);
-  void push(size_t, size_t, float);
-  void push(const Edge&);
+  MclMatrix(long n, bool directed = false);
+  function<void(const Edge&)> pushEdge;
+  void _pushDirected(const Edge&);
+  void _pushUndirected(const Edge&);
   void push(const vector<Edge>&);
+  void push(size_t, size_t, float);
   long size() const;
   void sortRow();
   void write(const string&, bool resort=false);

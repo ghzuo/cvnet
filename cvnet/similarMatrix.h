@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-29 11:19:21
+ * @Last Modified Time: 2025-01-25 3:43:19
  */
 
 #ifndef SIMILARMATRIX_H
@@ -19,12 +19,11 @@
 #include <iostream>
 #include <limits>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <stdexcept>
 
-#include "kit.h"
-
+#include "../kit/kit.h"
 using namespace std;
 
 // basic matrix of distance
@@ -40,13 +39,13 @@ struct MatrixHeader {
       : rowName(rn), colName(cn), nrow(irow), ncol(icol){};
   MatrixHeader(const string &);
   void read(gzFile &);
+  void write(gzFile &) const;
   friend ostream &operator<<(ostream &, const MatrixHeader &);
 };
 
 struct Msimilar {
   MatrixHeader header;
   vector<float> data;
-  vector<long> rbh;
 
   Msimilar() = default;
   Msimilar(long irow, long icol, float d0 = 0.0) : header(irow, icol) {
@@ -63,7 +62,6 @@ struct Msimilar {
 
   // set row name and col name
   void resetByHeader(const MatrixHeader &, float d0 = 0.0);
-  void getRBH();
 
   // get/set value of matrix
   void _set(size_t, size_t, float);

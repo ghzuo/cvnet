@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-15 8:51:35
+ * @Last Modified Time: 2025-01-17 6:22:28
  */
 
 #include "fileOption.h"
@@ -188,7 +188,7 @@ size_t FileOption::genGeneIndex(map<string, size_t> &gShift) {
     ndx += gsize[gn];
   }
   fndx.close();
-  
+
   theInfo("Generate new gene index file");
   return ndx;
 }
@@ -201,7 +201,7 @@ size_t FileOption::obtainGeneIndex(map<string, size_t> &gShift) {
     // check gene list
     for (const auto &fn : gflist) {
       string gn = getFileName(fn);
-      if (gShift.find(gn) == gShift.end()) 
+      if (gShift.find(gn) == gShift.end())
         return genGeneIndex(gShift);
     }
     theInfo("Used existing gene index file");
@@ -240,14 +240,18 @@ string FileOption::clsuf() {
   return oss.str();
 }
 
-void FileOption::setoutfnm() {
-  outfn = outdir + outfn;
-  outndx = outdir + outndx;
-  if (!netsuf.empty()) {
-    string suf = sufsep + netsuf;
-    outfn += suf;
-    outndx += suf;
-  }
+void FileOption::setoutfn(bool reset) {
+  // add suffix for net method
+  string addsuf;
+  if (!netsuf.empty())
+    addsuf = sufsep + netsuf;
+  // output file path
+  if (reset)
+    outfn = outdir + outfn;
+  else
+    outfn = outdir + clsuf() + addsuf + "." + outfmt;
+  // index file path
+  outndx = outdir + outndx + addsuf;
 }
 
 void FileOption::setSuffix(const string &str) {

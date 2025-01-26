@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-03 00:40:49
+ * @Last Modified Time: 2025-01-25 2:29:24
  */
 
 #include "similarMeth.h"
@@ -42,6 +42,7 @@ SimilarMeth *SimilarMeth::create(const string &methStr) {
 }
 
 void SimilarMeth::getMatrix(const TriFileName &tf) {
+  // get and write down the similar matrix
   Msimilar sm;
   try {
     CVArray cva(tf.cvfa, lp);
@@ -57,6 +58,10 @@ void SimilarMeth::getMatrix(const TriFileName &tf) {
     exit(2);
   }
   sm.write(tf.smf);
+
+  // calc and write down RBH
+  GeneRBH rbh(sm);
+  rbh.write(tf.smf);
 };
 
 void SimilarMeth::calcSim(const CVArray &cva, const CVArray &cvb,
@@ -75,9 +80,6 @@ void SimilarMeth::calcSim(const CVArray &cva, const CVArray &cvb,
       sm.set(i, j, scale(sm.get(i, j), cva.norm[i], cvb.norm[j]));
     }
   }
-
-  // get the reciprocal best hit
-  sm.getRBH();
 };
 
 ///.........................
@@ -149,7 +151,7 @@ float Euclidean::scale(float val, float aNorm, float bNorm) {
   // for vector a{a1, a2, 0} and b{b1, 0, b3}
   // d^2 = (a1-b1)^2 + a2^2 + b3^2 = (a1^2 + a2^2) + (b1^2 + b3^2) - 2*a1*b1
   // d = sqrt(2 - 2 * a1 *b1)
-  return 1 - 0.5*sqrt(2)*sqrt(1 - val);
+  return 1 - 0.5 * sqrt(2) * sqrt(1 - val);
 }
 
 // ... distance scaling at L1

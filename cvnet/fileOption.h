@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-15 8:45:48
+ * @Last Modified Time: 2025-01-25 11:52:07
  */
 
 #ifndef FILEOPTION_H
@@ -47,11 +47,11 @@ struct FileOption {
   int k = 5;
   string smeth = "InterList";
   string smdir = "cache/sm/";
-  string emeth = "RBH";
+  string emeth = "GRB";
   double cutoff = 0.1;
-  string outdir = "edge/";
+  string outdir = "mcl/";
   string outndx = "GeneIndex.tsv";
-  string outfmt = "edge";
+  string outfmt = "mcl";
   string netsuf;
   string outfn;
 
@@ -69,7 +69,7 @@ struct FileOption {
   void setgndir(const string &);
   void setcache(string);
   void setoutdir(const string &);
-  void setoutfnm();
+  void setoutfn(bool reset=false);
 
   string cvsuf();
   string smsuf();

@@ -20,6 +20,7 @@ set(CVKITSHEADS
     similarMatrix.h
     similarMeth.h
     edgeMeth.h
+    edges.h
     mclmatrix.h)
 
 set(LIBCVKIT_SRC
@@ -33,6 +34,7 @@ set(LIBCVKIT_SRC
     similarMatrix.cpp
     similarMeth.cpp
     edgeMeth.cpp
+    edges.cpp
     mclmatrix.cpp)
 
 add_library(cvkit STATIC ${LIBCVKIT_SRC})

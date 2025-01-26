@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-13 11:18:05
+ * @Last Modified Time: 2025-01-25 8:28:00
  */
 
 #include "similarMatrix.h"
@@ -16,10 +16,8 @@
 MatrixHeader::MatrixHeader(const string &fname) {
   gzFile fp;
   string gzfile = addsuffix(fname, ".gz");
-  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL) {
-    cerr << "Similar Matrix file not found: \"" << gzfile << '"' << endl;
-    exit(1);
-  }
+  if ((fp = gzopen(gzfile.c_str(), "rb")) == NULL)
+    throw runtime_error("Cannot open file for reading: " + gzfile);
 
   // read header
   read(fp);
@@ -35,6 +33,16 @@ void MatrixHeader::read(gzFile &fp) {
   gzread(fp, (char *)&(ncol), sizeof(ncol));
 };
 
+void MatrixHeader::write(gzFile &fp) const {
+  // write the genome information
+  string str = rowName + "\n" + colName + "\n";
+  gzputs(fp, str.c_str());
+
+  // write the size of CVArray
+  gzwrite(fp, &(nrow), sizeof(nrow));
+  gzwrite(fp, &(ncol), sizeof(ncol));
+};
+
 ostream &operator<<(ostream &os, const MatrixHeader &hd) {
   os << hd.rowName << ": " << hd.nrow << "\n" << hd.colName << ": " << hd.ncol;
   return os;
@@ -46,37 +54,6 @@ void Msimilar::resetByHeader(const MatrixHeader &hd, float d0) {
   vector<float> tmp(hd.nrow * hd.ncol, d0);
   data.swap(tmp);
 }
-
-// get reciprocal best hit
-void Msimilar::getRBH() {
-  // initial rbh to -1
-  rbh.resize(header.nrow);
-
-  // get for every row
-  for (long i = 0; i < header.nrow; ++i) {
-    // initial the condition
-    long ibeg = i * header.ncol;
-    long iend = ibeg + header.ncol;
-    float maxSim = data[ibeg];
-    rbh[i] = ibeg;
-    // get the best the row
-    for (long j = ibeg + 1; j < iend; ++j) {
-      if (maxSim < data[j]) {
-        rbh[i] = j;
-        maxSim = data[j];
-      }
-    }
-    rbh[i] -= ibeg;
-
-    // check whether the test of the col
-    for (long k = rbh[i]; k < data.size(); k += header.ncol) {
-      if (data[k] > maxSim) {
-        rbh[i] = -1;
-        break;
-      }
-    }
-  }
-};
 
 // option on sigle item
 float Msimilar::get(size_t i, size_t j) const {
@@ -136,23 +113,14 @@ void Msimilar::write(const string &fname) const {
   // open and test file
   gzFile fp;
   string gzfile = addsuffix(fname, ".gz");
-  if ((fp = gzopen(gzfile.c_str(), "wb")) == NULL) {
-    cerr << "Error happen on write cvfile: " << gzfile << endl;
-    exit(1);
-  }
-  // write the genome information
-  string str = header.rowName + "\n" + header.colName + "\n";
-  gzputs(fp, str.c_str());
+  if ((fp = gzopen(gzfile.c_str(), "wb")) == NULL)
+    throw runtime_error("Cannot open file for reading: " + gzfile);
 
-  // write the size of CVArray
-  gzwrite(fp, &(header.nrow), sizeof(header.nrow));
-  gzwrite(fp, &(header.ncol), sizeof(header.ncol));
+  // write the head
+  header.write(fp);
 
   // write data
   gzwrite(fp, data.data(), data.size() * sizeof(data[0]));
-
-  // write reciprocal best hit index
-  gzwrite(fp, rbh.data(), rbh.size() * sizeof(rbh[0]));
 
   // close file
   gzclose(fp);
@@ -174,10 +142,6 @@ void Msimilar::read(const string &fname) {
     data.resize(dsize);
     gzread(fp, (char *)data.data(), dsize * sizeof(data[0]));
 
-    // read reciprocal best hit
-    rbh.resize(header.nrow);
-    gzread(fp, (char *)rbh.data(), header.nrow * sizeof(rbh[0]));
-
     // close file
     gzclose(fp);
   } catch (std::exception &e) {
@@ -190,11 +154,7 @@ void Msimilar::read(const string &fname) {
 };
 
 ostream &operator<<(ostream &os, const Msimilar &sm) {
-  os << sm.header << "\n\n======= the RBH =========\n";
-  for (size_t i = 0; i < sm.rbh.size(); ++i)
-    os << i << "\t" << sm.rbh[i] << "\n";
-
-  os << "\n========= the similarity =====" << endl;
+  os << sm.header << "\n========= the similarity =====" << endl;
   for (size_t i = 0; i < sm.header.nrow; ++i) {
     for (size_t j = 0; j < sm.header.ncol; ++j)
       os << sm.get(i, j) << " ";

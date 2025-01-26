@@ -7,16 +7,10 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:42:05
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-01 10:24:28
+ * @Last Modified Time: 2025-01-25 9:50:19
  */
 
 #include "mclmatrix.h"
-
-// for Edge
-ostream &operator<<(ostream &os, const Edge &e) {
-  os << e.index.first << "\t" << e.index.second << "\t" << e.weight;
-  return os;
-};
 
 // for MCL item
 MclItem::MclItem(const string &str) {
@@ -27,21 +21,33 @@ MclItem::MclItem(const string &str) {
 }
 
 // for MCL matrix
-MclMatrix::MclMatrix(long n) { data.resize(n); }
-
-void MclMatrix::push(const Edge &e) { push(e.index, e.weight); };
-
-void MclMatrix::push(const vector<Edge> &ve) {
-  // push edge into mcl matrix
-  for (const auto &e : ve) {
-    push(e.index, e.weight);
+MclMatrix::MclMatrix(long n, bool directed) {
+  data.resize(n);
+  if (directed) {
+    pushEdge = [this](const Edge &e) {
+      push(e.index.first, e.index.second, e.weight);
+    };
+  } else {
+    pushEdge = [this](const Edge &e) {
+      push(e.index.first, e.index.second, e.weight);
+      push(e.index.second, e.index.first, e.weight);
+    };
   }
 };
 
-void MclMatrix::push(pair<size_t, size_t> ndx, float val) {
-  push(ndx.first, ndx.second, val);
-  push(ndx.second, ndx.first, val);
-}
+void MclMatrix::push(const vector<Edge> &ve) {
+  for (const auto &e : ve)
+    pushEdge(e);
+};
+
+void MclMatrix::_pushUndirected(const Edge &e) {
+  push(e.index.first, e.index.second, e.weight);
+  push(e.index.second, e.index.first, e.weight);
+};
+
+void MclMatrix::_pushDirected(const Edge &e) {
+  push(e.index.first, e.index.second, e.weight);
+};
 
 void MclMatrix::push(size_t i, size_t j, float val) {
   data[i].push_back(MclItem(j, val));

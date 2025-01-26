@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-13 12:35:07
+ * @Last Modified Time: 2025-01-25 11:46:28
  */
 
 #include "edgeMeth.h"
@@ -16,45 +16,33 @@
 EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
   // create the distance method
   EdgeMeth *meth;
-  if (methStr == "CUT") {
-    meth = new EdgeByCutoff();
+  if (methStr == "GRB") {
+    meth = new EdgeByGeneMutualBest();
   } else if (methStr == "RBH") {
     meth = new EdgeByMutualBest();
-  } else if (methStr == "BRB") {
+  } else if (methStr == "CUT") {
+    meth = new EdgeByCutoff();
+  } else if (methStr == "SRB") {
     meth = new EdgeByMutualBestPlus();
   } else {
     cerr << "Unknow Edge Method: " << methStr << endl;
     exit(3);
   }
 
+  meth->methStr = methStr;
   meth->threshold = cutoff;
   return meth;
 };
 
-void EdgeMeth::getEdge(const string &smf, const map<string, size_t> &gidx,
-                       vector<Edge> &edge) {
-  Msimilar sm(smf);
-  auto itrow = gidx.find(delsuffix(sm.header.rowName));
-  auto itcol = gidx.find(delsuffix(sm.header.colName));
+pair<size_t, size_t> EdgeMeth::getIndex(const map<string, size_t> &gidx,
+                                        const MatrixHeader &hd) const {
+  auto itrow = gidx.find(delsuffix(hd.rowName));
+  auto itcol = gidx.find(delsuffix(hd.colName));
   if (itrow == gidx.end())
-    throw runtime_error("Row not found in GIdx: " + delsuffix(sm.header.rowName));
-  if (itcol == gidx.end()) 
-    throw runtime_error("Col not found in GIdx: " + delsuffix(sm.header.colName));
-  auto mtxShift = make_pair(itrow->second, itcol->second);
-  sm2edge(sm, edge);
-  for (auto &e : edge)
-    e.shift(mtxShift);
-};
-
-void EdgeMeth::mutualBestHit(const Msimilar &sm, vector<Edge> &edges) const {
-  for (size_t i = 0; i < sm.rbh.size(); ++i) {
-    if (sm.rbh[i] >= 0) {
-      size_t j = sm.rbh[i];
-      float val = sm.get(i, j);
-      if (val > threshold)
-        edges.emplace_back(make_pair(i, j), val);
-    }
-  }
+    throw runtime_error("Row not found in GIdx: " + delsuffix(hd.rowName));
+  if (itcol == gidx.end())
+    throw runtime_error("Col not found in GIdx: " + delsuffix(hd.colName));
+  return make_pair(itrow->second, itcol->second);
 };
 
 void EdgeMeth::cutoff(const Msimilar &sm, float cut, vector<Edge> &edge) const {
@@ -65,17 +53,106 @@ void EdgeMeth::cutoff(const Msimilar &sm, float cut, vector<Edge> &edge) const {
   }
 };
 
-void EdgeByMutualBestPlus::sm2edge(const Msimilar &sm,
-                                   vector<Edge> &edge) const {
-  float minW = std::numeric_limits<float>::max();
-  for (size_t i = 0; i < sm.rbh.size(); ++i) {
-    if (sm.rbh[i] >= 0) {
-      size_t j = sm.rbh[i];
-      float val = sm.get(i, j);
-      if (val < minW)
-        minW = val;
+void EdgeMeth::shiftEdges(const pair<size_t, size_t> &mshift,
+                          vector<Edge> &es) const {
+  for (auto &e : es)
+    e.shift(mshift);
+};
+
+/*****************************************************************************
+ ********* The Derived Classes
+ *****************************************************************************/
+void EdgeByCutoff::sm2edge(const string &fsm, const map<string, size_t> &gidx,
+                           vector<Edge> &es) const {
+  Msimilar sm(fsm);
+  cutoff(sm, threshold, es);
+  shiftEdges(getIndex(gidx, sm.header), es);
+}
+
+void EdgeByMutualBest::sm2edge(const string &fsm,
+                               const map<string, size_t> &gidx,
+                               vector<Edge> &es) const {
+  GeneRBH rbh(fsm);
+  auto mshift = getIndex(gidx, rbh.header);
+  for(auto& it : rbh.data){
+    if(it.weight > threshold){
+      it.shift(mshift);
+      es.emplace_back(it);
     }
   }
+}
+
+void EdgeByMutualBestPlus::sm2edge(const string &fsm,
+                                   const map<string, size_t> &gidx,
+                                   vector<Edge> &es) const {
+  // get the minial rbh between two genome
+  GeneRBH rbh(fsm);
+  float minW = std::numeric_limits<float>::max();
+  for (auto &it : rbh.data)
+    minW = it.weight < minW ? it.weight : minW;
   minW = minW < threshold ? threshold : minW;
-  cutoff(sm, minW, edge);
+
+  // get the edge and shift
+  Msimilar sm(fsm);
+  cutoff(sm, minW, es);
+  shiftEdges(getIndex(gidx, sm.header), es);
+};
+
+void EdgeByGeneMutualBest::init(const vector<string> &flist,
+                                const map<string, size_t> &gidx, size_t ngene) {
+  // initial the minGRB
+  minGRB.resize(ngene, std::numeric_limits<float>::max());
+
+  // update the minGRB by RBH
+#pragma omp parallel
+  {
+    vector<float> grb(ngene, std::numeric_limits<float>::max());
+#pragma omp for
+    for (auto i = 0; i < flist.size(); ++i) {
+      GeneRBH rbh(flist[i]);
+      auto mshift = getIndex(gidx, rbh.header);
+      for (auto it : rbh.data) {
+        auto irow = mshift.first + it.index.first;
+        auto icol = mshift.second + it.index.second;
+        if (it.weight < grb[irow])
+          grb[irow] = it.weight;
+        if (it.weight < grb[icol])
+          grb[icol] = it.weight;
+      }
+    }
+#pragma omp critical
+    {
+      for (auto i = 0; i < ngene; ++i) {
+        if (grb[i] < minGRB[i])
+          minGRB[i] = grb[i];
+      }
+    }
+
+    for (auto i = 0; i < ngene; ++i) {
+      if(minGRB[i] < threshold)
+        minGRB[i] = threshold;
+    }
+  }
+};
+
+void EdgeByGeneMutualBest::sm2edge(const string &fsm,
+                                   const map<string, size_t> &gidx,
+                                   vector<Edge> &es) const {
+
+  // read the similar matrix
+  Msimilar sm(fsm);
+  auto mshift = getIndex(gidx, sm.header);
+
+  // get mininal RBH for gene
+  for (auto i = 0; i < sm.header.nrow; ++i) {
+    auto irow = mshift.first + i;
+    for (auto j = 0; j < sm.header.ncol; ++j) {
+      auto val = sm._get(i, j);
+      auto icol = mshift.second + j;
+      if (val >= minGRB[irow])
+        es.emplace_back(irow, icol, val);
+      if (val >= minGRB[icol])
+        es.emplace_back(icol, irow, val);
+    }
+  }
 };

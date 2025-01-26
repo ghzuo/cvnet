@@ -10,13 +10,15 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-14 6:54:43
+@Last Modified Time: 2025-01-26 5:32:53
 '''
 
 import numpy as np
 import pandas as pd
 import subprocess
 from igraph import Graph
+from Bio import SeqIO
+import os
 
 
 def parseROW(row):
@@ -173,11 +175,12 @@ def runMCL(infile, outfile=None, inf=1.5, te=16):
 def readSeqGenome(file):
     df = pd.read_csv(file, sep="\t")
     gname = []
-    gindex = []
+    gondx = []
     for index, row in df.iterrows():
-        gname = gname + [row["Genome"]] * row["Size"]
-        gindex = gindex + [index] * row["Size"]
-    return np.array(gname), np.array(gindex)
+        gondx = gondx + [index] * row["Size"]
+        gname = gname + [':'.join([row['Genome'], str(i)])
+                         for i in range(0, row['Size'])]
+    return np.array(gondx), np.array(gname), df['Genome']
 
 
 def graphClusters(file):
@@ -198,15 +201,31 @@ def lineClusters(file):
 def byFileName(file):
     if file.endswith('.cln'):
         return lineClusters(file)
-    elif file.endswith('.mcl'):
+    elif file.endswith('.edge'):
+        return graphClusters(file)
+    elif file.endswith('.mcx'):
         return fileClusters(file)
     else:
-        return graphClusters(file)
+        raise ValueError("Unsupported file format")
 
 
-if __name__ == "__main__":
-    wkdir = "./"
+def delSuffix(filename):
+    last_dot_index = filename.rfind('.')
+    if last_dot_index != -1:
+        return filename[:last_dot_index]
+    else:
+        return filename
 
-    cls, cln, seq = getInfo(wkdir)
-    print(cln)
-    print(seq)
+
+def scFastaGenome(args, ortho):
+    for nm in ortho.columns:
+        # get single copy gene
+        index = ortho[nm].apply(lambda x: int(x.split(':', 1)[1])).tolist()
+        inpath = args.indir + nm
+        full = [rec for rec in SeqIO.parse(inpath, 'fasta')]
+        newg = [full[i] for i in index]
+        # write down
+        os.makedirs(args.outdir, exist_ok=True)
+        outpath = args.outdir + nm
+        with open(outpath, 'w') as outf:
+            SeqIO.write(newg, outf, 'fasta')

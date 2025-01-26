@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-14 9:20:30
+@Last Modified Time: 2025-01-26 5:34:47
 '''
 
 import pandas as pd
@@ -50,16 +50,32 @@ if __name__ == "__main__":
         getCluster = tk.mclClusters
 
     # get gene-genome index
-    _, gIndex = tk.readSeqGenome(args.IndexFile)
+    gIndex, gName, fasta = tk.readSeqGenome(args.IndexFile)
     ngno = gIndex[-1] + 1
 
     # read cluster and do statistics
     nfcls = []
-    for opt in args.infiles:
-        # get cluster and do statistics
-        cls = getCluster(opt)
+    for path in args.infiles:
+        # get file name
+        opt = tk.delSuffix(path)
+
+        # get cluster
+        try:
+            cls = getCluster(path)
+        except Exception as e:
+            print("Error: %s" % e)
+            continue
+
+        # do statistics for cluster
         scls = pd.DataFrame(tk.statCl(cls, gIndex).T,
                             columns=["Ngenome", "Ngene"])
+
+        # get single copy
+        scndx = scls[(scls['Ngenome'] == ngno) & (
+            scls['Ngene'] == ngno)].index.tolist()
+        sclst = pd.DataFrame([gName[cls[i]] for i in scndx])
+        sclst.columns = fasta
+        sclst.to_csv('SingleCopy-' + opt + '.tsv', sep='\t', index=False)
 
         # count number of cluster with same numbers of genome and gene
         ngeno = scls['Ngenome'].value_counts()

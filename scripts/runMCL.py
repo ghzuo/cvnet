@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 9:54:44
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-14 9:15:29
+@Last Modified Time: 2025-01-26 3:41:59
 '''
 
 
@@ -17,7 +17,7 @@ import argparse
 import subprocess
 
 
-if __name__ == "__main__":
+def parseArgs():
     # default options
     parser = argparse.ArgumentParser(
         description='Run the MCL command for files and inflates')
@@ -27,21 +27,28 @@ if __name__ == "__main__":
                         default=[1.20], help="The Inflates for MCL")
     parser.add_argument('-N', '--nThreads', type=int,
                         default=16, help="The Number of Threads for MCL")
-    parser.add_argument('-E', '--edge', action="store_false", default=True,
+    parser.add_argument('-M', '--mcl', action="store_true", default=False,
                         help="Whether the input file format edge")
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+if __name__ == "__main__":
+    args = parseArgs()
 
     for path in args.infile:
         for inf in args.inflate:
             print(f"run mcl for {path} with inflate={inf} ...")
-            command = ['mcl', path,  '-I', str(inf), '-te', str(args.nThreads), 
+            command = ['mcl', path,  '-I', str(inf), '-te', str(args.nThreads),
                        '-V', 'all']
-            outf = path + ".I" + str(int(inf*100.0 + 0.5))
-            if args.edge:
-                outf += ".cln"
+            if path.endswith('.mcl'):
+                outf = path.replace('mcl', f"I{int(inf*100.0 + 0.5)}.mcx")
+            elif path.endwith('.edge'):
+                outf = path.replace('edge', f"I{int(inf*100.0 + 0.5)}.cln")
                 command.append('--abc')
+            elif args.mcl:
+                outf = path.replace('mcl', f"I{int(inf*100.0 + 0.5)}.mcx")
             else:
-                outf += ".mcl"
+                outf = path + f".I{int(inf*100.0 + 0.5)}.cln"
+                command.append('--abc')
             command.extend(['-o', outf])
-
             subprocess.call(command)
