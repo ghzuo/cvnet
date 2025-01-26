@@ -9,7 +9,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-12-25 3:39:34
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-26 5:34:47
+@Last Modified Time: 2025-01-26 10:55:39
 '''
 
 import pandas as pd
@@ -67,26 +67,21 @@ if __name__ == "__main__":
             continue
 
         # do statistics for cluster
-        scls = pd.DataFrame(tk.statCl(cls, gIndex).T,
-                            columns=["Ngenome", "Ngene"])
+        scls = tk.statCl(cls, gIndex)
+        scls.to_csv("ngcls-" + opt + '.tsv', sep='\t', index=False)
 
-        # get single copy
-        scndx = scls[(scls['Ngenome'] == ngno) & (
-            scls['Ngene'] == ngno)].index.tolist()
-        sclst = pd.DataFrame([gName[cls[i]] for i in scndx])
-        sclst.columns = fasta
-        sclst.to_csv('SingleCopy-' + opt + '.tsv', sep='\t', index=False)
+        # get the full cover orthogroup
+        ogfull = scls[scls['Ngenome'] == ngno]
+        scfull = ogfull[ogfull['Ngene'] == ngno]
+        nfcls.append([opt, len(ogfull), len(scfull)])
 
-        # count number of cluster with same numbers of genome and gene
-        ngeno = scls['Ngenome'].value_counts()
-        ngene = scls.value_counts()
-
-        # write down data
-        ngene.to_csv("ngene-" + opt + ".tsv", sep='\t')
-        ngeno.to_csv("ngeno-" + opt + ".tsv", sep='\t')
-
-        # Number of full cover Orthorgroup
-        nfcls.append([opt, ngeno.get(ngno), ngene.get((ngno, ngno))])
+        # get single copy gene
+        scTable = 'SingleCopy-' + opt + '.tsv'
+        scndx = scfull['index'].tolist()
+        if len(scndx) > 0:
+            sclst = pd.DataFrame([gName[cls[i]] for i in scndx])
+            sclst.columns = fasta
+            sclst.to_csv(scTable, sep='\t', index=False)
 
     # write the number of full cover cluster
     ofg = pd.DataFrame(

@@ -10,7 +10,7 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2024-09-23 15:58:50
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-26 5:32:53
+@Last Modified Time: 2025-01-26 11:42:34
 '''
 
 import numpy as np
@@ -96,7 +96,8 @@ def addCID(seq, cls):
 
 def statCl(cls, gid):
     inf = [(len(np.unique(gid[cl])), len(cl)) for cl in cls]
-    return np.array(inf).T
+    df = pd.DataFrame(inf, columns=["Ngenome", "Ngene"]).reset_index()
+    return df
 
 
 def getInfo(dir):
@@ -178,7 +179,8 @@ def readSeqGenome(file):
     gondx = []
     for index, row in df.iterrows():
         gondx = gondx + [index] * row["Size"]
-        gname = gname + [':'.join([row['Genome'], str(i)])
+        gname = gname + [':'.join([row['Genome'], str(i),
+                                   str(row['Start'] + i)])
                          for i in range(0, row['Size'])]
     return np.array(gondx), np.array(gname), df['Genome']
 
@@ -217,15 +219,35 @@ def delSuffix(filename):
         return filename
 
 
-def scFastaGenome(args, ortho):
+def scGenomeFasta(args):
+    # read the table
+    ortho = pd.read_csv(args.infile, sep='\t', header=0)
+    # output the single copy fasta
     for nm in ortho.columns:
         # get single copy gene
-        index = ortho[nm].apply(lambda x: int(x.split(':', 1)[1])).tolist()
+        index = ortho[nm].apply(lambda x: int(x.split(':')[1])).tolist()
         inpath = args.indir + nm
         full = [rec for rec in SeqIO.parse(inpath, 'fasta')]
         newg = [full[i] for i in index]
         # write down
         os.makedirs(args.outdir, exist_ok=True)
         outpath = args.outdir + nm
+        with open(outpath, 'w') as outf:
+            SeqIO.write(newg, outf, 'fasta')
+
+
+def scOrthoFasta(args):
+    # read the table
+    ortho = pd.read_csv(args.infile, sep='\t', header=0)
+    # get all genes
+    glist = []
+    for nm in ortho.columns:
+        inpath = args.indir + nm
+        glist.extend([rec for rec in SeqIO.parse(inpath, 'fasta')])
+    # get Orthogroup Fasta
+    for ndx, row in ortho.iterrows():
+        os.makedirs(args.outdir, exist_ok=True)
+        outpath = f'{args.outdir}scOrtho-{ndx:05}.fasta'
+        newg = [glist[int(x.rsplit(':', 1)[1])] for x in row.tolist()]
         with open(outpath, 'w') as outf:
             SeqIO.write(newg, outf, 'fasta')

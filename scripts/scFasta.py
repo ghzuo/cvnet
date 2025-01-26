@@ -9,11 +9,10 @@ Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
 @Author: Dr. Guanghong Zuo
 @Date: 2025-01-26 3:36:59
 @Last Modified By: Dr. Guanghong Zuo
-@Last Modified Time: 2025-01-26 5:45:08
+@Last Modified Time: 2025-01-26 11:47:27
 '''
 
 
-import pandas as pd
 import toolkit as tk
 import argparse
 
@@ -28,12 +27,16 @@ def parseArgs():
                         help="The directory of original fasta files")
     parser.add_argument('-o', '--outdir', type=str, default="scFasta/",
                         help="The output directory default: scFasta/")
+    parser.add_argument('-O', '--Ortho', action='store_true', default=False,
+                        help="Output fasta include the orthogroup")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = parseArgs()
-    # read the table
-    ortho = pd.read_csv(args.infile, sep='\t', header=0)
+
     # generate fasta
-    tk.scFastaGenome(args, ortho)
+    if args.Ortho:
+        tk.scOrthoFasta(args)
+    else:
+        tk.scGenomeFasta(args)
