@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 2:29:24
+ * @Last Modified Time: 2025-04-11 Friday 14:59:56
  */
 
 #include "similarMeth.h"
@@ -15,7 +15,7 @@
 /**************************************************************
  * the similar methods
  **************************************************************/
-SimilarMeth *SimilarMeth::create(const string &methStr) {
+SimilarMeth *SimilarMeth::create(const string &methStr, float mindist) {
 
   // create the distance method
   SimilarMeth *meth;
@@ -38,6 +38,7 @@ SimilarMeth *SimilarMeth::create(const string &methStr) {
     exit(3);
   }
 
+  meth->mindist = mindist;
   return meth;
 }
 
@@ -57,7 +58,7 @@ void SimilarMeth::getMatrix(const TriFileName &tf) {
     cerr << e.what() << "\nin calculate similar matrix: " << tf.smf << endl;
     exit(2);
   }
-  sm.write(tf.smf);
+  sm.write(tf.smf, mindist);
 
   // calc and write down RBH
   GeneRBH rbh(sm);

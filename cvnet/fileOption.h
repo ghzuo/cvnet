@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 11:52:07
+ * @Last Modified Time: 2025-04-11 Friday 15:00:27
  */
 
 #ifndef FILEOPTION_H
@@ -47,7 +47,8 @@ struct FileOption {
   int k = 5;
   string smeth = "InterList";
   string smdir = "cache/sm/";
-  string emeth = "GRB";
+  double mindist = -0.1;
+  string emeth = "GRB"; 
   double cutoff = 0.1;
   string outdir = "mcl/";
   string outndx = "GeneIndex.tsv";

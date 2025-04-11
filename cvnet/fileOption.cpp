@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 5:02:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-17 6:22:28
+ * @Last Modified Time: 2025-04-11 Friday 16:01:03
  */
 
 #include "fileOption.h"
@@ -299,9 +299,10 @@ string FileOption::info() const {
   string str;
   str +=
       "Method for Composition Vector: " + cmeth + ", with Kmer=" + to_string(k);
-  str += "\nMethod for Similarity between CV: " + smeth;
+  str += "\nMethod for Similarity between CV: " + smeth + ", save ";
+  str += mindist < 0 ? "Full Matrix" : "Similarity >= " + to_string(mindist);
   str += "\nMethod for Selecting Edge: " + emeth +
-         ", with Cutoff=" + to_string(cutoff);
+         ", with Cutoff = " + to_string(cutoff);
   str += "\nInput List file: " + lstfn;
   if (!netsuf.empty())
     str += "\nWith pairs file: " + netsuf;

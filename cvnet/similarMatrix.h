@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 3:43:19
+ * @Last Modified Time: 2025-04-11 Friday 15:57:05
  */
 
 #ifndef SIMILARMATRIX_H
@@ -32,6 +32,7 @@ struct MatrixHeader {
   string colName;
   long nrow = 0;
   long ncol = 0;
+  long nsize = -1;
 
   MatrixHeader() = default;
   MatrixHeader(long irow, long icol) : nrow(irow), ncol(icol){};
@@ -76,7 +77,7 @@ struct Msimilar {
 
   // output info
   string info() const;
-  void write(const string &) const;
+  void write(const string &, float);
   void read(const string &);
 
   // output stream

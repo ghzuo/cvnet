@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 10:59:10
+ * @Last Modified Time: 2025-04-11 Friday 14:37:20
  */
 
 #include "cvnet.h"
@@ -83,6 +83,11 @@ CVNet::CVNet(int argc, char *argv[]) {
       .default_value(fnm.cutoff)
       .store_into(fnm.cutoff)
       .nargs(1);
+  parser.add_argument("-m", "--mindist")
+      .help("minimum for similarity")
+      .default_value(fnm.mindist)
+      .store_into(fnm.mindist)
+      .nargs(1);
   parser.add_argument("-C", "--cache")
       .help("super directory for Cache files")
       .default_value("cache")
@@ -134,7 +139,7 @@ CVNet::CVNet(int argc, char *argv[]) {
   cmeth = CVmeth::create(fnm.cmeth, fnm.cvdir, fnm.gtype);
 
   // set select method
-  smeth = SimilarMeth::create(fnm.smeth);
+  smeth = SimilarMeth::create(fnm.smeth, fnm.mindist);
 
   // set select method
   emeth = EdgeMeth::create(fnm.emeth, fnm.cutoff);

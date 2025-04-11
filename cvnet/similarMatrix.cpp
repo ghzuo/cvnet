@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 8:28:00
+ * @Last Modified Time: 2025-04-11 Friday 15:59:53
  */
 
 #include "similarMatrix.h"
@@ -31,6 +31,7 @@ void MatrixHeader::read(gzFile &fp) {
   // get the matrix size
   gzread(fp, (char *)&(nrow), sizeof(nrow));
   gzread(fp, (char *)&(ncol), sizeof(ncol));
+  gzread(fp, (char *)&(nsize), sizeof(nsize));
 };
 
 void MatrixHeader::write(gzFile &fp) const {
@@ -41,6 +42,7 @@ void MatrixHeader::write(gzFile &fp) const {
   // write the size of CVArray
   gzwrite(fp, &(nrow), sizeof(nrow));
   gzwrite(fp, &(ncol), sizeof(ncol));
+  gzwrite(fp, &(nsize), sizeof(nsize));
 };
 
 ostream &operator<<(ostream &os, const MatrixHeader &hd) {
@@ -109,18 +111,28 @@ string Msimilar::info() const {
          std::to_string(header.nrow) + "x" + std::to_string(header.ncol);
 }
 
-void Msimilar::write(const string &fname) const {
+void Msimilar::write(const string &fname, float mindist) {
   // open and test file
   gzFile fp;
   string gzfile = addsuffix(fname, ".gz");
   if ((fp = gzopen(gzfile.c_str(), "wb")) == NULL)
     throw runtime_error("Cannot open file for reading: " + gzfile);
 
-  // write the head
-  header.write(fp);
-
   // write data
-  gzwrite(fp, data.data(), data.size() * sizeof(data[0]));
+  if (mindist < 0.0) {
+    // for full matrix
+    header.write(fp);
+    gzwrite(fp, data.data(), data.size() * sizeof(data[0]));
+  } else {
+    // for threshold matrix
+    vector<pair<size_t, float>> vec;
+    for (size_t i = 0; i < data.size(); ++i)
+      if (data[i] >= mindist)
+        vec.emplace_back(i, data[i]);
+    header.nsize = vec.size();
+    header.write(fp);
+    gzwrite(fp, vec.data(), vec.size() * sizeof(vec[0]));
+  }
 
   // close file
   gzclose(fp);
@@ -140,7 +152,14 @@ void Msimilar::read(const string &fname) {
     // read data
     size_t dsize = header.nrow * header.ncol;
     data.resize(dsize);
-    gzread(fp, (char *)data.data(), dsize * sizeof(data[0]));
+    if (header.nsize < 0) {
+      gzread(fp, (char *)data.data(), dsize * sizeof(data[0]));
+    } else {
+      vector<pair<size_t, float>> vec(header.nsize);
+      gzread(fp, (char *)vec.data(), header.nsize * sizeof(vec[0]));
+      for (auto &v : vec)
+        data[v.first] = v.second;
+    } 
 
     // close file
     gzclose(fp);

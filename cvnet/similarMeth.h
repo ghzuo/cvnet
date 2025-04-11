@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 2:28:57
+ * @Last Modified Time: 2025-04-11 Friday 14:39:11
  */
 
 #ifndef SIMILARMETH_H
@@ -35,9 +35,10 @@ using namespace std;
 
 struct SimilarMeth {
   enum LPnorm lp;
+  float mindist;
 
   // the create function
-  static SimilarMeth *create(const string &);
+  static SimilarMeth *create(const string &, float);
 
   // get the similarity matrix
   void getMatrix(const TriFileName&);
