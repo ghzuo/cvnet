@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-04-11 Friday 14:37:20
+ * @Last Modified Time: 2025-04-11 Friday 16:37:33
  */
 
 #include "cvnet.h"
@@ -135,14 +135,9 @@ CVNet::CVNet(int argc, char *argv[]) {
     exit(1);
   }
 
-  // set cvmeth method
-  cmeth = CVmeth::create(fnm.cmeth, fnm.cvdir, fnm.gtype);
-
-  // set select method
-  smeth = SimilarMeth::create(fnm.smeth, fnm.mindist);
-
-  // set select method
-  emeth = EdgeMeth::create(fnm.emeth, fnm.cutoff);
+  // check cutoff and mindist
+  if (fnm.cutoff < fnm.mindist)
+    fnm.cutoff = fnm.mindist;
 
   // setup the input file names
   fnm.setfn();
@@ -157,6 +152,15 @@ CVNet::CVNet(int argc, char *argv[]) {
 
   // output information
   theInfo(fnm.info() + "\nPerpared argments of project");
+
+  // set cvmeth method
+  cmeth = CVmeth::create(fnm.cmeth, fnm.cvdir, fnm.gtype);
+
+  // set select method
+  smeth = SimilarMeth::create(fnm.smeth, fnm.mindist);
+
+  // set select method
+  emeth = EdgeMeth::create(fnm.emeth, fnm.cutoff);
 }
 
 void CVNet::gn2cva() {
