@@ -8,7 +8,7 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2024-12-15 20:15:35
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2024-12-25 10:55:33
+# @Last Modified Time: 2025-04-25 Friday 11:07:47
 ###
 
 
@@ -23,7 +23,7 @@ RUN apk --update add --no-cache g++ make cmake git zlib-dev zlib-static
 
 ## Build cvnet
 WORKDIR /root
-COPY ./src /root/cvnet
+COPY ../src /root/cvnet
 RUN  git config --global url."https://kkgithub.com".insteadOf https://github.com
 RUN mkdir cvnet/build/ && cd cvnet/build/ && cmake .. -DSTATIC=ON && make 
 

@@ -1,0 +1,44 @@
+###
+# Copyright (c) 2025
+# See the accompanying Manual for the contributors and the way to
+# cite this work. Comments and suggestions welcome. Please contact
+# Dr. Guanghong Zuo <ghzuo@ucas.ac.cn>
+# 
+# @Author: Dr. Guanghong Zuo
+# @Date: 2025-04-25 Friday 10:55:34
+# @Last Modified By: Dr. Guanghong Zuo
+# @Last Modified Time: 2025-04-25 Friday 11:13:47
+###
+
+Bootstrap: docker
+From: alpine
+
+%files
+    ../src /root/cvnet
+
+%labels
+    Version 0.1
+    MAINTAINER Guanghong Zuo<ghzuo@ucas.ac.cn>
+    description "Singularity Container for CVNet"
+
+%post
+    # install dependencies
+    apk update
+    apk add --no-cache --virtual .build-deps g++ make cmake git zlib-dev zlib-static
+    # for github config
+    # git config --global url."https://kkgithub.com".insteadOf https://github.com
+    
+    # build cvnet
+    mkdir -p /root/cvnet/build
+    cd /root/cvnet/build
+    cmake .. -DSTATIC=ON
+    make
+    make install
+    
+    # clear the build dirctory and cache files
+    apk del .build-deps
+    rm -rf /root/cvnet
+    rm -rf /var/cache/apk/*
+    
+%runscript
+    exec cvnet "$@"

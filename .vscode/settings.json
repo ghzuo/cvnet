@@ -26,4 +26,5 @@
   "cmake.configureArgs": [
     "-DSTATIC=ON"
   ],
+  "cmake.sourceDirectory": "/home/ghzuo/project/CVTree/osCVNet/src",
 }
