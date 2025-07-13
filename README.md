@@ -44,6 +44,5 @@ More detail of the command usage can be obtaion by `-h` option.
 
 ## Reference
 
-- Guanghong Zuo (2021) CVTree: A Parallel Alignment-free Phylogeny
-  and Taxonomy Tool based on Composition Vectors of Genomes,
-  BioRxiv doi:10.1101/2021.02.04.429726
+- Yi-Fei Lu, Guang-Hong Zuo and Xiao-Yang Zhi CVNET: Rapid and accurate 
+  inference of large numbers of orthologous genes in genomes, 2025
