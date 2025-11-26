@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2022-11-24 00:27:58
+ * @Last Modified Time: 2025-08-20 Wednesday 21:46:32
  */
 
 #define THEINFO
@@ -20,12 +20,12 @@ Info theInfo;
  ********************************************************************************/
 Timer::Timer() : start(std::chrono::system_clock::now()){};
 
-double Timer::elapsed() {
+auto Timer::elapsed() {
   auto now = std::chrono::system_clock::now();
-  double time =
+  auto time =
       std::chrono::duration_cast<std::chrono::milliseconds>(now - start)
           .count();
-  return time / 1000.0;
+  return std::chrono::duration<double>(time).count()*0.001;
 };
 
 /********************************************************************************

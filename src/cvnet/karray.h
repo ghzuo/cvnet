@@ -8,7 +8,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-12-03 22:14:17
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-13 7:42:52
+ * @Last Modified Time: 2025-08-20 Wednesday 13:29:34
  */
 
 #ifndef KARRAY_H
@@ -51,9 +51,9 @@ struct KdimInfo {
 
 // the infomation of CV dimension
 struct CVdimInfo {
-  float len   = NAN;
-  float lasso = NAN;
-  float norm  = NAN;
+  double len   = NAN;
+  double lasso = NAN;
+  double norm  = NAN;
 
   CVdimInfo() = default;
   CVdimInfo(const CVdimInfo &rhs): len(rhs.len), lasso(rhs.lasso), norm(rhs.norm){};

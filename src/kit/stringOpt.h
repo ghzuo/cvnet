@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-20 4:10:49
+ * @Last Modified Time: 2025-08-20 Wednesday 13:39:13
  */
 
 #ifndef STRINGOPT_H
@@ -19,10 +19,23 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <unistd.h>
 #include <vector>
+#ifdef _WIN32
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#define _NO_WINDOWS_H_BYTE_
+#include <windows.h>
+#include <io.h>
+#include <process.h>
+#include <direct.h>
+#define STDIN_FILENO  0
+#define STDOUT_FILENO 1
+#define STDERR_FILENO 2
+#else
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#endif
 
 using namespace std;
 
@@ -35,7 +48,7 @@ string Ltrim(const string &);
 string Rtrim(const string &);
 string trim(const string &);
 
-int separateWord(vector<string> &, string, const string &sep = " ,");
+size_t separateWord(vector<string> &, string, const string &sep = " ,");
 
 template <class T, class A>
 string strjoin(const A &begin, const A &end, const T &t) {
@@ -100,7 +113,7 @@ string int2lenStr(int, size_t, char c='0');
  * @brief options on read columns file
  * 
  ********************************************************************************/
-int nColumns(const string&);
+size_t nColumns(const string&);
 
 //read column-style file 
 template <class T>

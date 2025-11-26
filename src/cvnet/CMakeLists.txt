@@ -50,10 +50,10 @@ set(CVNET_SRC ${CVKITSHEADS} cvnet.h cvnet.cpp)
 set(DUMP_SRC ${CVKITSHEADS} dump.cpp)
 
 add_executable(cvnet ${CVNET_SRC})
-target_link_libraries(cvnet PRIVATE cvkit kit argparse)
+target_link_libraries(cvnet PRIVATE cvkit kit)
 
 add_executable(dump ${DUMP_SRC})
-target_link_libraries(dump PRIVATE cvkit kit argparse)
+target_link_libraries(dump PRIVATE cvkit kit)
 
 install(TARGETS cvnet 
                 dump 

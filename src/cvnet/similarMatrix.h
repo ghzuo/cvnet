@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-04-11 Friday 15:57:05
+ * @Last Modified Time: 2025-08-20 Wednesday 12:35:29
  */
 
 #ifndef SIMILARMATRIX_H
@@ -53,7 +53,7 @@ struct Msimilar {
     data.resize(irow * icol, d0);
   };
   Msimilar(const string &rn, const string &cn, long irow, long icol,
-           double d0 = 0.0)
+           float d0 = 0.0)
       : header(rn, cn, irow, icol) {
     data.resize(irow * icol, d0);
   };

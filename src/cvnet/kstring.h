@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2017-03-17 15:39:23
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-10 1:07:34
+ * @Last Modified Time: 2025-08-20 Wednesday 15:11:48
  */
 
 #ifndef KSTRING_H
@@ -26,6 +26,7 @@
 #include <vector>
 #include <zlib.h>
 
+#include "fileOpt.h"
 #include "readgenome.h"
 
 typedef unsigned long mlong;
@@ -61,7 +62,7 @@ struct Kstr {
 
 private:
   static char cmap[128];
-  static size_t nbase;
+  static unsigned long nbase;
 };
 
 struct Kstr_Hash {
@@ -87,7 +88,7 @@ struct CVblock {
   CViter mid() const;
   CViter getLower(const CViter &) const;
   CViter getUpper(const CViter &) const;
-  int length() const;
+  size_t length() const;
 
   bool pop();
   bool resetBegin(CViter &);

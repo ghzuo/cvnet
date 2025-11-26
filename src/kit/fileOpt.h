@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-04-23 21:32:43
+ * @Last Modified Time: 2025-08-20 Wednesday 16:42:44
  */
 
 #ifndef FILEOPT_H
@@ -17,6 +17,7 @@
 #include <string>
 #include <zlib.h>
 #include <map>
+#include <limits>
 #include "stringOpt.h"
 using namespace std;
 
@@ -57,6 +58,9 @@ int gzline(gzFile &, string &);
 
 // check gzip file empty
 bool gzvalid(const string&);
+
+// for gzwrite/gzread size_t
+int gzwrite(gzFile, voidpc, size_t);
 
 // read list file for list and name map
 void readNameMap(const string&, vector<string>&, map<string,string>&);

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-04-11 Friday 15:59:53
+ * @Last Modified Time: 2025-08-20 Wednesday 14:20:10
  */
 
 #include "similarMatrix.h"
@@ -129,7 +129,7 @@ void Msimilar::write(const string &fname, float mindist) {
     for (size_t i = 0; i < data.size(); ++i)
       if (data[i] >= mindist)
         vec.emplace_back(i, data[i]);
-    header.nsize = vec.size();
+    header.nsize = (long) vec.size();
     header.write(fp);
     gzwrite(fp, vec.data(), vec.size() * sizeof(vec[0]));
   }

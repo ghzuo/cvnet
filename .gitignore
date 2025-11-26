@@ -10,3 +10,4 @@ a.out
 example
 !example/faa/
 !example/list
+build-temp-*/

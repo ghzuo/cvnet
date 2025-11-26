@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-01 1:50:09
+ * @Last Modified Time: 2025-08-20 Wednesday 13:23:06
  */
 
 #include "stringOpt.h"
@@ -17,13 +17,13 @@
  *
  * @return string
  ********************************************************************************/
-int separateWord(vector<string> &w, string t, const string &sep) {
+size_t separateWord(vector<string> &w, string t, const string &sep) {
 
   w.clear();
   // convert all unvisible charater into space;
   for (unsigned ix = 0; ix < t.size(); ++ix) {
     char ch_t = t[ix];
-    if (ch_t < 33 or ch_t > 126)
+    if (ch_t < 33 || ch_t > 126)
       t[ix] = 32;
   }
 
@@ -168,7 +168,7 @@ string int2lenStr(int n, size_t w, char c) {
  * @brief options on read file
  *
  ********************************************************************************/
-int nColumns(const string &file) {
+size_t nColumns(const string &file) {
   ifstream infile(file);
   if (!infile) {
     cerr << "\nCannot found the input file " << file << endl;
@@ -213,13 +213,13 @@ bool isDirectory(const string &filename) {
  * @brief for color convert
  *
  ********************************************************************************/
-//参数入参范围h(0~360),s(0~100),v(0~100),这里要注意，要把s,v缩放到0~1之间
-//转换结果R(0~255),G(0~255),B(0~255)
+//parameters range: h(0~360),s(0~100),v(0~100)
+//parameter range for RGB: R(0~255),G(0~255),B(0~255)
 void hsv2rgb(vector<int> &cv) {
 
   float H = (float)(cv[0]);
-  float S = (float)(cv[1]) / 100.0;
-  float V = (float)(cv[2]) / 100.0;
+  float S = (float)(cv[1]) / 100.0f;
+  float V = (float)(cv[2]) / 100.0f;
   float R, G, B;
 
   if (S == 0) {

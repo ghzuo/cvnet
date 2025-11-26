@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-04-11 Friday 16:37:33
+ * @Last Modified Time: 2025-08-20 Wednesday 13:40:30
  */
 
 #include "cvnet.h"
@@ -169,7 +169,7 @@ void CVNet::gn2cva() {
   for (auto &f : fnm.gflist)
     gsize[getFileName(f)] = 0;
 #pragma omp parallel for
-  for (size_t i = 0; i < fnm.gflist.size(); ++i) {
+  for (int i = 0; i < fnm.gflist.size(); ++i) {
     if (!gzvalid(cmeth->getCVname(fnm.gflist[i], fnm.k))) {
       size_t gsz = cmeth->getcva(fnm.gflist[i], fnm.k);
       gsize[getFileName(fnm.gflist[i])] = gsz;

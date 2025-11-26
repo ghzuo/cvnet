@@ -7,13 +7,13 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 11:46:28
+ * @Last Modified Time: 2025-08-20 Wednesday 13:03:07
  */
 
 #include "edgeMeth.h"
 
 // for Edge method
-EdgeMeth *EdgeMeth::create(const string &methStr, double cutoff) {
+EdgeMeth *EdgeMeth::create(const string &methStr, float cutoff) {
   // create the distance method
   EdgeMeth *meth;
   if (methStr == "GRB") {
@@ -87,7 +87,7 @@ void EdgeByMutualBestPlus::sm2edge(const string &fsm,
                                    vector<Edge> &es) const {
   // get the minial rbh between two genome
   GeneRBH rbh(fsm);
-  float minW = std::numeric_limits<float>::max();
+  auto minW = std::numeric_limits<float>::max();
   for (auto &it : rbh.data)
     minW = it.weight < minW ? it.weight : minW;
   minW = minW < threshold ? threshold : minW;

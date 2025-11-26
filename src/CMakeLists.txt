@@ -7,7 +7,7 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2017-09-01 16:22:53
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2024-12-25 10:52:32
+# @Last Modified Time: 2025-11-26 Wednesday 20:19:01
 ###
 
 cmake_minimum_required(VERSION 3.14)
@@ -67,6 +67,7 @@ FetchContent_Declare(
   GIT_TAG        v3.1
 )
 FetchContent_MakeAvailable(argparse)
+include_directories(${argparse_SOURCE_DIR}/include)
 
 ## include subdirectories
 ADD_SUBDIRECTORY(kit)

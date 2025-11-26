@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:41:51
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 2:30:27
+ * @Last Modified Time: 2025-08-20 Wednesday 12:43:32
  */
 
 #ifndef MCLMATRIX_H
@@ -26,11 +26,11 @@
 using namespace std;
 
 struct MclItem {
-  long ndx;
+  size_t ndx;
   float val;
 
   MclItem() = default;
-  MclItem(long ndx, float val) : ndx(ndx), val(val) {};
+  MclItem(size_t ndx, float val) : ndx(ndx), val(val) {};
   MclItem(const string&);
 
   friend ostream& operator<<(ostream& os, const MclItem& item) {
@@ -41,7 +41,7 @@ struct MclItem {
 struct MclMatrix {
   vector<vector<MclItem>> data;
 
-  MclMatrix(long n, bool directed = false);
+  MclMatrix(size_t n, bool directed = false);
   function<void(const Edge&)> pushEdge;
   void _pushDirected(const Edge&);
   void _pushUndirected(const Edge&);

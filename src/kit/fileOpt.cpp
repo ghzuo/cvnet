@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-23 9:24:18
+ * @Last Modified Time: 2025-08-20 Wednesday 15:18:57
  */
 
 #include "fileOpt.h"
@@ -68,6 +68,15 @@ bool gzvalid(const string &filename) {
   return false;
 };
 
+int gzwrite (gzFile file, voidpc buf, size_t size){
+  if (size > std::numeric_limits<unsigned int>::max()){
+    throw(std::runtime_error("Size too large"));
+  } else {
+    unsigned int len = static_cast<unsigned int>(size);
+    return gzwrite(file, buf, len);
+  }
+};
+
 // read list file for list and name map
 void readNameMap(const string &file, vector<string> &nmlist,
                  map<string, string> &nameMap) {
@@ -96,7 +105,7 @@ void mkpath(const string &nm) {
   while ((npos = nm.find("/", npos)) != std::string::npos) {
     string dir = nm.substr(0, npos);
 #ifdef _WIN32
-    mkdir(dir.c_str());
+    _mkdir(dir.c_str());
 #else
     mkdir(dir.c_str(), 0755);
 #endif

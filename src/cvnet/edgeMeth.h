@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 11:54:59
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 8:18:38
+ * @Last Modified Time: 2025-08-20 Wednesday 12:57:18
  */
 
 #ifndef EDGEMETH_H
@@ -15,6 +15,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <limits>
 
 #include "edges.h"
 #include "mclmatrix.h"
@@ -24,10 +25,10 @@ using namespace std;
 
 // edge method
 struct EdgeMeth {
-  double threshold;
+  float threshold;
   string methStr;
   double directed = false;
-  static EdgeMeth *create(const string &, double);
+  static EdgeMeth *create(const string &, float);
 
   // get the full net
   template <typename T>

@@ -7,26 +7,26 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-12 9:36:27
+ * @Last Modified Time: 2025-08-20 Wednesday 15:12:34
  */
 
 #include "kstring.h"
 
-size_t Kstr::nbase;
+unsigned long Kstr::nbase;
 char Kstr::cmap[128];
 vector<char> Kstr::charSet;
 
 int Kstr::init(const vector<char> &letters) {
-  nbase = letters.size() + 1;
+  nbase = static_cast<unsigned long>(letters.size()) + 1;
   charSet = letters;
-  for (int i = 1; i < nbase; ++i) {
+  for (unsigned i = 1; i < nbase; ++i) {
     cmap[letters[i - 1]] = i;
     cmap[i] = letters[i - 1];
   }
 
-  float logbs = log2(nbase);
-  float sz = sizeof(unsigned long) * 8;
-  return sz / logbs;
+  auto logbs = log2(nbase);
+  auto sz = sizeof(unsigned long) * 8;
+  return static_cast<int>(sz / logbs);
 };
 
 Kstr::Kstr() : ks(0){};
@@ -121,7 +121,7 @@ void writecv(const CVmap &cv, const string &file) {
 // output cv vector file and gzip it
 void writecv(const CVvec &cv, const string &file) {
   double inner(0);
-  unsigned long size = cv.size();
+  auto size = cv.size();
 
   for (const CVdim &c : cv)
     inner += c.second * c.second;
@@ -134,8 +134,8 @@ void writecv(const CVvec &cv, const string &file) {
 
   gzwrite(fp, &inner, sizeof(double));
   gzwrite(fp, &size, sizeof(unsigned long));
-  gzwrite(fp, cv.data(), size * sizeof(CVdim));
-  // for(const CVdim& s : cv)
+  gzwrite(fp, cv.data(), sizeof(CVdim)*size);
+  // for(const CVdim& s : cv) 
   // 	gzwrite(fp, &s, sizeof(CVdim));
 
   gzclose(fp);
@@ -184,7 +184,7 @@ double readcv(const string &filename, CVmap &cv) {
   mlong size = tmp.second;
 
   // read the cv
-  for (int i = 0; i < size; ++i) {
+  for (unsigned i = 0; i < size; ++i) {
     CVdim cd;
     gzread(fp, (char *)&cd, sizeof(CVdim));
     cv.insert(cv.end(), cd);
@@ -232,7 +232,7 @@ CVblock::CVblock(const CViter &a, const CViter &b) : begin(a), end(b){};
 
 bool CVblock::empty() const { return begin == end; };
 
-int CVblock::length() const { return distance(begin, end); };
+size_t CVblock::length() const { return distance(begin, end); };
 
 CViter CVblock::last() const { return end - 1; };
 
@@ -477,7 +477,7 @@ void readvk(const string &filename, vector<Kstr> &vk) {
 
 void writevk(const string &file, const vector<Kstr> &vk) {
 
-  unsigned long size = vk.size();
+  auto size = vk.size();
   double inner(1.0);
 
   gzFile fp;

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-05 11:42:05
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-01-25 9:50:19
+ * @Last Modified Time: 2025-08-20 Wednesday 12:39:40
  */
 
 #include "mclmatrix.h"
@@ -21,7 +21,7 @@ MclItem::MclItem(const string &str) {
 }
 
 // for MCL matrix
-MclMatrix::MclMatrix(long n, bool directed) {
+MclMatrix::MclMatrix(size_t n, bool directed) {
   data.resize(n);
   if (directed) {
     pushEdge = [this](const Edge &e) {
@@ -58,7 +58,7 @@ long MclMatrix::size() const { return data.size(); };
 void MclMatrix::sortRow() {
   // sort the items of column
 #pragma omp parallel for
-  for (size_t i = 0; i < data.size(); ++i) {
+  for (int i = 0; i < data.size(); ++i) {
     sort(data[i].begin(), data[i].end(),
          [](auto &a, auto &b) { return a.ndx < b.ndx; });
   }

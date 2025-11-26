@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2022-11-24 00:26:47
+ * @Last Modified Time: 2025-08-20 Wednesday 12:30:36
  */
 
 #ifndef INFO_H
@@ -26,7 +26,7 @@ struct Timer {
   std::chrono::system_clock::time_point start;
 
   Timer();
-  double elapsed();
+  auto elapsed();
 };
 
 /********************************************************************************

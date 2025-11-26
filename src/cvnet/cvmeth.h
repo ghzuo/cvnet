@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2024-12-31 11:06:29
+ * @Last Modified Time: 2025-08-20 Wednesday 15:24:55
  */
 
 #ifndef CVMETH_H
@@ -23,9 +23,9 @@
 #include <set>
 #include <sstream>
 #include <string>
-#include <sys/types.h>
 #include <unordered_map>
 #include <vector>
+#include <functional>
 
 #include "kit.h"
 #include "kstring.h"
@@ -50,7 +50,7 @@ struct CVmeth {
   void setg(const string &);
 
   // get the cvname for diffent cvdir
-  function<string(const string &, size_t)> getCVname;
+  std::function<std::string(const std::string&, size_t)> getCVname;
 
   // from genome to cv
   void checkK(const vector<size_t> &);
