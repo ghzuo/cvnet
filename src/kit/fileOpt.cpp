@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 15:18:57
+ * @Last Modified Time: 2025-11-26 Wednesday 17:46:23
  */
 
 #include "fileOpt.h"
@@ -54,10 +54,9 @@ int gzline(gzFile &fp, string &line) {
 
 // check whether a gzip file is exist and not emtpy
 bool gzvalid(const string &filename) {
-  string gzfile = addsuffix(filename, ".gz");
-  if (fileExists(gzfile)) {
+  if (fileExists(filename)) {
     gzFile fp;
-    if ((fp = gzopen(gzfile.c_str(), "rb")) != NULL) {
+    if ((fp = gzopen(filename.c_str(), "rb")) != NULL) {
       if (gzgetc(fp) != -1) {
         gzclose(fp);
         return true;
@@ -68,13 +67,29 @@ bool gzvalid(const string &filename) {
   return false;
 };
 
+// write gz file
 int gzwrite (gzFile file, voidpc buf, size_t size){
-  if (size > std::numeric_limits<unsigned int>::max()){
+  if (size > numeric_limits<unsigned int>::max()){
     throw(std::runtime_error("Size too large"));
   } else {
     unsigned int len = static_cast<unsigned int>(size);
     return gzwrite(file, buf, len);
   }
+};
+
+// check whether a gzip file is exist and unzipable
+bool gzFullValid(const string &filename) {
+  if (fileExists(filename)) {
+    gzFile fp;
+    if ((fp = gzopen(filename.c_str(), "rb")) != NULL) {
+      char buffer[1024];
+      int bytes_read;
+      while ((bytes_read = gzread(fp, buffer, sizeof(buffer))) > 0) {}
+      gzclose(fp);
+      if(bytes_read == 0) return true;
+    }
+  }
+  return false;
 };
 
 // read list file for list and name map
@@ -131,3 +146,37 @@ string nameWithK(const string &str, size_t k) {
   }
   return sstr;
 }
+
+// get the magic number of file
+vector<unsigned char> getMagicNumber(const string& fname, int n) {
+    std::ifstream file(fname, std::ios::binary);
+
+    vector<unsigned char> magic(n);
+    file.read(reinterpret_cast<char*>(magic.data()), n);
+    return magic;
+};
+
+/********************************************************************************
+ * @brief Functions by sys state for file state
+ * @param filename
+ ********************************************************************************/
+long getFileSize(const string &filename) {
+  struct stat fileInfo;
+  if (stat(filename.c_str(), &fileInfo) != 0)
+    return -1;
+  return fileInfo.st_size;
+}
+
+bool fileExists(const string &filename) {
+  struct stat buffer;
+  return (stat(filename.c_str(), &buffer) == 0);
+};
+
+bool isDirectory(const string &filename) {
+  struct stat fileInfo;
+  if (stat(filename.c_str(), &fileInfo) != 0) {
+    cerr << "Cannot find the file/dirctory " << filename << endl;
+    exit(6);
+  }
+  return fileInfo.st_mode & S_IFDIR;
+};

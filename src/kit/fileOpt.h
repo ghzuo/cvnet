@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 16:42:44
+ * @Last Modified Time: 2025-11-26 Wednesday 17:45:31
  */
 
 #ifndef FILEOPT_H
@@ -58,6 +58,7 @@ int gzline(gzFile &, string &);
 
 // check gzip file empty
 bool gzvalid(const string&);
+bool gzFullValid(const string&);
 
 // for gzwrite/gzread size_t
 int gzwrite(gzFile, voidpc, size_t);
@@ -70,5 +71,15 @@ void mkpath(const string&);
 
 // replace $ with k value in file name
 string nameWithK(const string &, size_t);
+
+// get magic number of file
+vector<unsigned char> getMagicNumber(const string&, int n);
+
+/********************************************************************************
+ * @brief function by sys stat
+ ********************************************************************************/
+long getFileSize(const string &);
+bool fileExists(const string &);
+bool isDirectory(const string &);
 
 #endif // FILEOPT_H

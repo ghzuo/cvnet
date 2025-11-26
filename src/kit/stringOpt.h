@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:28
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 13:39:13
+ * @Last Modified Time: 2025-11-26 Wednesday 17:58:40
  */
 
 #ifndef STRINGOPT_H
@@ -93,7 +93,6 @@ string addnamelabel(const string&, const string&, char sep = '-');
 bool hasSuffix(const string&, const string&);
 string getFileName(const string&);
 string getDirName(const string&);
-string substrReplace(const string&, const string&, const string&);
 
 /********************************************************************************
  * @brief option on convert string to number
@@ -160,13 +159,6 @@ template <class T> void uniqueWithOrder(vector<T> &list) {
   tmpVector.shrink_to_fit();
   list.swap(tmpVector);
 };
-
-/********************************************************************************
- * @brief function by sys stat
- ********************************************************************************/
-long getFileSize(const string &);
-bool fileExists(const string &);
-bool isDirectory(const string &);
 
 /********************************************************************************
  * @brief for color wheel

@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 13:23:06
+ * @Last Modified Time: 2025-11-26 Wednesday 18:01:49
  */
 
 #include "stringOpt.h"
@@ -94,8 +94,9 @@ string delsuffix(const string &nm) {
 }
 
 void addsuffix(string &str, char c) {
-  if (str.back() != c) 
-    str.push_back(c);
+  string::iterator iter = str.end();
+  if (*(--iter) != c)
+    str += c;
 }
 
 string addsuffix(const string &str, char c) {
@@ -138,15 +139,6 @@ string getDirName(const string& path){
   return path.substr(0, path.find_last_of('/'));
 };
 
-string substrReplace(const string& str, const string& from, const string& to){
-  size_t pos = str.find(from);
-  if(pos != string::npos)
-    return str.substr(0, pos) + to + str.substr(pos + from.size());
-  else
-    return str;
-};
-
-
 /********************************************************************************
  * @brief option on convert string to number
  *
@@ -182,31 +174,6 @@ size_t nColumns(const string &file) {
   vector<string> items;
   separateWord(items, line);
   return items.size();
-};
-
-/********************************************************************************
- * @brief Functions by sys state for file state
- * @param filename
- ********************************************************************************/
-long getFileSize(const string &filename) {
-  struct stat fileInfo;
-  if (stat(filename.c_str(), &fileInfo) != 0)
-    return -1;
-  return fileInfo.st_size;
-}
-
-bool fileExists(const string &filename) {
-  struct stat buffer;
-  return (stat(filename.c_str(), &buffer) == 0);
-};
-
-bool isDirectory(const string &filename) {
-  struct stat fileInfo;
-  if (stat(filename.c_str(), &fileInfo) != 0) {
-    cerr << "Cannot find the file/dirctory " << filename << endl;
-    exit(6);
-  }
-  return fileInfo.st_mode & S_IFDIR;
 };
 
 /********************************************************************************
