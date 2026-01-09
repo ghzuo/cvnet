@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-23 5:16:41
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 13:40:30
+ * @Last Modified Time: 2026-01-09 Friday 16:34:48
  */
 
 #include "cvnet.h"
@@ -104,6 +104,11 @@ CVNet::CVNet(int argc, char *argv[]) {
       .default_value(fnm.outfmt)
       .nargs(1)
       .store_into(fnm.outfmt);
+  parser.add_argument("-S", "--memory-save")
+      .help("write edge into file directly to save memory")
+      .nargs(0)
+      .flag()
+      .store_into(fnm.memSave);
   parser.add_argument("-N", "--index-file")
       .help("gene index file name")
       .default_value(fnm.outndx)
@@ -141,6 +146,10 @@ CVNet::CVNet(int argc, char *argv[]) {
 
   // setup the input file names
   fnm.setfn();
+
+  // set the output to edge if memory save
+  if (fnm.memSave)
+    fnm.outfmt = "edge";
 
   // set default outdir when out format changed
   if (parser.is_used("-O") == false) {
@@ -202,11 +211,13 @@ void CVNet::sm2net() {
   vector<string> smlist;
   fnm.smfnlist(smlist);
   // get net
-  if (fnm.outfmt.compare("mcl") == 0) {
+  if (fnm.memSave){
+    emeth->writeNet(smlist, gidx, ngene, fnm.outfn);
+  } else if (fnm.outfmt.compare("mcl") == 0) {
     MclMatrix mm(ngene, emeth->directed);
     emeth->getNet(smlist, gidx, ngene, mm);
     mm.write(fnm.outfn, true);
-  } else {
+  } else if (fnm.outfmt.compare("edge") == 0) {
     EdgeList es;
     emeth->getNet(smlist, gidx, ngene, es);
     es.write(fnm.outfn, true);

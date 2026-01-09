@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-18 4:58:58
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-04-11 Friday 15:00:27
+ * @Last Modified Time: 2026-01-09 Friday 16:03:46
  */
 
 #ifndef FILEOPTION_H
@@ -55,6 +55,7 @@ struct FileOption {
   string outfmt = "mcl";
   string netsuf;
   string outfn;
+  bool memSave = false;
 
   vector<string> gflist;
   vector<TriFileName> smplist;

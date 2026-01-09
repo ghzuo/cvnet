@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 12:11:57
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 13:03:07
+ * @Last Modified Time: 2026-01-09 Friday 15:03:28
  */
 
 #include "edgeMeth.h"
@@ -32,6 +32,29 @@ EdgeMeth *EdgeMeth::create(const string &methStr, float cutoff) {
   meth->methStr = methStr;
   meth->threshold = cutoff;
   return meth;
+};
+
+void EdgeMeth::writeNet(const vector<string> &flist,
+                        const map<string, size_t> &gidx, size_t ngene,
+                        const string &fnet) {
+  // initial network method
+  init(flist, gidx, ngene);
+  theInfo("The net method: " + methStr + " is ready");
+
+  // get the edge and push into net
+  ofstream ofs(fnet);
+#pragma omp parallel for ordered
+  for (int i = 0; i < flist.size(); ++i) {
+    vector<Edge> es;
+    sm2edge(flist[i], gidx, es);
+#pragma omp ordered
+    {
+      for (auto &e : es)
+        ofs << e << endl;
+    }
+  }
+  ofs.close();
+  theInfo("Get sparse matrix");
 };
 
 pair<size_t, size_t> EdgeMeth::getIndex(const map<string, size_t> &gidx,
@@ -74,8 +97,8 @@ void EdgeByMutualBest::sm2edge(const string &fsm,
                                vector<Edge> &es) const {
   GeneRBH rbh(fsm);
   auto mshift = getIndex(gidx, rbh.header);
-  for(auto& it : rbh.data){
-    if(it.weight > threshold){
+  for (auto &it : rbh.data) {
+    if (it.weight > threshold) {
       it.shift(mshift);
       es.emplace_back(it);
     }
@@ -129,7 +152,7 @@ void EdgeByGeneMutualBest::init(const vector<string> &flist,
     }
 
     for (auto i = 0; i < ngene; ++i) {
-      if(minGRB[i] < threshold)
+      if (minGRB[i] < threshold)
         minGRB[i] = threshold;
     }
   }

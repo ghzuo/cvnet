@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2024-12-21 11:54:59
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 12:57:18
+ * @Last Modified Time: 2026-01-09 Friday 13:43:55
  */
 
 #ifndef EDGEMETH_H
@@ -48,6 +48,10 @@ struct EdgeMeth {
     }
     theInfo("Get sparse matrix");
   };
+
+  // write down edge list into a file
+  void writeNet(const vector<string> &, const map<string, size_t> &, size_t,
+                const string &);
 
   // select items: cutoff or Reciprocal Best Hit
   pair<size_t, size_t> getIndex(const map<string, size_t> &,
