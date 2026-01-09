@@ -2,6 +2,7 @@ build
 CMakeLists.txt.user
 .DS_Store
 .vstags
+.cache
 .history
 __pycache__
 data

@@ -4,7 +4,7 @@
       "name": "Mac",
       "includePath": [
         "${workspaceFolder}/**",
-        "${workspaceFolder}/src/**",
+        "${workspaceFolder}/src/kit",
         "/usr/local/Cellar/nlohmann-json/3.11.2/include"
       ],
       "defines": [],
@@ -19,8 +19,7 @@
     {
       "name": "Linux",
       "includePath": [
-        "${workspaceFolder}/src/**",
-        "${workspaceFolder}/src/kit/**",
+        "${workspaceFolder}/src/kit",
         "${workspaceFolder}/**"
       ],
       "defines": [],

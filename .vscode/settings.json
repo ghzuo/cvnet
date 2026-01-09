@@ -26,5 +26,12 @@
   "cmake.configureArgs": [
     "-DSTATIC=ON"
   ],
-  "cmake.sourceDirectory": "/home/ghzuo/project/CVTree/osCVNet/src",
+  "cmake.sourceDirectory": "${workspaceFolder}/src",
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/**",
+    "${workspaceFolder}/src/kit",
+  ],
+  "C_Cpp.default.cppStandard": "c++17",
+  "C_Cpp.default.cStandard": "c17",
+  "C_Cpp.intelliSenseEngine": "default"
 }

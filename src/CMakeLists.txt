@@ -7,7 +7,7 @@
 # @Author: Dr. Guanghong Zuo
 # @Date: 2017-09-01 16:22:53
 # @Last Modified By: Dr. Guanghong Zuo
-# @Last Modified Time: 2025-11-26 Wednesday 20:19:01
+# @Last Modified Time: 2026-01-09 Friday 18:21:02
 ###
 
 cmake_minimum_required(VERSION 3.14)
@@ -59,15 +59,22 @@ if (OPENMP_FOUND)
   endif ()
 endif()
 
-## download argparse
-include(FetchContent)
-FetchContent_Declare(
-  argparse
-  GIT_REPOSITORY https://github.com/p-ranav/argparse.git
-  GIT_TAG        v3.1
-)
-FetchContent_MakeAvailable(argparse)
-include_directories(${argparse_SOURCE_DIR}/include)
+## check argparse
+find_path(ARGPARSE_INCLUDE_DIR argparse/argparse.hpp)
+if(ARGPARSE_INCLUDE_DIR)
+  message(STATUS "Found argparse: ${ARGPARSE_INCLUDE_DIR}")
+  include_directories(${ARGPARSE_INCLUDE_DIR})
+else()
+  message(STATUS "argparse not found, downloading...")
+  include(FetchContent)
+  FetchContent_Declare(
+    argparse
+    GIT_REPOSITORY https://github.com/p-ranav/argparse.git
+    GIT_TAG        v3.1
+  )
+  FetchContent_MakeAvailable(argparse)
+  include_directories(${argparse_SOURCE_DIR}/include)
+endif()
 
 ## include subdirectories
 ADD_SUBDIRECTORY(kit)
