@@ -23,7 +23,7 @@ SET(CMAKE_VERBOSE_MAKEFILE on)
 ADD_DEFINITIONS("-std=c++17 -O3")
 
 ## static option
-option(STATIC "Build as a static library" OFF)
+option(STATIC "Build as a static library" ON)
 if(STATIC)
   message(STATUS "Building with STATIC=ON")
   set(CMAKE_FIND_LIBRARY_SUFFIXES .a)

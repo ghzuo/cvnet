@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 14:20:10
+ * @Last Modified Time: 2026-05-03 Sunday 12:44:08
  */
 
 #include "similarMatrix.h"
@@ -82,8 +82,18 @@ void Msimilar::add(size_t i, size_t j, float val) {
   if (i >= header.nrow || j >= header.ncol)
     throw out_of_range("Index " + outIndex(i, j) + " out of " +
                        outIndex(header.nrow, header.ncol) +
-                       " in Msimilar::add()");
+                       " in Msimilar::add() for similarity matrix between " +
+                       header.rowName + " and " + header.colName);
   _add(i, j, val);
+};
+
+void Msimilar::add(int i, int j, float val) {
+  if (i < 0 || j < 0)
+    throw out_of_range(
+        "Index " + outIndex(i, j) +
+        " out of range in Msimilar::add() for similarity matrix between " +
+        header.rowName + " and " + header.colName);
+  add(static_cast<size_t>(i), static_cast<size_t>(j), val);
 };
 
 void Msimilar::_add(size_t i, size_t j, float val) {
@@ -129,7 +139,7 @@ void Msimilar::write(const string &fname, float mindist) {
     for (size_t i = 0; i < data.size(); ++i)
       if (data[i] >= mindist)
         vec.emplace_back(i, data[i]);
-    header.nsize = (long) vec.size();
+    header.nsize = (long)vec.size();
     header.write(fp);
     gzwrite(fp, vec.data(), vec.size() * sizeof(vec[0]));
   }
@@ -159,7 +169,7 @@ void Msimilar::read(const string &fname) {
       gzread(fp, (char *)vec.data(), header.nsize * sizeof(vec[0]));
       for (auto &v : vec)
         data[v.first] = v.second;
-    } 
+    }
 
     // close file
     gzclose(fp);

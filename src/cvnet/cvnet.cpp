@@ -195,7 +195,7 @@ void CVNet::cva2sm() {
 #pragma omp parallel for
   for (int i = 0; i < tlist.size(); ++i) {
     auto &it = tlist[i];
-    if (!gzvalid(it.smf))
+    if (!gzvalid(addsuffix(it.smf, ".gz")))
       smeth->getMatrix(it);
   }
   theInfo("Get All Similar Matrix");

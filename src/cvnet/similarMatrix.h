@@ -7,7 +7,7 @@
  * @Author: Dr. Guanghong Zuo
  * @Date: 2022-03-16 12:10:27
  * @Last Modified By: Dr. Guanghong Zuo
- * @Last Modified Time: 2025-08-20 Wednesday 12:35:29
+ * @Last Modified Time: 2026-05-03 Sunday 12:35:27
  */
 
 #ifndef SIMILARMATRIX_H
@@ -69,6 +69,7 @@ struct Msimilar {
   void set(size_t, size_t, float);
   void _add(size_t, size_t, float);
   void add(size_t, size_t, float);
+  void add(int, int, float);
   float _get(size_t, size_t) const;
   float get(size_t, size_t) const;
   pair<size_t, size_t> index(size_t) const;
